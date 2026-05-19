@@ -74,9 +74,9 @@ Thumbs.db
 .env.local
 .env.*.local
 
-# environment files - DO NOT COMMIT for real projects, but for this starter we need them to be present
-# src/environments/environment.ts
-# src/environments/environment.prod.ts
+# environment files - DO NOT COMMIT
+src/environments/environment.ts
+src/environments/environment.prod.ts
 
 # Android Security - DO NOT COMMIT
 android/keystore.properties

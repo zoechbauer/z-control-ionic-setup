@@ -9,7 +9,12 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "lint": "ng lint"
+    "test:watch": "ng test --watch",
+    "test:coverage": "ng test --code-coverage --watch=false",
+    "lint": "ng lint",
+    "generate-env": "node ./tools/generate-env.js",
+    "emulators:start": "firebase emulators:start",
+    "emulators:debug": "firebase emulators:start --inspect-functions=9229"
   },
   "private": true,
   "dependencies": {

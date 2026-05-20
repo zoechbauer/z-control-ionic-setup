@@ -6,6 +6,7 @@ import {
   IonIcon,
   IonTabButton,
 } from '@ionic/angular/standalone';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-tabs',
@@ -17,8 +18,9 @@ import {
     IonLabel,
     IonIcon,
     IonTabButton,
+    TranslateModule,
   ],
 })
 export class TabsPage {
-  constructor() {}
+  constructor(public translate: TranslateService) {}
 }

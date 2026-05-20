@@ -1,0 +1,208 @@
+{
+  "------ global": "-------",
+  "APP": {
+    "NAME": "z-control IONIC Setup",
+    "LOADING_DATA": "Daten werden geladen...",
+    "UNDER_CONSTRUCTION": "Diese Funktion ist in Arbeit."
+  },
+  "------ header page": "-------",
+  "HEADER": {
+    "CURRENT_PAGE": {
+      "MAIN_LONG": "Hauptfunktion langer Name",
+      "MAIN_SHORT": "Hauptfunktion",
+      "SETTINGS": "Einstellungen "
+    },
+    "TOOLTIP": {
+      "OPEN_FEEDBACK": "Feedback-Seite öffnen",
+      "OPEN_HELP": "Hilfeseite öffnen",
+      "GOTO_MAIN": "Zur Hauptfunktionsseite wechseln",
+      "GOTO_SETTINGS": "Zur Einstellungsseite wechseln"
+    }
+  },
+  "------ footer page": "-------",
+  "FOOTER": {
+    "COUNTRY": "Österreich",
+    "TOOLTIP": {
+      "CONTACT_SUPPORT": "Kontaktieren Sie den Support von z-control per Mail"
+    }
+  },
+  "------ tabs page": "-------",
+  "TABS": {
+    "MAIN": "Hauptfunktion",
+    "SETTINGS": "Einstellungen"
+  },
+
+  "------ main page": "-------",
+  "MAIN": {
+    "CARD": {
+      "TITLE": "Hauptfunktion",
+      "INFO-1": "Hier können Sie die Hauptfunktion der App nutzen.",
+      "INFO-2": "Mittels Simulations-Schalftläche können Sie den Aufruf der Funktion simulieren und das Kontingent vermindern.",
+      "BUTTON": {
+        "SIMULATE": "Simulation starten"
+      }
+    },
+    "TOAST": {
+      "SIMULATION": "Die Hauptfunktions-Simulation wurde gestartet. Das monatliche Kontingent wurde vermindert."
+    }
+  },
+
+  "------ main page - statistics infos": "-------",
+  "MAIN_STATISTICS": {
+    "ACCORDION": {
+      "TITLE": "Monatliches Kontingent"
+    },
+    "CARD": {
+      "TITLE": "Verfügbares Kontingent für {{yearMonth}}",
+      "SUBTITLE": "Anzahl der verbrauchten Zeichen",
+      "GRID": {
+        "USER": "Benutzer",
+        "USER_NAME_YOU": "Sie",
+        "USER_NAME_ALL": "Alle Benutzer",
+        "USED": "Verbraucht",
+        "LIMIT": "Limit",
+        "AVAILABLE": "Verfügbar",
+        "INFO": "Das Feature wird bis zum nächsten Monat ausgesetzt sobald entweder Sie oder alle Benutzer das Limit erreicht haben."
+      },
+      "CONTINGENT_EXCEEDED_1": "Ihr monatliches Kontingent wurde aufgebraucht.",
+      "CONTINGENT_EXCEEDED_2": "Das Feature wird bis zum nächsten Monat ausgesetzt. Alle anderen Funktionen können weiterhin genutzt werden.",
+      "CONTINGENT_EXCEEDED_3": "Ab dem nächsten Monat steht Ihnen wieder das volle Kontingent zur Verfügung."
+    }
+  },
+
+  "------ settings page": "-------",
+  "SETTINGS": {
+    "TITLE": "Einstellungen",
+    "INFORMATIONS": "Informationen",
+    "BUTTON": {
+      "CLOSE": "Zurück zu Einstellungen"
+    },
+    "TOOLTIPS": {
+      "OPEN_ACCORDION": "Einstellungen öffnen",
+      "CLOSE_ACCORDION": "Einstellungen schließen"
+    },
+    "LANGUAGE": {
+      "ACCORDION": "Sprache ändern",
+      "LABEL": {
+        "LANG": "Sprache"
+      },
+      "SELECT": {
+        "EN": "Englisch",
+        "DE": "Deutsch"
+      },
+      "TOOLTIPS": {
+        "CHANGE_LANGUAGE": "Sprache ändern"
+      }
+    },
+    "FEEDBACK": {
+      "ACCORDION": "Feedback an z-control senden",
+      "SEPARATOR": "Feedback"
+    },
+    "PRIVACY": {
+      "ACCORDION": "Datenschutz-Bestimmungen",
+      "TOOLTIPS": {
+        "OPEN_POLICY": "Datenschutzrichtlinie in einem neuen Tab öffnen"
+      }
+    },
+    "RELEASE-NOTES": {
+      "ACCORDION": "App Version {{versionInfo}} - Versionshinweise",
+      "TOOLTIPS": {
+        "OPEN_RELEASE_NOTES": "Release-Notes (Changelog) öffnen — nach Kategorien gruppiert und es werden zuerst die neuesten Einträge angezeigt."
+      }
+    },
+    "MOBILE-APP": {
+      "ACCORDION": "Mobile App installieren",
+      "TOOLTIPS": {
+        "DOWNLOAD": "Download der nativen Android-App aus dem Google Play Store"
+      }
+    },
+    "SOURCE": {
+      "ACCORDION": "Quellcode abrufen",
+      "TOOLTIPS": {
+        "DOWNLOAD": "GitHub-Repository in einem neuen Tab öffnen — Quellcode, Lizenz, Release Notes und Dokumentationen anzeigen."
+      }
+    },
+    "STATISTICS": {
+      "ACCORDION": "Statistik für {{yearMonth}} abrufen",
+      "LABEL": {
+        "GLOBAL_TRANS_STATUS": "Übersetzungs-Status",
+        "GLOBAL_TRANS_STOPPED": "Übersetzung gestoppt für alle Benutzer",
+        "GLOBAL_TRANS_ACTIVE": "Übersetzung aktiv für alle Benutzer",
+        "TOTAL_CONTINGENT": "Gesamtes Übersetzungskontingent",
+        "USED": "Verbrauchte Summe",
+        "BUFFER": "Puffer",
+        "AVAILABLE": "Noch verfügbar",
+        "CHECKSUM_ALL_USERS": "Verbraucht von allen Benutzern",
+        "CHARS": "Zeichen",
+        "GRID_INFO_NOTE": "Absteigend sortiert nach Datum der letzten Übersetzung",
+        "GRID_SEARCH_INFO": "Text=Benutz.|Plattf., <|>=verbraucht, <<|>>=Sprachen",
+        "USER_STATISTICS_OVERVIEW": "Benutzer-Statistik Übersicht",
+        "JSON_DATA": "Rohdaten (JSON) - nur für Debug"
+      },
+      "FILTER": {
+        "LABEL": {
+          "FILTER_HEADER": "Filter und Anzeigemodus",
+          "FILTER_MONTH_DATA": "Monatsdaten filtern",
+          "FILTER_MONTH_DATA_ALL": "Alle Monate",
+          "FILTER_DATA": "Daten filtern",
+          "DISPLAY_MODE_USER": "Benutzer-Ansicht",
+          "DISPLAY_MODE_PROGRAMMER": "Programmierer-Ansicht"
+        },
+        "TITLE": {
+          "FILTER_MONTH_DATA": "Daten des Monats filtern oder alle Daten anzeigen",
+          "FILTER_DATA": "Daten mit ausgewähltem Monat neu laden"
+        }
+      },
+      "GRID": {
+        "USER_CONTINGENT": "Benutzer-Übersetzungskontingent",
+        "USER": "Benutzer",
+        "USED": "Verbraucht von {{limit}}",
+        "PLATFORM": "Plattform",
+        "LAST_TRANSLATION": "Letzte Übersetzung"
+      },
+      "USER_DETAIL": {
+        "TITLE": "Benutzer-Übersetzungs-Informationen",
+        "USER_INFORMATION": {
+          "TITLE": "Benutzerinformationen",
+          "LABEL": {
+            "USER_ID": "Benutzer-ID",
+            "USER_NAME": "Benutzer-Name",
+            "USER_CREATED": "Erstellt am",
+            "USER_UPDATED": "Aktualisiert am",
+            "USER_TYPE": "Typ",
+            "USER_TYPE_USER": "Benutzer-Gerät",
+            "USER_TYPE_PROGRAMMER": "Programmierer-Gerät"
+          }
+        },
+        "DEVICE_INFORMATION": {
+          "TITLE": "Geräteinformationen",
+          "LABEL": {
+            "PLATFORM": "Plattform",
+            "DEVICE_PLATFORM": "Geräte-Plattform",
+            "NATIVE": "Handy/Tablet",
+            "DEVICE": "Gerät",
+            "MODEL": "Modell"
+          }
+        },
+        "TRANSLATION_STATISTICS": {
+          "TITLE": "Übersetzungsstatistik",
+          "LABEL": {
+            "TRANSLATED_CHARS": "Übersetzte Zeichen",
+            "LANGUAGE": "Sprache",
+            "TARGET_LANGUAGES": "Zielsprachen",
+            "LAST_TRANSLATION": "Letzte Übersetzung"
+          }
+        },
+        "USER_AGENT": {
+          "TITLE": "User-Agent"
+        },
+        "APP_VERSION": {
+          "TITLE": "App-Version",
+          "LABEL": {
+            "VERSION": "Version (Datum)"
+          }
+        }
+      }
+    }
+  }
+}

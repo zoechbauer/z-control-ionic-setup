@@ -10,8 +10,11 @@ import {
   provideIonicAngular,
 } from '@ionic/angular/standalone';
 import { provideHttpClient } from '@angular/common/http';
+import { provideTranslateService } from '@ngx-translate/core';
+import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 
 import { routes } from './app-routes';
+import { ServicesModule } from './services.module';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -22,5 +25,13 @@ export const appConfig: ApplicationConfig = {
     }),
     provideHttpClient(),
     provideRouter(routes, withPreloading(PreloadAllModules)),
+
+    importProvidersFrom(ServicesModule),
+
+    provideTranslateService({ fallbackLang: 'de' }),
+    ...provideTranslateHttpLoader({
+      prefix: './assets/i18n/',
+      suffix: '.json',
+    }),
   ],
 };

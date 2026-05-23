@@ -53,9 +53,15 @@ function makeEnv(prod = false) {
       ),
       useFirebaseEmulator:
         v("USE_FIREBASE_EMULATOR", "false").toLowerCase() === "true",
-    },
-    googleTranslate: {
-      apiKey: v("GOOGLE_TRANSLATE_API_KEY", ""),
+      programmerDevices: {
+        updateUsermap:
+          v("PROGRAMMER_DEVICES_UPDATE_USERMAP", "false").toLowerCase() ===
+          "true",
+        devices: [
+          { GalaxyA33LUid: v("PROGRAMMER_GALAXY_A33_UID", "") },
+          { WebChromeUid: v("PROGRAMMER_WEB_CHROME_UID", "") },
+        ],
+      },
     },
     firebase: {
       apiKey: v("FIREBASE_API_KEY", ""),

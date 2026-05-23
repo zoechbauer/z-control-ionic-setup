@@ -12,18 +12,8 @@
       <ion-card-title>{{ "MAIN.CARD.TITLE" | translate }}</ion-card-title>
     </ion-card-header>
     <ion-card-content>
-      <p class="ion-padding">{{ "MAIN.CARD.INFO-1" | translate }}</p>
-      <p class="ion-padding">{{ "MAIN.CARD.INFO-2" | translate }}</p>
+      <app-feature-example></app-feature-example>
     </ion-card-content>
-
-    <div class="ion-text-center">
-      <ion-button
-        fill="clear"
-        (click)="simulateFeatureCall()"
-        (keydown.enter)="simulateFeatureCall()"
-        >{{ 'MAIN.CARD.BUTTON.SIMULATE' | translate }}</ion-button
-      >
-    </div>
   </ion-card>
   <ion-accordion-group
     (ionValueChange)="onAccordionGroupChange($event, content)"

@@ -35,15 +35,31 @@
   "------ main page": "-------",
   "MAIN": {
     "CARD": {
-      "TITLE": "Main Feature",
-      "INFO-1": "Here you can use the main feature of the app.",
-      "INFO-2": "Using the simulation button, you can simulate the function call and reduce the contingent.",
+      "TITLE": "Main Feature"
+    }
+  },
+  "FEATURE": {
+    "CARD": {
+      "TITLE": "Search related words",
+      "SUBTITLE": "Enter a word and find related words",
+      "INFO-1": "is used to show a main feature example. The Datamuse API is used in a simple word search.",
+      "INFO-2": "The feature is not the main focus of this app, but it serves as an example of how a feature can be implemented in the z-control Ionic Setup.",
       "BUTTON": {
-        "SIMULATE": "Start Simulation"
+        "SEARCH": "Search",
+        "CLEAR": "Clear"
+      },
+      "LABEL": {
+        "INPUT": "Search word:",
+        "RELATED_WORDS": "Related words:"
+      },
+      "PLACEHOLDER": {
+        "INPUT": "Enter text..."
       }
     },
     "TOAST": {
-      "SIMULATION": "The main feature simulation has started. The monthly quota has been reduced."
+      "QUOTA_REDUCED": "The monthly quota has been reduced.",
+      "CONTINGENT_EXCEEDED": "Feature quota exceeded. Please try again next month.",
+      "ERROR_CALLING_FEATURE": "Error calling the main feature. Please try again later."
     }
   },
 

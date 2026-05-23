@@ -18,6 +18,7 @@ import { PrivacyPolicyAccordionComponent } from '../ui/components/accordions/pri
 import { GetMobileAppAccordionComponent } from '../ui/components/accordions/get-mobile-app-accordion.component';
 import { GetStatisticsAccordionComponent } from '../ui/components/accordions/get-statistics-accordion.component';
 import { SpinnerComponent } from '../ui/components/spinner/spinner.component';
+import { FirebaseFirestoreUtilsService } from '../services/firebase-firestore-utils.service';
 
 // Single source of truth for settings accordion IDs.
 // Add new accordion IDs here when extending the settings page.
@@ -53,7 +54,7 @@ type AccordionValue = (typeof ACCORDION_VALUES)[number];
 })
 export class SettingsPage implements OnInit, OnDestroy {
   private readonly validAccordionValues = new Set<AccordionValue>(
-    ACCORDION_VALUES
+    ACCORDION_VALUES,
   );
   openAccordion: AccordionValue | null = null;
   showAllAccordions = true;
@@ -69,6 +70,7 @@ export class SettingsPage implements OnInit, OnDestroy {
     public translate: TranslateService,
     public readonly localStorage: LocalStorageService,
     public readonly utilsService: UtilsService,
+    private readonly firestoreUtilsService: FirebaseFirestoreUtilsService,
   ) {}
 
   ngOnInit() {
@@ -86,12 +88,12 @@ export class SettingsPage implements OnInit, OnDestroy {
         this.translate.setDefaultLang(lang);
         this.selectedLanguage = lang;
         this.isLoading = false;
-      })
+      }),
     );
     this.subscriptions.push(
       this.utilsService.logoClicked$.subscribe(() => {
         this.openFeedbackAccordion();
-      })
+      }),
     );
   }
 
@@ -118,12 +120,17 @@ export class SettingsPage implements OnInit, OnDestroy {
       return;
     }
 
+    // refresh statistic on open to update data on month change - we need to do this before setting the openAccordion value, because the accordion content gets destroyed on close and recreated on open - so we need to update the data before that happens
+    if (value === 'get-statistics') {
+      this.firestoreUtilsService.requestStatisticsRefresh();
+    }
+
     this.openAccordion = value;
     this.showAllAccordions = this.openAccordion == null;
   }
 
   private normalizeAccordionValue(
-    rawValue: unknown
+    rawValue: unknown,
   ): AccordionValue | null | undefined {
     // Header toggle close can emit undefined, null, or empty string.
     if (rawValue === undefined || rawValue === null || rawValue === '') {

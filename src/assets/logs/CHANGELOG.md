@@ -2,6 +2,15 @@
 
 Welcome to the latest updates for the **z-control IONIC Setup** app.
 
+## [0.2] – 2026-05-23
+
+### ✨ New Features
+
+- Added Firebase Functions to store contingent usage data in Firestore.
+- Implemented Search related words feature using the Datamuse API, with results displayed on the Main page. This feature serves as an example of how to implement a feature in this z-control IONIC setup project.
+- Added contingent usage tracking for the Search related words feature, with monthly quota management.
+- Added relevant documentation for Firebase Functions and unit-testing from z-control Translator app.
+
 ## [0.1] – 2026-05-20
 
 ### ✨ New Features

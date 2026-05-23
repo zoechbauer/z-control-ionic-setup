@@ -23,6 +23,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 import { LogoComponent } from '../logo/logo.component';
 import { AllMonthsOption, DisplayMode, LogoType } from 'src/app/shared/enums';
+import { FirebaseFirestoreService } from 'src/app/services/firebase-firestore.service';
 import { environment } from 'src/environments/environment';
 import {
   FirestoreContingentData,
@@ -33,6 +34,7 @@ import {
 } from 'src/app/shared/firebase-firestore.interfaces';
 import { UtilsService } from 'src/app/services/utils.service';
 import { LocalStorageService } from 'src/app/services/local-storage.service';
+import { FirebaseFirestoreUtilsService } from 'src/app/services/firebase-firestore-utils.service';
 import { SpinnerComponent } from '../spinner/spinner.component';
 import { FormsModule } from '@angular/forms';
 
@@ -104,6 +106,8 @@ export class GetStatisticsComponent implements OnInit, OnDestroy {
 
   constructor(
     private readonly translate: TranslateService,
+    private readonly firestoreService: FirebaseFirestoreService,
+    private readonly firestoreUtilsService: FirebaseFirestoreUtilsService,
     private readonly localStorageService: LocalStorageService,
     private readonly utilsService: UtilsService
   ) {}
@@ -147,10 +151,28 @@ export class GetStatisticsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.setupSubscriptions();
     this.setupEventListeners();
     this.init();
   }
 
+  private setupSubscriptions(): void {
+    this.subscriptions.push(
+      this.firestoreUtilsService.statisticsRefresh$.subscribe(() => {
+        // Only reload if not currently loading
+        if (!this.isLoading) {
+          this.init();
+        }
+      }),
+      this.firestoreService.programmerDeviceRefresh$.subscribe(() => {
+        // Update isProgrammerDevice without triggering full reload
+        const newValue = this.firestoreService.isProgrammerDevice;
+        if (this.isProgrammerDevice !== newValue) {
+          this.isProgrammerDevice = newValue;
+        }
+      })
+    );
+  }
 
   private setupEventListeners(): void {
     window.addEventListener('resize', () => {
@@ -166,68 +188,59 @@ export class GetStatisticsComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.searchTerm = '';
     this.isPortrait = this.utilsService.isPortrait;
+    this.isProgrammerDevice = this.firestoreService.isProgrammerDevice;
     await this.setFilterValues();
 
-    try{
+    try {
       this.currentUserUid = await this.localStorageService.loadFirestoreUid();
-      // TODO load test data from test file
-       } catch (error) {
+
+      // Read control flags
+      this.contingentData = await this.firestoreService.readContingentData(
+        this.filterSelectedMonth
+      );
+      this.isStopped = !!this.contingentData.StopTranslationForAllUsers;
+
+      // Total contingent
+      this.totalLimit =
+        this.contingentData.maxFreeTranslateCharsPerMonth ??
+        environment.app.maxFreeTranslateCharsPerMonth;
+      this.totalBuffer =
+        this.contingentData.maxFreeTranslateCharsBufferPerMonth ??
+        environment.app.maxFreeTranslateCharsBufferPerMonth;
+      this.totalCharCount = await this.firestoreService.getTotalCharCount(
+        this.filterSelectedMonth
+      );
+      this.totalRemaining = Math.max(
+        0,
+        this.totalLimit - this.totalBuffer - this.totalCharCount
+      );
+
+      // User contingent
+      this.userLimit =
+        this.contingentData.maxFreeTranslateCharsPerMonthForUser ??
+        environment.app.maxFreeTranslateCharsPerMonthForUser;
+
+      // user statistics and info
+      this.statisticsData =
+        await this.firestoreUtilsService.getDisplayedUserStatistics(
+          this.isProgrammerDevice
+        );
+      this.userStatisticsSummaryData =
+        this.firestoreUtilsService.getUserStatisticsSummary(
+          this.statisticsData?.displayedUserStatistics ?? []
+        );
+
+      // Calculate the sum of all users' translated characters
+      this.allUsersCharCount =
+        this.statisticsData?.displayedUserStatistics.reduce(
+          (sum, userStat) => sum + userStat.translatedCharCount,
+          0
+        ) ?? 0;
+    } catch (error) {
       console.error('GetStatisticsComponent: Error loading statistics', error);
     } finally {
       this.isLoading = false;
     }
-
-    // TODO replace with hardcoded testdata from test file when not using real Firestore data, to avoid hitting Firestore read limits during development and testing
-    // try {
-    //   this.currentUserUid = await this.localStorageService.loadFirestoreUid();
-
-    //   // Read control flags
-    //   this.contingentData = await this.firestoreService.readContingentData(
-    //     this.filterSelectedMonth
-    //   );
-    //   this.isStopped = !!this.contingentData.StopTranslationForAllUsers;
-
-    //   // Total contingent
-    //   this.totalLimit =
-    //     this.contingentData.maxFreeTranslateCharsPerMonth ??
-    //     environment.app.maxFreeTranslateCharsPerMonth;
-    //   this.totalBuffer =
-    //     this.contingentData.maxFreeTranslateCharsBufferPerMonth ??
-    //     environment.app.maxFreeTranslateCharsBufferPerMonth;
-    //   this.totalCharCount = await this.firestoreService.getTotalCharCount(
-    //     this.filterSelectedMonth
-    //   );
-    //   this.totalRemaining = Math.max(
-    //     0,
-    //     this.totalLimit - this.totalBuffer - this.totalCharCount
-    //   );
-
-    //   // User contingent
-    //   this.userLimit =
-    //     this.contingentData.maxFreeTranslateCharsPerMonthForUser ??
-    //     environment.app.maxFreeTranslateCharsPerMonthForUser;
-
-    //   // user statistics and info
-    //   this.statisticsData =
-    //     await this.firestoreUtilsService.getDisplayedUserStatistics(
-    //       this.isProgrammerDevice
-    //     );
-    //   this.userStatisticsSummaryData =
-    //     this.firestoreUtilsService.getUserStatisticsSummary(
-    //       this.statisticsData?.displayedUserStatistics ?? []
-    //     );
-
-    //   // Calculate the sum of all users' translated characters
-    //   this.allUsersCharCount =
-    //     this.statisticsData?.displayedUserStatistics.reduce(
-    //       (sum, userStat) => sum + userStat.translatedCharCount,
-    //       0
-    //     ) ?? 0;
-    // } catch (error) {
-    //   console.error('GetStatisticsComponent: Error loading statistics', error);
-    // } finally {
-    //   this.isLoading = false;
-    // }
   }
 
   onSearchTermChange(value: string | null | undefined): void {

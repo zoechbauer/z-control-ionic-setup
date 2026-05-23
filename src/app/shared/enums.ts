@@ -14,8 +14,8 @@ export enum Modal {
 }
 
 export enum ToastAnchor {
-  TRANSLATE_PAGE = 'toast-anchor-translate',
-  SETTINGS_PAGE = 'toast-anchor-settings',
+  MainPage = 'toast-anchor-main',
+  SettingsPage = 'toast-anchor-settings',
 }
 
 export enum DisplayMode {

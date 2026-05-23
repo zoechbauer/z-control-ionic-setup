@@ -10,9 +10,17 @@ export const environment = {
     name: '__APP_NAME__',
     showTabsBar: __SHOW_TABS_BAR__,
     useFirebaseEmulator: __USE_FIREBASE_EMULATOR__,
-  },
-  googleTranslate: {
-    apiKey: '__GOOGLE_TRANSLATE_API_KEY__',
+    programmerDevices: {
+      updateUsermap: __PROGRAMMER_DEVICES_UPDATE_USERMAP__,
+      devices: [
+        {
+          GalaxyA33Uid: __PROGRAMMER_GALAXY_A33_UID__,
+        },
+        {
+          WebChromeUid: __PROGRAMMER_WEB_CHROME_UID__,
+        },
+      ],
+    },
   },
   firebase: {
     apiKey: __FIREBASE_API_KEY__,

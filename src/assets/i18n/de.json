@@ -35,15 +35,31 @@
   "------ main page": "-------",
   "MAIN": {
     "CARD": {
-      "TITLE": "Hauptfunktion",
-      "INFO-1": "Hier können Sie die Hauptfunktion der App nutzen.",
-      "INFO-2": "Mittels Simulations-Schalftläche können Sie den Aufruf der Funktion simulieren und das Kontingent vermindern.",
+      "TITLE": "Hauptfunktion"
+    }
+  },
+  "FEATURE": {
+    "CARD": {
+      "TITLE": "Verwandte Wörter suchen",
+      "SUBTITLE": "Geben Sie ein Wort ein und finden Sie verwandte Wörter",
+      "INFO-1": "wird verwendet, um ein Beispiel für die Hauptfunktion zu zeigen. Die Datamuse-API wird in einer einfachen Wortsuche verwendet.",
+      "INFO-2": "Die Funktion ist nicht der Hauptfokus dieser App, dient jedoch als Beispiel dafür, wie ein Feature im z-control Ionic Setup implementiert werden kann.",
       "BUTTON": {
-        "SIMULATE": "Simulation starten"
+        "SEARCH": "Suchen",
+        "CLEAR": "Löschen"
+      },
+      "LABEL": {
+        "INPUT": "Wort suchen:",
+        "RELATED_WORDS": "Verwandte Wörter:"
+      },
+      "PLACEHOLDER": {
+        "INPUT": "Geben Sie Text ein..."
       }
     },
     "TOAST": {
-      "SIMULATION": "Die Hauptfunktions-Simulation wurde gestartet. Das monatliche Kontingent wurde vermindert."
+      "QUOTA_REDUCED": "Das monatliche Kontingent wurde reduziert.",
+      "CONTINGENT_EXCEEDED": "Feature-Kontingent überschritten. Bitte versuchen Sie es nächsten Monat erneut.",
+      "ERROR_CALLING_FEATURE": "Fehler beim Aufruf der Hauptfunktion. Bitte versuchen Sie es später erneut."
     }
   },
 

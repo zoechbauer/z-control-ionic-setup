@@ -4,10 +4,10 @@ import { BehaviorSubject } from 'rxjs';
 
 import { AllMonthsOption, DisplayMode } from '../shared/enums';
 import { UtilsService } from './utils.service';
+import { AppConstants } from '../shared/app.constants';
 
 enum LocalStorage {
   SelectedLanguage = 'selectedLanguage',
-  CurrentUser = 'mlt_currentUser',
   StatisticsDisplayMode = 'statisticsDisplayMode',
   StatisticsSelectedMonth = 'statisticsSelectedMonth',
 }
@@ -148,7 +148,7 @@ export class LocalStorageService {
    * @returns The stored firestore UID or null if not found
    */
   async loadFirestoreUid(): Promise<string | null> {
-    const firestoreUid = await this.storage.get(LocalStorage.CurrentUser);
+    const firestoreUid = await this.storage.get(AppConstants.currentUser);
     if (firestoreUid) {
       this.firestoreUidSubject.next(firestoreUid);
       return firestoreUid;
@@ -162,7 +162,7 @@ export class LocalStorageService {
    */
   async saveFirestoreUid(uid: string): Promise<void> {
     try {
-      await this.storage.set(LocalStorage.CurrentUser, uid);
+      await this.storage.set(AppConstants.currentUser, uid);
     } catch (error) {
       console.error('Error saving current user UID:', error);
     }

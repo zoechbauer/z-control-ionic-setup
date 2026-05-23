@@ -3,19 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
   IonContent,
-  IonHeader,
   IonItem,
   IonLabel,
-  IonTitle,
-  IonToolbar,
   IonAccordion,
   IonAccordionGroup,
   IonCard,
   IonCardHeader,
   IonCardTitle,
   IonCardContent,
-  IonCardSubtitle,
-  IonButton,
 } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
@@ -23,11 +18,12 @@ import { Subscription } from 'rxjs';
 import { HeaderComponent } from '../ui/components/header/header.component';
 import { UtilsService } from '../services/utils.service';
 import { LocalStorageService } from '../services/local-storage.service';
-import { ToastService } from '../services/toast.service';
 import { DeviceInfo } from '../shared/firebase-firestore.interfaces';
 import { DeviceUtils } from '../services/device-utils.service';
 import { Tab } from '../shared/enums';
 import { UserStatisticComponent } from '../ui/components/user-statistic/user-statistic.component';
+import { FirebaseFirestoreUtilsService } from '../services/firebase-firestore-utils.service';
+import { FeatureExampleComponent } from '../feature-example/feature-example.component';
 
 @Component({
   selector: 'app-main',
@@ -35,16 +31,11 @@ import { UserStatisticComponent } from '../ui/components/user-statistic/user-sta
   styleUrls: ['./main.page.scss'],
   standalone: true,
   imports: [
-    IonButton,
-    IonCardSubtitle,
     IonAccordionGroup,
     IonAccordion,
     IonContent,
-    IonHeader,
     IonItem,
     IonLabel,
-    IonTitle,
-    IonToolbar,
     IonCard,
     IonCardHeader,
     IonCardTitle,
@@ -54,12 +45,12 @@ import { UserStatisticComponent } from '../ui/components/user-statistic/user-sta
     TranslatePipe,
     HeaderComponent,
     UserStatisticComponent,
+    FeatureExampleComponent,
   ],
 })
 export class MainPage implements OnInit, OnDestroy {
   Tab = Tab;
   settingsIcon: string = '<ion-icon name="settings-outline"></ion-icon>';
-  isLoading = false;
 
   private readonly subscriptions: Subscription[] = [];
 
@@ -67,17 +58,14 @@ export class MainPage implements OnInit, OnDestroy {
     return DeviceUtils.getDeviceInfo();
   }
 
-  isContingentExceeded: boolean = false;
-
   constructor(
     public translate: TranslateService,
     public localStorage: LocalStorageService,
     public readonly utilsService: UtilsService,
-    private readonly toastService: ToastService,
+    private readonly firestoreUtilsService: FirebaseFirestoreUtilsService,
   ) {}
 
   ngOnInit() {
-    this.isLoading = true;
     this.utilsService.showOrHideIonTabBar();
     this.setupEventListeners();
     this.setupSubscriptions();
@@ -98,15 +86,10 @@ export class MainPage implements OnInit, OnDestroy {
     );
   }
 
-  simulateFeatureCall() {
-    this.toastService.showToast(this.translate.instant('MAIN.TOAST.SIMULATION'));
-  }
-
   onAccordionGroupChange(event: CustomEvent, content: IonContent) {
     const accordionValue = event?.detail?.value;
     if (accordionValue) {
-      // TODO
-      // this.firestoreUtilsService.requestStatisticsRefresh();
+      this.firestoreUtilsService.requestStatisticsRefresh();
     }
   }
 

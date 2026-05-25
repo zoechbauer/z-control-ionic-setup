@@ -1,9 +1,9 @@
 <ion-card>
   <ion-card-header class="ion-text-center">
     <ion-card-title>{{ "FEATURE.CARD.TITLE" | translate }}</ion-card-title>
-    <ion-card-subtitle>{{
-      "FEATURE.CARD.SUBTITLE" | translate
-    }}</ion-card-subtitle>
+    <ion-card-subtitle>
+      {{ "FEATURE.CARD.SUBTITLE" | translate }}
+    </ion-card-subtitle>
   </ion-card-header>
   <ion-card-content>
     <p class="ion-padding">
@@ -19,12 +19,19 @@
         (ionInput)="enableButtons()"
       ></ion-input>
     </ion-item>
-    <div *ngIf="relatedWords.length > 0">
-      <ion-item>{{ "FEATURE.CARD.LABEL.RELATED_WORDS" | translate }}</ion-item>
-      <p *ngFor="let word of relatedWords" class="ion-padding-start related-word">
+    <ion-list lines="none" *ngIf="relatedWords.length">
+      <ion-list-header>
+        {{ "FEATURE.CARD.LABEL.RELATED_WORDS" | translate }}
+      </ion-list-header>
+
+      <div
+        class="ion-padding-start"
+        style="font-weight: 700; font-size: 16px"
+        *ngFor="let word of relatedWords"
+      >
         {{ word }}
-      </p>
-    </div>
+      </div>
+    </ion-list>
   </ion-card-content>
   <div class="ion-text-center">
     <ion-button

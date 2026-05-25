@@ -255,7 +255,7 @@ describe('FirebaseFirestoreService', () => {
       expect(result).toEqual({});
       expect(toastServiceMock.showToast).toHaveBeenCalledWith(
         'Error reading contingent data.',
-        ToastAnchor.TRANSLATE_PAGE
+        ToastAnchor.MainPage
       );
     });
   });
@@ -299,7 +299,7 @@ describe('FirebaseFirestoreService', () => {
       expect(callableSpy).toHaveBeenCalledWith({});
       expect(toastServiceMock.showToast).toHaveBeenCalledWith(
         'Error creating missing contingent data.',
-        ToastAnchor.TRANSLATE_PAGE
+        ToastAnchor.MainPage
       );
     });
   });
@@ -319,22 +319,22 @@ describe('FirebaseFirestoreService', () => {
         data: () => expectedResult,
       } as any);
 
-      const result = await service.getCharCountForUser();
+      const charCount = await service.getCharCountForUser();
 
       expect((service as any).getFirestoreDoc).toHaveBeenCalled();
       expect((service as any).getFirestoreDocSnapshot).toHaveBeenCalledWith(
         fakeRef
       );
-      expect(result).toEqual(expectedResult);
+      expect(charCount).toEqual(expectedResult);
     });
 
-    it('should return zero character count and empty target languages when user does not exist', async () => {
+    it('should return zero character count when user does not exist', async () => {
       (service as any).user = null;
-      const result = await service.getCharCountForUser();
-      expect(result).toEqual({ charCount: 0, targetLanguages: [] });
+      const charCount = await service.getCharCountForUser();
+      expect(charCount).toEqual(0);
     });
 
-    it('should return zero character count and empty target languages when fields are missing', async () => {
+    it('should return zero character count when fields are missing', async () => {
       (service as any).user = { uid: 'test-uid' } as any;
       const fakeRef = { id: 'fake-ref' } as any;
       spyOn<any>(service, 'getFirestoreDoc').and.returnValue(fakeRef);
@@ -343,12 +343,11 @@ describe('FirebaseFirestoreService', () => {
         data: () => ({}),
       } as any);
 
-      const result = await service.getCharCountForUser();
-
-      expect(result).toEqual({ charCount: 0, targetLanguages: [] });
+      const charCount = await service.getCharCountForUser();
+      expect(charCount).toEqual(0);
     });
 
-    it('should return zero character count and empty target languages when document does not exist', async () => {
+    it('should return zero character count when document does not exist', async () => {
       (service as any).user = { uid: 'test-uid' } as any;
       const fakeRef = { id: 'fake-ref' } as any;
       spyOn<any>(service, 'getFirestoreDoc').and.returnValue(fakeRef);
@@ -357,16 +356,16 @@ describe('FirebaseFirestoreService', () => {
         data: () => undefined,
       } as any);
 
-      const result = await service.getCharCountForUser();
+      const charCount = await service.getCharCountForUser();
 
       expect((service as any).getFirestoreDoc).toHaveBeenCalled();
       expect((service as any).getFirestoreDocSnapshot).toHaveBeenCalledWith(
         fakeRef
       );
-      expect(result).toEqual({ charCount: 0, targetLanguages: [] });
+      expect(charCount).toEqual(0);
     });
 
-    it('should log error and return zero character count and empty target languages when snapshot read fails', async () => {
+    it('should log error and return zero character count when snapshot read fails', async () => {
       spyOn(console, 'error');
       (service as any).user = { uid: 'test-uid' } as any;
       const fakeRef = { id: 'fake-ref' } as any;
@@ -375,13 +374,13 @@ describe('FirebaseFirestoreService', () => {
         new Error('firestore read failed')
       );
 
-      const result = await service.getCharCountForUser();
+      const charCount = await service.getCharCountForUser();
 
       expect(console.error).toHaveBeenCalledWith(
         'Error fetching char count for user:',
         new Error('firestore read failed')
       );
-      expect(result).toEqual({ charCount: 0, targetLanguages: [] });
+      expect(charCount).toEqual(0);
     });
   });
 
@@ -908,7 +907,7 @@ describe('FirebaseFirestoreService', () => {
       );
       expect(toastServiceMock.showToast).toHaveBeenCalledWith(
         'TRANSLATE.CARD_RESULTS.TOAST.ERROR_GETTING_PROGRAMMER_DEVICE_STATUS',
-        ToastAnchor.TRANSLATE_PAGE
+        ToastAnchor.MainPage
       );
       expect(result).toBeFalse();
     });
@@ -955,7 +954,7 @@ describe('FirebaseFirestoreService', () => {
       );
       expect(toastServiceMock.showToast).toHaveBeenCalledWith(
         'TRANSLATE.CARD_RESULTS.TOAST.ERROR_GETTING_PROGRAMMER_DEVICES',
-        ToastAnchor.TRANSLATE_PAGE
+        ToastAnchor.MainPage
       );
       expect(result).toEqual([]);
     });
@@ -1031,7 +1030,7 @@ describe('FirebaseFirestoreService', () => {
       );
       expect(toastServiceMock.showToast).toHaveBeenCalledWith(
         'TRANSLATE.CARD_RESULTS.TOAST.ERROR_UPDATING_PROGRAMMER_DEVICES',
-        ToastAnchor.TRANSLATE_PAGE
+        ToastAnchor.MainPage
       );
     });
 
@@ -1148,7 +1147,7 @@ describe('FirebaseFirestoreService', () => {
       );
       expect(toastServiceMock.showToast).toHaveBeenCalledWith(
         'TRANSLATE.CARD_RESULTS.TOAST.ERROR_ADDING_USER',
-        ToastAnchor.TRANSLATE_PAGE
+        ToastAnchor.MainPage
       );
     });
   });
@@ -1279,7 +1278,7 @@ describe('FirebaseFirestoreService', () => {
       );
       expect(toastServiceMock.showToast).toHaveBeenCalledWith(
         'TRANSLATE.CARD_RESULTS.TOAST.ERROR_LOADING_USERS',
-        ToastAnchor.SETTINGS_PAGE
+        ToastAnchor.SettingsPage
       );
       expect(result).toEqual([]);
     });
@@ -1533,7 +1532,7 @@ describe('FirebaseFirestoreService', () => {
         );
         expect(toastServiceMock.showToast).toHaveBeenCalledWith(
           'Error creating missing contingent data.',
-          ToastAnchor.TRANSLATE_PAGE
+          ToastAnchor.MainPage
         );
       });
     });

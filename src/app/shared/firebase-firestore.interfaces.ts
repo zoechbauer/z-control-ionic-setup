@@ -76,7 +76,3 @@ export interface DeviceInfo {
     date: string;
   };
 }
-export interface CharCountResult {
-  charCount: number;
-  targetLanguages: string[];
-}

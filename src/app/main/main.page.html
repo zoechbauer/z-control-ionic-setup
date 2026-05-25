@@ -7,7 +7,7 @@
   class="translation-content"
   [class.landscape]="!utilsService.isPortrait"
 >
-  <ion-card class="main-feature-card" color="light">
+  <ion-card class="main-feature-card">
     <ion-card-header>
       <ion-card-title>{{ "MAIN.CARD.TITLE" | translate }}</ion-card-title>
     </ion-card-header>
@@ -19,7 +19,7 @@
     (ionValueChange)="onAccordionGroupChange($event, content)"
   >
     <ion-accordion value="user-contingent" class="monthly-quota-accordion">
-      <ion-item slot="header" color="light">
+      <ion-item slot="header">
         <ion-label
           >{{ 'MAIN_STATISTICS.ACCORDION.TITLE' | translate }}</ion-label
         >

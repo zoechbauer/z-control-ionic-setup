@@ -208,7 +208,7 @@ describe('isContingentForUserExceeded', () => {
       maxFreeTranslateCharsPerMonthForUser: 10_000,
     } as any;
     const firestoreServiceMock = {
-      getCharCountForUser: async () => ({ charCount: 10_000 }),
+      getCharCountForUser: async () => 10_000,
     };
     const service = new FirebaseFirestoreUtilsService(
       firestoreServiceMock as any
@@ -223,7 +223,7 @@ describe('isContingentForUserExceeded', () => {
   it('returns true if user contingent data is undefined', async () => {
     const firestoreContingentData = {};
     const firestoreServiceMock = {
-      getCharCountForUser: async () => ({ charCount: 10_000 }),
+      getCharCountForUser: async () => 10_000,
     };
     const service = new FirebaseFirestoreUtilsService(
       firestoreServiceMock as any

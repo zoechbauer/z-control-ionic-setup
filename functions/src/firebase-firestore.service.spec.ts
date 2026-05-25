@@ -106,10 +106,9 @@ describe('FirebaseFirestoreService', () => {
   });
 
   describe('getCharCountForUser', () => {
-    it('should return char count and target languages for the user', async () => {
+    it('should return char count for the user', async () => {
       const mockDocData = {
-        charCount: 1234,
-        targetLanguages: ['en', 'nl'],
+        charCount: 1234
       };
       const mockGet = vi.fn().mockResolvedValue({
         exists: true,
@@ -122,33 +121,7 @@ describe('FirebaseFirestoreService', () => {
 
       const charCount = await service.getCharCountForUser();
 
-      expect(charCount).toEqual(mockDocData);
-      expect(mockDoc).toHaveBeenCalledWith(
-        expect.stringContaining('testUserId')
-      );
-      expect(mockGet).toHaveBeenCalled();
-    });
-
-    it('should return empty array for targetLanguages values for the user if target languages do not exist', async () => {
-      const mockDocData = {
-        charCount: 1234,
-      };
-      const mockGet = vi.fn().mockResolvedValue({
-        exists: true,
-        data: () => mockDocData,
-      });
-      const mockDoc = vi.fn().mockReturnValue({ get: mockGet });
-
-      const service = new FirebaseFirestoreService('testUserId');
-      service.db = { doc: mockDoc };
-      const expectedResult = {
-        charCount: 1234,
-        targetLanguages: [],
-      };
-
-      const charCount = await service.getCharCountForUser();
-
-      expect(charCount).toEqual(expectedResult);
+      expect(charCount).toEqual(mockDocData.charCount);
       expect(mockDoc).toHaveBeenCalledWith(
         expect.stringContaining('testUserId')
       );
@@ -158,7 +131,6 @@ describe('FirebaseFirestoreService', () => {
     it('should return default values for the user if doc does not exist', async () => {
       const mockDocData = {
         charCount: 0,
-        targetLanguages: [],
       };
       const mockGet = vi.fn().mockResolvedValue({
         exists: false,
@@ -171,7 +143,7 @@ describe('FirebaseFirestoreService', () => {
 
       const charCount = await service.getCharCountForUser();
 
-      expect(charCount).toEqual(mockDocData);
+      expect(charCount).toEqual(mockDocData.charCount);
       expect(mockDoc).toHaveBeenCalledWith(
         expect.stringContaining('testUserId')
       );

@@ -6,10 +6,14 @@ Welcome to the latest updates for the **z-control IONIC Setup** app.
 
 ### ✨ New Features
 
-- Added Firebase Functions to store contingent usage data in Firestore.
-- Implemented Search related words feature using the Datamuse API, with results displayed on the Main page. This feature serves as an example of how to implement a feature in this z-control IONIC setup project.
-- Added contingent usage tracking for the Search related words feature, with monthly quota management.
-- Added relevant documentation for Firebase Functions and unit-testing from z-control Translator app.
+- Added Firebase Functions to store quota usage data in Firestore.
+- Implemented the Search Related Words feature using the Datamuse API, with results shown on the Main page. This feature demonstrates how to implement functionality in the z-control IONIC Setup project.
+- Added quota usage tracking for the Search Related Words feature, including monthly quota management.
+- Added relevant documentation for Firebase Functions and unit testing based on the z-control Translator app.
+
+### 🔧 Internal
+
+- Removed targetLanguages from getCharCountForUser in the Firestore service, as it is no longer required for quota tracking.
 
 ## [0.1] – 2026-05-20
 

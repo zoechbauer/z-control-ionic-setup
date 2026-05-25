@@ -1,7 +1,6 @@
 import admin from 'firebase-admin';
 import { FireStoreConstants, UserType } from './shared/app.constants.js';
 import {
-  CharCountResult,
   DeviceInfo,
   FirestoreContingentData,
   ProgrammerDeviceUID,
@@ -28,30 +27,29 @@ export class FirebaseFirestoreService {
    */
   async readContingentData(): Promise<FirestoreContingentData> {
     const doc = await this.db
-      .doc(`${FireStoreConstants.getMetaContingentDataDocumentPath(this.collection)}`)
+      .doc(
+        `${FireStoreConstants.getMetaContingentDataDocumentPath(this.collection)}`,
+      )
       .get();
     return doc.data() as FirestoreContingentData;
   }
 
   /**
-   * Retrieves the character count and target languages for the current user.
+   * Retrieves the character count for the current user.
    *
-   * Returns the user's cumulative translated character count and their selected target languages
-   * for translations. If the user document doesn't exist or lacks character count data, returns 0.
+   * Returns the user's cumulative translated character count. If the user document doesn't exist or lacks character count data, returns 0.
    *
-   * @returns Promise resolving to an object with charCount and targetLanguages array.
+   * @returns Promise resolving to the character count as a number.
+
    * @throws Error if the document read operation fails.
    */
-  async getCharCountForUser(): Promise<CharCountResult> {
+  async getCharCountForUser(): Promise<number> {
     const doc = await this.db
-      .doc(`${FireStoreConstants.getUsersCollectionPath(this.collection)}/${this.userId}`)
+      .doc(
+        `${FireStoreConstants.getUsersCollectionPath(this.collection)}/${this.userId}`,
+      )
       .get();
-    return doc.exists && doc.data()?.charCount
-      ? {
-          charCount: doc.data()!.charCount,
-          targetLanguages: doc.data()?.targetLanguages || [],
-        }
-      : { charCount: 0, targetLanguages: [] };
+    return doc.exists && doc.data()?.charCount ? doc.data()!.charCount : 0;
   }
 
   /**
@@ -66,7 +64,9 @@ export class FirebaseFirestoreService {
   async getTotalCharCount(): Promise<number> {
     try {
       const doc = await this.db
-        .doc(`${FireStoreConstants.getMetaTotalCharsDocumentPath(this.collection)}`)
+        .doc(
+          `${FireStoreConstants.getMetaTotalCharsDocumentPath(this.collection)}`,
+        )
         .get();
       return doc.exists && doc.data()?.charCount ? doc.data()!.charCount : 0;
     } catch (error) {
@@ -82,7 +82,7 @@ export class FirebaseFirestoreService {
   async createMissingContingentData(): Promise<void> {
     try {
       const docRef = this.db.doc(
-        `${FireStoreConstants.getMetaContingentDataDocumentPath(this.collection)}`
+        `${FireStoreConstants.getMetaContingentDataDocumentPath(this.collection)}`,
       );
       const doc = await docRef.get();
       if (!doc.exists) {
@@ -94,7 +94,7 @@ export class FirebaseFirestoreService {
             maxFreeTranslateCharsBufferPerMonth: 5000,
             lastUpdated: new Date(),
           },
-          { merge: true }
+          { merge: true },
         );
         console.log('Created control flags document with default values.');
       }
@@ -142,7 +142,7 @@ export class FirebaseFirestoreService {
    * // After this, update UIDs directly in Firestore programmerDevices collection
    */
   async updateProgrammerDeviceUIDs(
-    programmerDeviceUIDs: ProgrammerDeviceUID[]
+    programmerDeviceUIDs: ProgrammerDeviceUID[],
   ): Promise<void> {
     if (!Array.isArray(programmerDeviceUIDs)) {
       throw new TypeError('programmerDeviceUIDs must be an array');
@@ -157,7 +157,7 @@ export class FirebaseFirestoreService {
         console.error(
           'Error updating user mapping for programmer device:',
           device,
-          error
+          error,
         );
       }
     }
@@ -169,12 +169,12 @@ export class FirebaseFirestoreService {
    */
   private async updateUserMappingUsers(
     device: ProgrammerDeviceUID,
-    allDevices: ProgrammerDeviceUID[]
+    allDevices: ProgrammerDeviceUID[],
   ): Promise<void> {
     const docRef = this.db.doc(
       `${FireStoreConstants.getUserMappingUsersCollectionPath(this.collection)}/${
         device.userId
-      }`
+      }`,
     );
     const doc = await docRef.get();
 
@@ -188,7 +188,7 @@ export class FirebaseFirestoreService {
             device: device.name,
             lastUpdated: new Date(),
           },
-          { merge: true }
+          { merge: true },
         );
       }
     } else {
@@ -202,7 +202,7 @@ export class FirebaseFirestoreService {
           device: device.name,
           createdAt: new Date(),
         },
-        { merge: true }
+        { merge: true },
       );
     }
   }
@@ -227,12 +227,12 @@ export class FirebaseFirestoreService {
    * });
    */
   private async createUserMappingProgrammerDevices(
-    device: ProgrammerDeviceUID
+    device: ProgrammerDeviceUID,
   ): Promise<void> {
     const docRef = this.db.doc(
       `${FireStoreConstants.getUserMappingProgrammerDevicesCollectionPath(this.collection)}/${
         device.userId
-      }`
+      }`,
     );
     const doc = await docRef.get();
 
@@ -243,10 +243,10 @@ export class FirebaseFirestoreService {
           device: device.name,
           createdAt: new Date(),
         },
-        { merge: true }
+        { merge: true },
       );
       console.log(
-        `Created programmer device mapping for userId: ${device.userId}`
+        `Created programmer device mapping for userId: ${device.userId}`,
       );
     }
   }
@@ -272,7 +272,7 @@ export class FirebaseFirestoreService {
   async getProgrammerDeviceUIDs(): Promise<ProgrammerDeviceUID[]> {
     try {
       const collectionRef = this.db.collection(
-        `${FireStoreConstants.getUserMappingProgrammerDevicesCollectionPath(this.collection)}`
+        `${FireStoreConstants.getUserMappingProgrammerDevicesCollectionPath(this.collection)}`,
       );
       const snapshot = await collectionRef.get();
 
@@ -284,7 +284,7 @@ export class FirebaseFirestoreService {
     } catch (error) {
       console.error(
         'Error retrieving programmer devices from Firestore:',
-        error
+        error,
       );
       throw error;
     }
@@ -293,7 +293,7 @@ export class FirebaseFirestoreService {
   async isProgrammerDevice(): Promise<boolean> {
     try {
       const collectionRef = this.db.collection(
-        `${FireStoreConstants.getUserMappingProgrammerDevicesCollectionPath(this.collection)}`
+        `${FireStoreConstants.getUserMappingProgrammerDevicesCollectionPath(this.collection)}`,
       );
       const snapshot = await collectionRef.get();
 
@@ -302,12 +302,12 @@ export class FirebaseFirestoreService {
         return false;
       }
       return snapshot.docs.some(
-        (doc) => (doc.data() as ProgrammerDeviceUID).userId === this.userId
+        (doc) => (doc.data() as ProgrammerDeviceUID).userId === this.userId,
       );
     } catch (error) {
       console.error(
         'Error checking if device is a programmer device from Firestore:',
-        error
+        error,
       );
       throw error;
     }
@@ -319,7 +319,7 @@ export class FirebaseFirestoreService {
    */
   private logCreatingDevice(device: ProgrammerDeviceUID): void {
     console.log(
-      `User mapping document for user ${device.userId} does not exist. Creating new document...`
+      `User mapping document for user ${device.userId} does not exist. Creating new document...`,
     );
   }
 
@@ -342,14 +342,14 @@ export class FirebaseFirestoreService {
     userId: string,
     programmerDeviceUIDs: ProgrammerDeviceUID[],
     deviceInfo: DeviceInfo,
-    isNative?: boolean
+    isNative?: boolean,
   ): Promise<void> {
     if (!userId) {
       throw new Error('userId must be provided');
     }
     try {
       const docRef = this.db.doc(
-        `${FireStoreConstants.getUserMappingUsersCollectionPath(this.collection)}/${userId}`
+        `${FireStoreConstants.getUserMappingUsersCollectionPath(this.collection)}/${userId}`,
       );
       const doc = await docRef.get();
       if (!doc.exists) {
@@ -364,13 +364,13 @@ export class FirebaseFirestoreService {
             userId: userId,
             createdAt: new Date(),
           },
-          { merge: true }
+          { merge: true },
         );
       } else if (
         !doc.data()?.deviceInfo ||
         !FirebaseFirestoreUtilsService.isDeepEqual(
           doc.data()?.deviceInfo,
-          deviceInfo
+          deviceInfo,
         )
       ) {
         // If document exists but deviceInfo is missing or different, update it
@@ -380,11 +380,11 @@ export class FirebaseFirestoreService {
             isNative: isNative ?? false,
             lastUpdated: new Date(),
           },
-          { merge: true }
+          { merge: true },
         );
         console.log(
           'Updated user mapping document with device info for user:',
-          userId
+          userId,
         );
       }
     } catch (error) {
@@ -399,7 +399,7 @@ export class FirebaseFirestoreService {
    */
   private async getUserName(
     userId: string,
-    programmerDeviceUIDs: ProgrammerDeviceUID[]
+    programmerDeviceUIDs: ProgrammerDeviceUID[],
   ): Promise<string> {
     const type = getUserType(userId, programmerDeviceUIDs);
     const userNumber = await this.countUser(type);
@@ -410,10 +410,10 @@ export class FirebaseFirestoreService {
    * Counts the number of existing user mappings of a given type.
    * Used to determine the sequence number for new user names.
    */
-  private async countUser(type: string ): Promise<number> {
+  private async countUser(type: string): Promise<number> {
     try {
       const collectionRef = this.db.collection(
-        `${FireStoreConstants.getUserMappingUsersCollectionPath(this.collection)}`
+        `${FireStoreConstants.getUserMappingUsersCollectionPath(this.collection)}`,
       );
       return await collectionRef
         .where('type', '==', type)
@@ -443,7 +443,7 @@ export class FirebaseFirestoreService {
    */
   async addTranslatedChars(
     count: number,
-    selectedLanguages: string[]
+    selectedLanguages: string[],
   ): Promise<void> {
     if (!this.userId) return;
 
@@ -466,10 +466,10 @@ export class FirebaseFirestoreService {
    */
   private async updateUserCharCount(
     count: number,
-    selectedLanguages: string[]
+    selectedLanguages: string[],
   ): Promise<void> {
     const docRef = this.db.doc(
-      `${FireStoreConstants.getUsersCollectionPath(this.collection)}/${this.userId}`
+      `${FireStoreConstants.getUsersCollectionPath(this.collection)}/${this.userId}`,
     );
     await docRef.set(
       {
@@ -477,7 +477,7 @@ export class FirebaseFirestoreService {
         targetLanguages: selectedLanguages,
         lastUpdated: new Date(),
       },
-      { merge: true }
+      { merge: true },
     );
   }
 
@@ -487,14 +487,14 @@ export class FirebaseFirestoreService {
    */
   private async updateTotalCharCount(count: number): Promise<void> {
     const totalRef = this.db.doc(
-      `${FireStoreConstants.getMetaTotalCharsDocumentPath(this.collection)}`
+      `${FireStoreConstants.getMetaTotalCharsDocumentPath(this.collection)}`,
     );
     await totalRef.set(
       {
         charCount: admin.firestore.FieldValue.increment(count),
         lastUpdated: new Date(),
       },
-      { merge: true }
+      { merge: true },
     );
   }
 }

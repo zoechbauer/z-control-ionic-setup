@@ -29,7 +29,6 @@ import {
   UserType,
   ProgrammerDeviceUID,
   DeviceInfo,
-  CharCountResult,
 } from '../shared/firebase-firestore.interfaces';
 import { ToastService } from './toast.service';
 import { AllMonthsOption, ToastAnchor } from '../shared/enums';
@@ -491,13 +490,13 @@ export class FirebaseFirestoreService {
   }
 
   /**
-   * Retrieves the current character count and last selected target languages for the authenticated user from Firestore.
-   * @returns Promise resolving to the user's current character count and target languages.
+   * Retrieves the current character count for the authenticated user from Firestore.
+   * @returns Promise resolving to the user's current character count.
    */
-  async getCharCountForUser(): Promise<CharCountResult> {
+  async getCharCountForUser(): Promise<number> {
     try {
       if (!this.user) {
-        return { charCount: 0, targetLanguages: [] };
+        return 0;
       }
       const usageSnap = await runInInjectionContext(this.injector, () => {
         const usageRef = this.getFirestoreDoc(
@@ -505,16 +504,13 @@ export class FirebaseFirestoreService {
         );
         return this.getFirestoreDocSnapshot(usageRef);
       });
-      const charCountResult: CharCountResult = usageSnap.exists()
-        ? {
-            charCount: (usageSnap.data() as any)['charCount'] || 0,
-            targetLanguages: (usageSnap.data() as any)['targetLanguages'] || [],
-          }
-        : { charCount: 0, targetLanguages: [] };
-      return charCountResult;
+      const charCount: number = usageSnap.exists()
+        ? (usageSnap.data() as any)['charCount'] || 0
+        : 0;
+      return charCount;
     } catch (error) {
       console.error('Error fetching char count for user:', error);
-      return { charCount: 0, targetLanguages: [] };
+      return 0;
     }
   }
 

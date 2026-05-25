@@ -10,6 +10,8 @@ import {
   IonButton,
   IonInput,
   IonCardSubtitle,
+  IonList,
+  IonListHeader,
 } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
@@ -24,8 +26,8 @@ import { FeatureResult } from 'functions/src/shared/firebase-firestore.interface
 @Component({
   selector: 'app-feature-example',
   templateUrl: './feature-example.component.html',
-  styleUrls: ['./feature-example.component.scss'],
   imports: [
+    IonListHeader,
     IonCardSubtitle,
     IonInput,
     IonButton,
@@ -34,6 +36,8 @@ import { FeatureResult } from 'functions/src/shared/firebase-firestore.interface
     IonCardHeader,
     IonCardTitle,
     IonCardContent,
+    IonList,
+    IonListHeader,
     CommonModule,
     FormsModule,
     TranslatePipe,
@@ -124,8 +128,7 @@ export class FeatureExampleComponent implements OnInit {
   }
 
   private displayFeatureResults(featureResults: FeatureResult): void {
-    this.relatedWords =
-      featureResults.feature['related'].split(', ');
+    this.relatedWords = featureResults.feature['related'].split(', ');
   }
 
   private initFormControls(): void {

@@ -511,8 +511,7 @@ export class FirebaseFirestoreUtilsService {
       );
     const displayedContingentData: DisplayedUserContingentData[] = [];
     // calculate data for current user
-    const { charCount: userCharCount } =
-      await this.firestoreService.getCharCountForUser();
+    const userCharCount = await this.firestoreService.getCharCountForUser();
     const limit =
       contingentData.maxFreeTranslateCharsPerMonthForUser ??
       environment.app.maxFreeTranslateCharsPerMonthForUser;
@@ -586,7 +585,7 @@ export class FirebaseFirestoreUtilsService {
     const limit =
       flags.maxFreeTranslateCharsPerMonthForUser ??
       environment.app.maxFreeTranslateCharsPerMonthForUser;
-    const { charCount } = await this.firestoreService.getCharCountForUser();
+    const charCount = await this.firestoreService.getCharCountForUser();
     return charCount >= limit;
   }
 

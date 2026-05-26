@@ -17,6 +17,9 @@ export const addUser = onCall(async (request) => {
   }
 
   const data = request.data as Partial<AddUserData>;
+  if (!data) {
+    throw new HttpsError('invalid-argument', 'Request data is empty.');
+  }
 
   const appId = data.appId;
   const programmerDeviceUIDs = data.programmerDeviceUIDs;

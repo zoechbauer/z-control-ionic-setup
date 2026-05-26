@@ -62,7 +62,7 @@ export class FirebaseFirestoreUtilsService {
     let flags = await firestoreService.readContingentData();
     if (!flags) {
       // could occur on change to next month
-      console.log(`Contingent data not found for user${userId} -> created`);
+      console.log(`Contingent data not found in collection ${collection} for user ${userId} -> created`);
       await firestoreService.createMissingContingentData();
       flags = await firestoreService.readContingentData();
     }

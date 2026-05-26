@@ -21,8 +21,10 @@ import { updateProgrammerDeviceUIDs } from './update-programmer-deviceUIDs.js';
 import { FirebaseFirestoreService } from './firebase-firestore.service.js';
 
 describe('updateProgrammerDeviceUIDs', () => {
-  const makeRequest = (uid?: string) => ({
+  const appId = 'ionic_setup';
+  const makeRequest = (uid?: string, appId?: string) => ({
     auth: uid ? { uid } : undefined,
+    data: appId !== undefined ? { appId } : undefined,
   });
 
   beforeEach(() => {
@@ -39,10 +41,34 @@ describe('updateProgrammerDeviceUIDs', () => {
     await expect(call).rejects.toMatchObject(expected);
   });
 
+  it('should throw invalid-argument HttpsError if appId is missing', async () => {
+    const request = makeRequest('user1'); // { auth: { uid: 'user1' }, data: undefined }
+    const call = (updateProgrammerDeviceUIDs as any)(request);
+    const expected = {
+      code: 'invalid-argument',
+      message: 'appId must be provided.',
+    };
+    await expect(call).rejects.toMatchObject(expected);
+  });
+
+  it('should throw internal HttpsError if wrong appId is provided', async () => {
+    const programmerDeviceUIDs = [{ userId: 'user1', name: 'Device 1' }];
+    const request = {
+      ...makeRequest('user1'),
+      data: { appId: 'wrongAppId', programmerDeviceUIDs },
+    };
+    const call = (updateProgrammerDeviceUIDs as any)(request);
+    const expected = {
+      code: 'internal',
+      message: 'Unsupported appId: wrongAppId',
+    };
+    await expect(call).rejects.toMatchObject(expected);
+  });
+
   it('should throw invalid argument HttpsError if programmerDeviceUIDs is not an array', async () => {
     const request = {
       ...makeRequest('user1'),
-      data: { programmerDeviceUIDs: 'not-an-array' },
+      data: { appId, programmerDeviceUIDs: 'not-an-array' },
     };
     const call = (updateProgrammerDeviceUIDs as any)(request);
     const expected = {
@@ -61,7 +87,7 @@ describe('updateProgrammerDeviceUIDs', () => {
     ];
     const request = {
       ...makeRequest('user1'),
-      data: { programmerDeviceUIDs },
+      data: { appId, programmerDeviceUIDs },
     };
     const call = (updateProgrammerDeviceUIDs as any)(request);
     const expected = {
@@ -73,13 +99,16 @@ describe('updateProgrammerDeviceUIDs', () => {
 
   it('should return { success: true } when firestoreService updates programmer device UIDs successfully', async () => {
     vi.mocked(FirebaseFirestoreService).mockImplementation(function (
-      this: any
+      this: any,
     ) {
       this.updateProgrammerDeviceUIDs = vi.fn().mockResolvedValue(undefined);
     } as any);
     const request = {
       ...makeRequest('user1'),
-      data: { programmerDeviceUIDs: [{ userId: 'user1', name: 'Device 1' }] },
+      data: {
+        appId,
+        programmerDeviceUIDs: [{ userId: 'user1', name: 'Device 1' }],
+      },
     };
     const call = (updateProgrammerDeviceUIDs as any)(request);
     const expected = { success: true };
@@ -88,7 +117,7 @@ describe('updateProgrammerDeviceUIDs', () => {
 
   it('should throw internal HttpsError if firestoreService.updateProgrammerDeviceUIDs throws an error', async () => {
     vi.mocked(FirebaseFirestoreService).mockImplementation(function (
-      this: any
+      this: any,
     ) {
       this.updateProgrammerDeviceUIDs = vi
         .fn()
@@ -97,7 +126,10 @@ describe('updateProgrammerDeviceUIDs', () => {
 
     const request = {
       ...makeRequest('user1'),
-      data: { programmerDeviceUIDs: [{ userId: 'user1', name: 'Device 1' }] },
+      data: {
+        appId,
+        programmerDeviceUIDs: [{ userId: 'user1', name: 'Device 1' }],
+      },
     };
     const call = (updateProgrammerDeviceUIDs as any)(request);
     const expected = {
@@ -110,14 +142,17 @@ describe('updateProgrammerDeviceUIDs', () => {
 
   it('should throw internal HttpsError with default message if thrown error has no message', async () => {
     vi.mocked(FirebaseFirestoreService).mockImplementation(function (
-      this: any
+      this: any,
     ) {
       this.updateProgrammerDeviceUIDs = vi.fn().mockRejectedValue(new Error());
     } as any);
 
     const request = {
       ...makeRequest('user1'),
-      data: { programmerDeviceUIDs: [{ userId: 'user1', name: 'Device 1' }] },
+      data: {
+        appId,
+        programmerDeviceUIDs: [{ userId: 'user1', name: 'Device 1' }],
+      },
     };
     const call = (updateProgrammerDeviceUIDs as any)(request);
     const expected = {

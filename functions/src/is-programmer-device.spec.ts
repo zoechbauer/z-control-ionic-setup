@@ -21,8 +21,10 @@ import { isProgrammerDevice } from './is-programmer-device.js';
 import { FirebaseFirestoreService } from './firebase-firestore.service.js';
 
 describe('isProgrammerDevice', () => {
-  const makeRequest = (uid?: string) => ({
+  const appId = 'ionic_setup';
+  const makeRequest = (uid?: string, appId?: string) => ({
     auth: uid ? { uid } : undefined,
+    data: appId !== undefined ? { appId } : undefined,
   });
 
   beforeEach(() => {
@@ -40,6 +42,26 @@ describe('isProgrammerDevice', () => {
     await expect(call).rejects.toMatchObject(expected);
   });
 
+  it('should throw invalid-argument HttpsError if appId is missing', async () => {
+      const request = makeRequest('user1'); // { auth: { uid: 'user1' }, data: undefined }
+      const call = (isProgrammerDevice as any)(request);
+      const expected = {
+        code: 'invalid-argument',
+        message: 'appId must be provided.',
+      };
+      await expect(call).rejects.toMatchObject(expected);
+    });
+  
+    it('should throw internal HttpsError if wrong appId is provided', async () => {
+      const request = makeRequest('user1', 'wrongAppId'); // { auth: { uid: 'user1' }, data: { appId: 'wrongAppId' } }
+      const call = (isProgrammerDevice as any)(request);
+      const expected = {
+        code: 'internal',
+        message: 'Unsupported appId: wrongAppId',
+      };
+      await expect(call).rejects.toMatchObject(expected);
+    });
+
   it('should return { isProgrammerDevice: true } when firestoreService returns true', async () => {
     vi.mocked(FirebaseFirestoreService).mockImplementation(function (
       this: any
@@ -47,7 +69,7 @@ describe('isProgrammerDevice', () => {
       this.isProgrammerDevice = vi.fn().mockResolvedValue(true);
     } as any);
 
-    const result = await (isProgrammerDevice as any)(makeRequest('user1'));
+    const result = await (isProgrammerDevice as any)(makeRequest('user1', appId));
     expect(result).toEqual({ isProgrammerDevice: true });
   });
 
@@ -58,7 +80,7 @@ describe('isProgrammerDevice', () => {
       this.isProgrammerDevice = vi.fn().mockResolvedValue(false);
     } as any);
 
-    const result = await (isProgrammerDevice as any)(makeRequest('user1'));
+    const result = await (isProgrammerDevice as any)(makeRequest('user1', appId));
     expect(result).toEqual({ isProgrammerDevice: false });
   });
 
@@ -72,7 +94,7 @@ describe('isProgrammerDevice', () => {
     } as any);
 
     await expect(
-      (isProgrammerDevice as any)(makeRequest('user1'))
+      (isProgrammerDevice as any)(makeRequest('user1', appId))
     ).rejects.toMatchObject({
       code: 'internal',
       message: 'DB error',
@@ -87,7 +109,7 @@ describe('isProgrammerDevice', () => {
     } as any);
 
     await expect(
-      (isProgrammerDevice as any)(makeRequest('user1'))
+      (isProgrammerDevice as any)(makeRequest('user1', appId))
     ).rejects.toMatchObject({
       code: 'internal',
       message: 'Error checking if device is a programmer device.',

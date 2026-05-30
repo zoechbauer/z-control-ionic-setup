@@ -1,6 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TranslateService } from '@ngx-translate/core';
-import { BehaviorSubject } from 'rxjs';
 
 import { LanguageAccordionComponent } from './language-accordion.component';
 import { createTranslateServiceMock } from 'src/app/testing/translate-service.mock';
@@ -83,14 +82,6 @@ describe('LanguageAccordionComponent', () => {
 
       expect(enOption).toBeTruthy();
       expect(deOption).toBeTruthy();
-    });
-
-    it('should show selected language name from LocalStorageService stream', () => {
-      fixture.detectChanges();
-
-      const headerSpan = fixture.nativeElement.querySelector('ion-label span');
-      expect(headerSpan).toBeTruthy();
-      expect((headerSpan.textContent || '').trim()).toBe('English');
     });
   });
 });

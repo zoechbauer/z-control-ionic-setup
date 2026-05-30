@@ -79,6 +79,7 @@
     <div class="ion-padding ion-text-center accordion-close-button">
       <ion-button
         (click)="showAll()"
+        (keydown.enter)="showAll()"
         expand="block"
         title="{{ 'SETTINGS.TOOLTIPS.CLOSE_ACCORDION' | translate }}"
       >

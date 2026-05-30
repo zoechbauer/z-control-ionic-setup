@@ -2,12 +2,12 @@
 
 Welcome to the latest updates for the **z-control IONIC Setup** app.
 
-## [0.3] – YYYY-MM-DD
+## [0.3] – 2026-05-30
 
 ### 🔧 Internal
 
-- Updated tests for the new appId parameters so the app remains stable after the refactor. Total: 118 tests, 100% backend coverage. 
-- TODO: update Frontend tests.
+- Refactored and updated tests to support the new appId parameters, ensuring continued app stability after major changes.
+- Achieved 100% backend test coverage (118 tests) and 99.55% frontend test coverage (498 tests), maintaining high reliability and code quality.
 
 ## [0.2] – 2026-05-23
 

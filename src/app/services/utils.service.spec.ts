@@ -63,7 +63,7 @@ describe('UtilsService', () => {
     it('should navigate to tab', () => {
       service.navigateToTab(Tab.MainFeature);
       expect(routerSpy.navigate).toHaveBeenCalledWith([
-        '/tabs/tab-translation',
+        '/tabs/main',
       ]);
     });
 

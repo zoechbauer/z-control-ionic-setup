@@ -25,6 +25,7 @@ import { DeviceUtils } from './device-utils.service';
 
 describe('FirebaseFirestoreService', () => {
   let service: FirebaseFirestoreService;
+  const appId = 'ionic_setup';
 
   const userStub: angularFireAuth.User = {
     uid: 'anonymous-uid',
@@ -130,7 +131,7 @@ describe('FirebaseFirestoreService', () => {
     authWrapperMock.signInAnonymously.calls.reset();
     authWrapperMock.onAuthStateChanged.calls.reset();
     getDeviceInfoSpy = spyOn(DeviceUtils, 'getDeviceInfo').and.returnValue(
-      mockDeviceInfo
+      mockDeviceInfo,
     );
   });
 
@@ -185,9 +186,9 @@ describe('FirebaseFirestoreService', () => {
 
   describe('readContingentData', () => {
     beforeEach(() => {
-        spyOn(utilsServiceMock, 'getCurrentMonth').and.returnValue('2026-04');
-      });
-      
+      spyOn(utilsServiceMock, 'getCurrentMonth').and.returnValue('2026-04');
+    });
+
     it('should return contingent data when document exists', async () => {
       const flags: FirestoreContingentData = {
         StopTranslationForAllUsers: true,
@@ -204,14 +205,14 @@ describe('FirebaseFirestoreService', () => {
 
       expect((service as any).getFirestoreDoc).toHaveBeenCalled();
       expect((service as any).getFirestoreDocSnapshot).toHaveBeenCalledWith(
-        fakeRef
+        fakeRef,
       );
       expect(result).toEqual(flags);
     });
 
     it('should return empty object when selected month is "all"', async () => {
       const result = await service.readContingentData(
-        AllMonthsOption.SelectOptionValue
+        AllMonthsOption.SelectOptionValue,
       );
       expect(result).toEqual({});
     });
@@ -247,7 +248,7 @@ describe('FirebaseFirestoreService', () => {
       const fakeRef = { id: 'fake-ref' } as any;
       spyOn<any>(service, 'getFirestoreDoc').and.returnValue(fakeRef);
       spyOn<any>(service, 'getFirestoreDocSnapshot').and.rejectWith(
-        new Error('firestore read failed')
+        new Error('firestore read failed'),
       );
 
       const result = await service.readContingentData('2026-04');
@@ -255,7 +256,7 @@ describe('FirebaseFirestoreService', () => {
       expect(result).toEqual({});
       expect(toastServiceMock.showToast).toHaveBeenCalledWith(
         'Error reading contingent data.',
-        ToastAnchor.MainPage
+        ToastAnchor.MainPage,
       );
     });
   });
@@ -268,15 +269,15 @@ describe('FirebaseFirestoreService', () => {
 
       const httpsCallableSpy = spyOn<any>(
         service,
-        'getHttpsCallable'
+        'getHttpsCallable',
       ).and.returnValue(callableSpy as any);
 
       await service.createMissingContingentData();
 
       expect(httpsCallableSpy).toHaveBeenCalledWith(
-        'createMissingContingentData'
+        'createMissingContingentData',
       );
-      expect(callableSpy).toHaveBeenCalledWith({});
+      expect(callableSpy).toHaveBeenCalledWith({ appId });
       expect(toastServiceMock.showToast).not.toHaveBeenCalled();
     });
 
@@ -288,18 +289,18 @@ describe('FirebaseFirestoreService', () => {
 
       const httpsCallableSpy = spyOn<any>(
         service,
-        'getHttpsCallable'
+        'getHttpsCallable',
       ).and.returnValue(callableSpy as any);
 
       await service.createMissingContingentData();
 
       expect(httpsCallableSpy).toHaveBeenCalledWith(
-        'createMissingContingentData'
+        'createMissingContingentData',
       );
-      expect(callableSpy).toHaveBeenCalledWith({});
+      expect(callableSpy).toHaveBeenCalledWith({ appId });
       expect(toastServiceMock.showToast).toHaveBeenCalledWith(
         'Error creating missing contingent data.',
-        ToastAnchor.MainPage
+        ToastAnchor.MainPage,
       );
     });
   });
@@ -307,23 +308,20 @@ describe('FirebaseFirestoreService', () => {
   describe('getCharCountForUser', () => {
     it('should return character count and target languages for user when document exist', async () => {
       (service as any).user = { uid: 'test-uid' } as any;
-      const expectedResult = {
-        charCount: 123,
-        targetLanguages: ['en', 'fr'],
-      } as any;
+      const expectedResult = 123;
 
       const fakeRef = { id: 'fake-ref' } as any;
       spyOn<any>(service, 'getFirestoreDoc').and.returnValue(fakeRef);
       spyOn<any>(service, 'getFirestoreDocSnapshot').and.resolveTo({
         exists: () => true,
-        data: () => expectedResult,
+        data: () => ({ charCount: expectedResult }),
       } as any);
 
       const charCount = await service.getCharCountForUser();
 
       expect((service as any).getFirestoreDoc).toHaveBeenCalled();
       expect((service as any).getFirestoreDocSnapshot).toHaveBeenCalledWith(
-        fakeRef
+        fakeRef,
       );
       expect(charCount).toEqual(expectedResult);
     });
@@ -360,7 +358,7 @@ describe('FirebaseFirestoreService', () => {
 
       expect((service as any).getFirestoreDoc).toHaveBeenCalled();
       expect((service as any).getFirestoreDocSnapshot).toHaveBeenCalledWith(
-        fakeRef
+        fakeRef,
       );
       expect(charCount).toEqual(0);
     });
@@ -371,14 +369,14 @@ describe('FirebaseFirestoreService', () => {
       const fakeRef = { id: 'fake-ref' } as any;
       spyOn<any>(service, 'getFirestoreDoc').and.returnValue(fakeRef);
       spyOn<any>(service, 'getFirestoreDocSnapshot').and.rejectWith(
-        new Error('firestore read failed')
+        new Error('firestore read failed'),
       );
 
       const charCount = await service.getCharCountForUser();
 
       expect(console.error).toHaveBeenCalledWith(
         'Error fetching char count for user:',
-        new Error('firestore read failed')
+        new Error('firestore read failed'),
       );
       expect(charCount).toEqual(0);
     });
@@ -398,7 +396,7 @@ describe('FirebaseFirestoreService', () => {
       const result = await service.getTotalCharCount();
       expect((service as any).getFirestoreDoc).toHaveBeenCalled();
       expect((service as any).getFirestoreDocSnapshot).toHaveBeenCalledWith(
-        fakeRef
+        fakeRef,
       );
       expect(result).toEqual(expectedTotal);
     });
@@ -415,7 +413,7 @@ describe('FirebaseFirestoreService', () => {
       const result = await service.getTotalCharCount();
       expect((service as any).getFirestoreDoc).toHaveBeenCalled();
       expect((service as any).getFirestoreDocSnapshot).toHaveBeenCalledWith(
-        fakeRef
+        fakeRef,
       );
       expect(result).toEqual(0);
     });
@@ -432,14 +430,14 @@ describe('FirebaseFirestoreService', () => {
       const fakeRef = { id: 'fake-ref' } as any;
       spyOn<any>(service, 'getFirestoreDoc').and.returnValue(fakeRef);
       spyOn<any>(service, 'getFirestoreDocSnapshot').and.rejectWith(
-        new Error('firestore read failed')
+        new Error('firestore read failed'),
       );
 
       const result = await service.getTotalCharCount();
 
       expect(console.error).toHaveBeenCalledWith(
         'Error fetching total char count:',
-        new Error('firestore read failed')
+        new Error('firestore read failed'),
       );
       expect(result).toEqual(0);
     });
@@ -564,7 +562,7 @@ describe('FirebaseFirestoreService', () => {
       ];
       spyOn<any>(
         service,
-        'getCachedTranslationsForPreviousMonth'
+        'getCachedTranslationsForPreviousMonth',
       ).and.returnValue(userTranslationStatistics);
       spyOn<any>(service, 'getDocs').and.resolveTo({} as any); // should not be called
 
@@ -580,7 +578,7 @@ describe('FirebaseFirestoreService', () => {
       spyOn(console, 'error');
       spyOn<any>(service, 'getCollection').and.returnValue({} as any);
       spyOn<any>(service, 'getDocs').and.rejectWith(
-        new Error('getDocs failed')
+        new Error('getDocs failed'),
       );
 
       const result = await (
@@ -590,7 +588,7 @@ describe('FirebaseFirestoreService', () => {
       expect(result).toEqual([]);
       expect(console.error).toHaveBeenCalledWith(
         'Error fetching all user statistics for month 2026-03:',
-        new Error('getDocs failed')
+        new Error('getDocs failed'),
       );
     });
 
@@ -613,7 +611,7 @@ describe('FirebaseFirestoreService', () => {
         (service as any).cachedTranslations.set(previousMonth, cachedData);
 
         const result = (service as any).getCachedTranslationsForPreviousMonth(
-          previousMonth
+          previousMonth,
         );
 
         expect(result).toEqual(cachedData);
@@ -624,7 +622,7 @@ describe('FirebaseFirestoreService', () => {
         (service as any).cachedTranslations.set(currentMonth, cachedData);
 
         const result = (service as any).getCachedTranslationsForPreviousMonth(
-          currentMonth
+          currentMonth,
         );
 
         expect(result).toBeUndefined();
@@ -633,7 +631,7 @@ describe('FirebaseFirestoreService', () => {
       it('should return undefined when no cached data exists for previous month', () => {
         // do not populate the cache
         const result = (service as any).getCachedTranslationsForPreviousMonth(
-          previousMonth
+          previousMonth,
         );
 
         expect(result).toBeUndefined();
@@ -643,7 +641,7 @@ describe('FirebaseFirestoreService', () => {
         (service as any).cachedTranslations.clear();
 
         const result = (service as any).getCachedTranslationsForPreviousMonth(
-          previousMonth
+          previousMonth,
         );
 
         expect(result).toBeUndefined();
@@ -663,13 +661,13 @@ describe('FirebaseFirestoreService', () => {
       ];
       spyOn<any>(
         service,
-        'getAllUserTranslationStatisticsForMonth'
+        'getAllUserTranslationStatisticsForMonth',
       ).and.resolveTo(stats);
 
       const result = await service.getAllUserTranslationStatistics('2026-03');
 
       expect(
-        (service as any).getAllUserTranslationStatisticsForMonth
+        (service as any).getAllUserTranslationStatisticsForMonth,
       ).toHaveBeenCalledOnceWith('2026-03');
       expect(result).toEqual(stats);
     });
@@ -682,7 +680,7 @@ describe('FirebaseFirestoreService', () => {
       ];
       spyOn(
         utilsServiceMock,
-        'getAllFirestoreSearchStringsForMonth'
+        'getAllFirestoreSearchStringsForMonth',
       ).and.returnValue(allMonths);
 
       const statsForMarch: UserTranslationStatistics[] = [
@@ -703,26 +701,26 @@ describe('FirebaseFirestoreService', () => {
       ];
       spyOn<any>(
         service,
-        'getAllUserTranslationStatisticsForMonth'
+        'getAllUserTranslationStatisticsForMonth',
       ).and.callFake(async (month: string) =>
-        month === '2026-03' ? statsForMarch : statsForFeb
+        month === '2026-03' ? statsForMarch : statsForFeb,
       );
 
       const result = await service.getAllUserTranslationStatistics(
-        AllMonthsOption.localStorageValue
+        AllMonthsOption.localStorageValue,
       );
 
       expect(
-        utilsServiceMock.getAllFirestoreSearchStringsForMonth
+        utilsServiceMock.getAllFirestoreSearchStringsForMonth,
       ).toHaveBeenCalled();
       expect(
-        (service as any).getAllUserTranslationStatisticsForMonth
+        (service as any).getAllUserTranslationStatisticsForMonth,
       ).toHaveBeenCalledWith('2026-03');
       expect(
-        (service as any).getAllUserTranslationStatisticsForMonth
+        (service as any).getAllUserTranslationStatisticsForMonth,
       ).toHaveBeenCalledWith('2026-02');
       expect(
-        (service as any).getAllUserTranslationStatisticsForMonth
+        (service as any).getAllUserTranslationStatisticsForMonth,
       ).not.toHaveBeenCalledWith(AllMonthsOption.localStorageValue);
       expect(result).toEqual([...statsForMarch, ...statsForFeb]);
     });
@@ -731,22 +729,22 @@ describe('FirebaseFirestoreService', () => {
       const allMonths = [AllMonthsOption.localStorageValue, '2026-03'];
       spyOn(
         utilsServiceMock,
-        'getAllFirestoreSearchStringsForMonth'
+        'getAllFirestoreSearchStringsForMonth',
       ).and.returnValue(allMonths);
       spyOn<any>(
         service,
-        'getAllUserTranslationStatisticsForMonth'
+        'getAllUserTranslationStatisticsForMonth',
       ).and.resolveTo([]);
 
       await service.getAllUserTranslationStatistics(
-        AllMonthsOption.localStorageValue
+        AllMonthsOption.localStorageValue,
       );
 
       expect(
-        (service as any).getAllUserTranslationStatisticsForMonth
+        (service as any).getAllUserTranslationStatisticsForMonth,
       ).toHaveBeenCalledTimes(1);
       expect(
-        (service as any).getAllUserTranslationStatisticsForMonth
+        (service as any).getAllUserTranslationStatisticsForMonth,
       ).not.toHaveBeenCalledWith(AllMonthsOption.localStorageValue);
     });
 
@@ -754,17 +752,17 @@ describe('FirebaseFirestoreService', () => {
       spyOn(console, 'error');
       spyOn(
         utilsServiceMock,
-        'getAllFirestoreSearchStringsForMonth'
+        'getAllFirestoreSearchStringsForMonth',
       ).and.throwError('unexpected failure');
 
       const result = await service.getAllUserTranslationStatistics(
-        AllMonthsOption.localStorageValue
+        AllMonthsOption.localStorageValue,
       );
 
       expect(result).toEqual([]);
       expect(console.error).toHaveBeenCalledWith(
         `Error fetching all user statistics for month ${AllMonthsOption.localStorageValue}:`,
-        jasmine.any(Error)
+        jasmine.any(Error),
       );
     });
   });
@@ -861,13 +859,13 @@ describe('FirebaseFirestoreService', () => {
         .and.resolveTo({ data: { isProgrammerDevice: true } });
       const httpsCallableSpy = spyOn<any>(
         service,
-        'getHttpsCallable'
+        'getHttpsCallable',
       ).and.returnValue(callableSpy as any);
 
       const result = await service.getIsProgrammerDevice();
 
       expect(httpsCallableSpy).toHaveBeenCalledWith('isProgrammerDevice');
-      expect(callableSpy).toHaveBeenCalledWith({});
+      expect(callableSpy).toHaveBeenCalledWith({ appId});
       expect(result).toBeTrue();
     });
 
@@ -877,13 +875,13 @@ describe('FirebaseFirestoreService', () => {
         .and.resolveTo({ data: { isProgrammerDevice: false } });
       const httpsCallableSpy = spyOn<any>(
         service,
-        'getHttpsCallable'
+        'getHttpsCallable',
       ).and.returnValue(callableSpy as any);
 
       const result = await service.getIsProgrammerDevice();
 
       expect(httpsCallableSpy).toHaveBeenCalledWith('isProgrammerDevice');
-      expect(callableSpy).toHaveBeenCalledWith({});
+      expect(callableSpy).toHaveBeenCalledWith({ appId});
       expect(result).toBeFalse();
     });
 
@@ -894,20 +892,20 @@ describe('FirebaseFirestoreService', () => {
         .and.rejectWith(new Error('call failed'));
       const httpsCallableSpy = spyOn<any>(
         service,
-        'getHttpsCallable'
+        'getHttpsCallable',
       ).and.returnValue(callableSpy as any);
 
       const result = await service.getIsProgrammerDevice();
 
       expect(httpsCallableSpy).toHaveBeenCalledWith('isProgrammerDevice');
-      expect(callableSpy).toHaveBeenCalledWith({});
+      expect(callableSpy).toHaveBeenCalledWith({ appId });
       expect(console.error).toHaveBeenCalledWith(
         'Error getting programmer device status:',
-        new Error('call failed')
+        new Error('call failed'),
       );
       expect(toastServiceMock.showToast).toHaveBeenCalledWith(
         'TRANSLATE.CARD_RESULTS.TOAST.ERROR_GETTING_PROGRAMMER_DEVICE_STATUS',
-        ToastAnchor.MainPage
+        ToastAnchor.MainPage,
       );
       expect(result).toBeFalse();
     });
@@ -924,13 +922,13 @@ describe('FirebaseFirestoreService', () => {
         .and.resolveTo({ data: { programmerDevices } });
       const httpsCallableSpy = spyOn<any>(
         service,
-        'getHttpsCallable'
+        'getHttpsCallable',
       ).and.returnValue(callableSpy as any);
 
       const result = await service.getProgrammerDeviceUIDs();
 
       expect(httpsCallableSpy).toHaveBeenCalledWith('getProgrammerDeviceUIDs');
-      expect(callableSpy).toHaveBeenCalledWith({});
+      expect(callableSpy).toHaveBeenCalledWith({ appId });
       expect(result).toEqual(programmerDevices);
     });
 
@@ -941,20 +939,20 @@ describe('FirebaseFirestoreService', () => {
         .and.rejectWith(new Error('call failed'));
       const httpsCallableSpy = spyOn<any>(
         service,
-        'getHttpsCallable'
+        'getHttpsCallable',
       ).and.returnValue(callableSpy as any);
 
       const result = await service.getProgrammerDeviceUIDs();
 
       expect(httpsCallableSpy).toHaveBeenCalledWith('getProgrammerDeviceUIDs');
-      expect(callableSpy).toHaveBeenCalledWith({});
+      expect(callableSpy).toHaveBeenCalledWith({ appId });
       expect(console.error).toHaveBeenCalledWith(
         'Error getting all programmer devices:',
-        new Error('call failed')
+        new Error('call failed'),
       );
       expect(toastServiceMock.showToast).toHaveBeenCalledWith(
         'TRANSLATE.CARD_RESULTS.TOAST.ERROR_GETTING_PROGRAMMER_DEVICES',
-        ToastAnchor.MainPage
+        ToastAnchor.MainPage,
       );
       expect(result).toEqual([]);
     });
@@ -979,22 +977,23 @@ describe('FirebaseFirestoreService', () => {
         { userId: 'uid2', name: 'Device 2' },
       ];
       spyOn<any>(service, 'getEnvironmentProgrammerDeviceUIDs').and.returnValue(
-        programmerDevices
+        programmerDevices,
       );
       const callableSpy = jasmine
         .createSpy('updateProgrammerDeviceUIDsCallable')
         .and.resolveTo(undefined);
       const httpsCallableSpy = spyOn<any>(
         service,
-        'getHttpsCallable'
+        'getHttpsCallable',
       ).and.returnValue(callableSpy as any);
 
       await service.updateProgrammerDeviceUIDs();
 
       expect(httpsCallableSpy).toHaveBeenCalledWith(
-        'updateProgrammerDeviceUIDs'
+        'updateProgrammerDeviceUIDs',
       );
       expect(callableSpy).toHaveBeenCalledWith({
+        appId,
         programmerDeviceUIDs: programmerDevices,
       });
     });
@@ -1006,31 +1005,32 @@ describe('FirebaseFirestoreService', () => {
         { userId: 'uid2', name: 'Device 2' },
       ];
       spyOn<any>(service, 'getEnvironmentProgrammerDeviceUIDs').and.returnValue(
-        programmerDevices
+        programmerDevices,
       );
       const callableSpy = jasmine
         .createSpy('updateProgrammerDeviceUIDsCallable')
         .and.rejectWith(new Error('call failed'));
       const httpsCallableSpy = spyOn<any>(
         service,
-        'getHttpsCallable'
+        'getHttpsCallable',
       ).and.returnValue(callableSpy as any);
 
       await service.updateProgrammerDeviceUIDs();
 
       expect(httpsCallableSpy).toHaveBeenCalledWith(
-        'updateProgrammerDeviceUIDs'
+        'updateProgrammerDeviceUIDs',
       );
       expect(callableSpy).toHaveBeenCalledWith({
+        appId,
         programmerDeviceUIDs: programmerDevices,
       });
       expect(console.error).toHaveBeenCalledWith(
         'Error updating programmer devices:',
-        new Error('call failed')
+        new Error('call failed'),
       );
       expect(toastServiceMock.showToast).toHaveBeenCalledWith(
         'TRANSLATE.CARD_RESULTS.TOAST.ERROR_UPDATING_PROGRAMMER_DEVICES',
-        ToastAnchor.MainPage
+        ToastAnchor.MainPage,
       );
     });
 
@@ -1038,7 +1038,7 @@ describe('FirebaseFirestoreService', () => {
       (environment as any).app.programmerDevices.updateUsermap = false;
       const getEnvironmentProgrammerDeviceUIDsSpy = spyOn<any>(
         service,
-        'getEnvironmentProgrammerDeviceUIDs'
+        'getEnvironmentProgrammerDeviceUIDs',
       );
       const getHttpsCallableSpy = spyOn<any>(service, 'getHttpsCallable');
 
@@ -1051,16 +1051,21 @@ describe('FirebaseFirestoreService', () => {
 
   describe('getEnvironmentProgrammerDeviceUIDs', () => {
     const originalDevices = environment.app.programmerDevices.devices;
+    const originalUpdateUsermap =
+      environment.app.programmerDevices.updateUsermap;
 
     afterEach(() => {
       (environment as any).app.programmerDevices.devices = originalDevices;
+      (environment as any).app.programmerDevices.updateUsermap =
+        originalUpdateUsermap;
     });
 
-    it('should return programmer device UIDs from environment', () => {
+    it('should return programmer device UIDs from environment if updateUsermap is true', () => {
       (environment as any).app.programmerDevices.devices = [
         { 'Device 1': 'uid1' },
         { 'Device 2': 'uid2' },
       ];
+      (environment as any).app.programmerDevices.updateUsermap = true;
 
       const result = (service as any).getEnvironmentProgrammerDeviceUIDs();
 
@@ -1070,8 +1075,12 @@ describe('FirebaseFirestoreService', () => {
       ]);
     });
 
-    it('should return empty array when no programmer devices are defined in environment', () => {
-      (environment as any).app.programmerDevices.devices = [];
+    it('should return empty array when programmer devices are defined in environment but updateUsermap is false', () => {
+      (environment as any).app.programmerDevices.devices = [
+        { 'Device 1': 'uid1' },
+        { 'Device 2': 'uid2' },
+      ];
+      (environment as any).app.programmerDevices.updateUsermap = false;
 
       const result = (service as any).getEnvironmentProgrammerDeviceUIDs();
 
@@ -1089,7 +1098,7 @@ describe('FirebaseFirestoreService', () => {
 
       const getEnvironmentProgrammerDeviceUIDsSpy = spyOn<any>(
         service,
-        'getEnvironmentProgrammerDeviceUIDs'
+        'getEnvironmentProgrammerDeviceUIDs',
       ).and.returnValue(programmerDevices);
 
       const callableSpy = jasmine
@@ -1098,7 +1107,7 @@ describe('FirebaseFirestoreService', () => {
 
       const httpsCallableSpy = spyOn<any>(
         service,
-        'getHttpsCallable'
+        'getHttpsCallable',
       ).and.returnValue(callableSpy as any);
 
       await service.addUser(userId);
@@ -1107,6 +1116,7 @@ describe('FirebaseFirestoreService', () => {
       expect(getEnvironmentProgrammerDeviceUIDsSpy).toHaveBeenCalled();
       expect(getDeviceInfoSpy).toHaveBeenCalled();
       expect(callableSpy).toHaveBeenCalledWith({
+        appId,
         userId,
         programmerDeviceUIDs: getEnvironmentProgrammerDeviceUIDsSpy(),
         deviceInfo: mockDeviceInfo,
@@ -1124,7 +1134,7 @@ describe('FirebaseFirestoreService', () => {
 
       const getEnvironmentProgrammerDeviceUIDsSpy = spyOn<any>(
         service,
-        'getEnvironmentProgrammerDeviceUIDs'
+        'getEnvironmentProgrammerDeviceUIDs',
       ).and.returnValue(programmerDevices);
 
       const callableSpy = jasmine
@@ -1133,7 +1143,7 @@ describe('FirebaseFirestoreService', () => {
 
       const httpsCallableSpy = spyOn<any>(
         service,
-        'getHttpsCallable'
+        'getHttpsCallable',
       ).and.returnValue(callableSpy as any);
 
       await service.addUser(userId);
@@ -1143,11 +1153,11 @@ describe('FirebaseFirestoreService', () => {
       expect(getDeviceInfoSpy).toHaveBeenCalled();
       expect(console.error).toHaveBeenCalledWith(
         'Error adding user:',
-        new Error('call failed')
+        new Error('call failed'),
       );
       expect(toastServiceMock.showToast).toHaveBeenCalledWith(
         'TRANSLATE.CARD_RESULTS.TOAST.ERROR_ADDING_USER',
-        ToastAnchor.MainPage
+        ToastAnchor.MainPage,
       );
     });
   });
@@ -1205,7 +1215,7 @@ describe('FirebaseFirestoreService', () => {
 
     it('should return users created in selected month', async () => {
       const getDocsSpy = spyOn<any>(service, 'getDocs').and.resolveTo(
-        createSnapshotMock(users) as any
+        createSnapshotMock(users) as any,
       );
 
       const result = await service.getUsers('2026-03');
@@ -1216,7 +1226,7 @@ describe('FirebaseFirestoreService', () => {
 
     it('should return users for another selected month', async () => {
       const getDocsSpy = spyOn<any>(service, 'getDocs').and.resolveTo(
-        createSnapshotMock(users) as any
+        createSnapshotMock(users) as any,
       );
 
       const result = await service.getUsers('2026-04');
@@ -1227,7 +1237,7 @@ describe('FirebaseFirestoreService', () => {
 
     it('should include user from another creation month when cached translations exist for selected month', async () => {
       spyOn<any>(service, 'getDocs').and.resolveTo(
-        createSnapshotMock(users) as any
+        createSnapshotMock(users) as any,
       );
 
       (service as any).cachedTranslations.set('2026-03', [
@@ -1246,7 +1256,7 @@ describe('FirebaseFirestoreService', () => {
 
     it('should not include user from another month when cached translatedCharCount is zero', async () => {
       spyOn<any>(service, 'getDocs').and.resolveTo(
-        createSnapshotMock(users) as any
+        createSnapshotMock(users) as any,
       );
 
       (service as any).cachedTranslations.set('2026-03', [
@@ -1266,7 +1276,7 @@ describe('FirebaseFirestoreService', () => {
     it('should log error, show toast and return empty array when getDocs fails', async () => {
       spyOn(console, 'error');
       const getDocsSpy = spyOn<any>(service, 'getDocs').and.rejectWith(
-        new Error('getDocs failed')
+        new Error('getDocs failed'),
       );
 
       const result = await service.getUsers('2026-03');
@@ -1274,11 +1284,11 @@ describe('FirebaseFirestoreService', () => {
       expect(getDocsSpy).toHaveBeenCalled();
       expect(console.error).toHaveBeenCalledWith(
         'Error loading users from user mapping:',
-        new Error('getDocs failed')
+        new Error('getDocs failed'),
       );
       expect(toastServiceMock.showToast).toHaveBeenCalledWith(
         'TRANSLATE.CARD_RESULTS.TOAST.ERROR_LOADING_USERS',
-        ToastAnchor.SettingsPage
+        ToastAnchor.SettingsPage,
       );
       expect(result).toEqual([]);
     });
@@ -1294,7 +1304,7 @@ describe('FirebaseFirestoreService', () => {
       expect(authWrapperMock.signInAnonymously).toHaveBeenCalledWith(authMock);
       expect(addUserSpy).toHaveBeenCalledWith('anonymous-uid');
       expect(localStorageServiceMock.saveFirestoreUid).toHaveBeenCalledWith(
-        'anonymous-uid'
+        'anonymous-uid',
       );
     });
 
@@ -1307,7 +1317,7 @@ describe('FirebaseFirestoreService', () => {
       expect(authWrapperMock.signInAnonymously).not.toHaveBeenCalled();
       expect(addUserSpy).toHaveBeenCalledWith('anonymous-uid');
       expect(localStorageServiceMock.saveFirestoreUid).toHaveBeenCalledWith(
-        'anonymous-uid'
+        'anonymous-uid',
       );
     });
   });
@@ -1319,7 +1329,7 @@ describe('FirebaseFirestoreService', () => {
       await (service as any).saveUserIdToLocalStorage(testUid);
 
       expect(localStorageServiceMock.saveFirestoreUid).toHaveBeenCalledWith(
-        testUid
+        testUid,
       );
     });
 
@@ -1327,14 +1337,14 @@ describe('FirebaseFirestoreService', () => {
       spyOn(console, 'error');
       const testUid = 'test-uid';
       localStorageServiceMock.saveFirestoreUid.and.throwError(
-        'localStorage save failed'
+        'localStorage save failed',
       );
 
       await (service as any).saveUserIdToLocalStorage(testUid);
 
       expect(console.error).toHaveBeenCalledWith(
         'Error saving user UID to localStorage:',
-        jasmine.any(Error)
+        jasmine.any(Error),
       );
     });
   });
@@ -1356,20 +1366,20 @@ describe('FirebaseFirestoreService', () => {
 
       const waitForAuthReadySpy = spyOn<any>(
         service,
-        'waitForAuthReady'
+        'waitForAuthReady',
       ).and.resolveTo();
       const addUserSpy = spyOn(service, 'addUser').and.resolveTo();
       const createMissingContingentDataSpy = spyOn(
         service,
-        'createMissingContingentData'
+        'createMissingContingentData',
       ).and.resolveTo();
       const updateProgrammerDeviceUIDsSpy = spyOn(
         service,
-        'updateProgrammerDeviceUIDs'
+        'updateProgrammerDeviceUIDs',
       ).and.resolveTo();
       const signInAnonymouslySpy = spyOn<any>(
         service,
-        'signInAnonymously'
+        'signInAnonymously',
       ).and.resolveTo();
 
       await (service as any).authenticateUser();
@@ -1377,7 +1387,7 @@ describe('FirebaseFirestoreService', () => {
       expect(waitForAuthReadySpy).toHaveBeenCalled();
       expect(addUserSpy).toHaveBeenCalledWith('anonymous-uid');
       expect(localStorageServiceMock.saveFirestoreUid).toHaveBeenCalledWith(
-        'anonymous-uid'
+        'anonymous-uid',
       );
       expect(getIdTokenSpy).toHaveBeenCalledWith(true);
       expect(createMissingContingentDataSpy).toHaveBeenCalled();
@@ -1399,11 +1409,11 @@ describe('FirebaseFirestoreService', () => {
       const addUserSpy = spyOn(service, 'addUser').and.resolveTo();
       const createMissingContingentDataSpy = spyOn(
         service,
-        'createMissingContingentData'
+        'createMissingContingentData',
       ).and.resolveTo();
       const updateProgrammerDeviceUIDsSpy = spyOn(
         service,
-        'updateProgrammerDeviceUIDs'
+        'updateProgrammerDeviceUIDs',
       ).and.resolveTo();
 
       await (service as any).authenticateUser();
@@ -1421,15 +1431,15 @@ describe('FirebaseFirestoreService', () => {
       spyOn<any>(service, 'waitForAuthReady').and.resolveTo();
       const signInAnonymouslySpy = spyOn<any>(
         service,
-        'signInAnonymously'
+        'signInAnonymously',
       ).and.resolveTo();
       const createMissingContingentDataSpy = spyOn(
         service,
-        'createMissingContingentData'
+        'createMissingContingentData',
       ).and.resolveTo();
       const updateProgrammerDeviceUIDsSpy = spyOn(
         service,
-        'updateProgrammerDeviceUIDs'
+        'updateProgrammerDeviceUIDs',
       ).and.resolveTo();
 
       await (service as any).authenticateUser();
@@ -1446,15 +1456,15 @@ describe('FirebaseFirestoreService', () => {
       spyOn<any>(service, 'waitForAuthReady').and.resolveTo();
       const signInAnonymouslySpy = spyOn<any>(
         service,
-        'signInAnonymously'
+        'signInAnonymously',
       ).and.resolveTo();
       const createMissingContingentDataSpy = spyOn(
         service,
-        'createMissingContingentData'
+        'createMissingContingentData',
       ).and.resolveTo();
       const updateProgrammerDeviceUIDsSpy = spyOn(
         service,
-        'updateProgrammerDeviceUIDs'
+        'updateProgrammerDeviceUIDs',
       ).and.resolveTo();
 
       await (service as any).authenticateUser();
@@ -1470,7 +1480,7 @@ describe('FirebaseFirestoreService', () => {
 
       spyOn<any>(service, 'waitForAuthReady').and.resolveTo();
       spyOn<any>(service, 'signInAnonymously').and.rejectWith(
-        new Error('signInAnonymously failed')
+        new Error('signInAnonymously failed'),
       );
       spyOn(service, 'createMissingContingentData').and.resolveTo();
       spyOn(service, 'updateProgrammerDeviceUIDs').and.resolveTo();
@@ -1479,7 +1489,7 @@ describe('FirebaseFirestoreService', () => {
 
       expect(console.error).toHaveBeenCalledWith(
         'Error during Firebase authentication:',
-        jasmine.any(Error)
+        jasmine.any(Error),
       );
     });
   });
@@ -1508,7 +1518,7 @@ describe('FirebaseFirestoreService', () => {
         (_auth: any, cb: Function) => {
           Promise.resolve().then(() => cb());
           return unsubSpy;
-        }
+        },
       );
 
       await (service as any).waitForAuthReady();
@@ -1528,11 +1538,11 @@ describe('FirebaseFirestoreService', () => {
 
         expect(console.error).toHaveBeenCalledWith(
           'Error creating missing contingent data:',
-          jasmine.anything()
+          jasmine.anything(),
         );
         expect(toastServiceMock.showToast).toHaveBeenCalledWith(
           'Error creating missing contingent data.',
-          ToastAnchor.MainPage
+          ToastAnchor.MainPage,
         );
       });
     });
@@ -1549,7 +1559,7 @@ describe('FirebaseFirestoreService', () => {
         expect(result).toEqual({});
         expect(console.error).toHaveBeenCalledWith(
           'Error reading contingent data:',
-          jasmine.anything()
+          jasmine.anything(),
         );
       });
 
@@ -1562,7 +1572,7 @@ describe('FirebaseFirestoreService', () => {
         expect(result).toEqual({});
         expect(console.error).toHaveBeenCalledWith(
           'Error reading contingent data:',
-          jasmine.anything()
+          jasmine.anything(),
         );
       });
     });
@@ -1580,7 +1590,7 @@ describe('FirebaseFirestoreService', () => {
         expect(result).toEqual([]);
         expect(console.error).toHaveBeenCalledWith(
           'Error fetching all user statistics for month 2026-02:',
-          jasmine.anything()
+          jasmine.anything(),
         );
       });
 
@@ -1597,7 +1607,7 @@ describe('FirebaseFirestoreService', () => {
         expect(result).toEqual([]);
         expect(console.error).toHaveBeenCalledWith(
           'Error fetching all user statistics for month 2026-02:',
-          jasmine.anything()
+          jasmine.anything(),
         );
       });
     });

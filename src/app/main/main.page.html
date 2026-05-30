@@ -4,7 +4,6 @@
 
 <ion-content
   #content
-  class="translation-content"
   [class.landscape]="!utilsService.isPortrait"
 >
   <ion-card class="main-feature-card">
@@ -15,6 +14,7 @@
       <app-feature-example></app-feature-example>
     </ion-card-content>
   </ion-card>
+  
   <ion-accordion-group
     (ionValueChange)="onAccordionGroupChange($event, content)"
   >

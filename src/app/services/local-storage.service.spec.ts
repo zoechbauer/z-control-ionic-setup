@@ -6,6 +6,7 @@ import { AllMonthsOption, DisplayMode } from '../shared/enums';
 import { TranslateService } from '@ngx-translate/core';
 import { ModalController } from '@ionic/angular';
 import { UtilsService } from './utils.service';
+import { AppConstants } from '../shared/app.constants';
 
 describe('LocalStorageService', () => {
   let service: LocalStorageService;
@@ -98,14 +99,14 @@ describe('LocalStorageService', () => {
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         'Error saving selected language:',
-        error
+        error,
       );
     });
 
     it('throws an error if language is not provided', async () => {
       await expectAsync(service.saveSelectedLanguage('')).toBeRejectedWithError(
         Error,
-        'Language must be provided'
+        'Language must be provided',
       );
     });
   });
@@ -134,8 +135,8 @@ describe('LocalStorageService', () => {
     it('should save the firestore uid', async () => {
       await service.saveFirestoreUid('some-uid');
       expect(storageSpy.set).toHaveBeenCalledWith(
-        'mlt_currentUser',
-        'some-uid'
+        AppConstants.currentUser,
+        'some-uid',
       );
     });
 
@@ -146,7 +147,7 @@ describe('LocalStorageService', () => {
       await service.saveFirestoreUid('some-uid');
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         'Error saving current user UID:',
-        error
+        error,
       );
     });
   });
@@ -176,7 +177,7 @@ describe('LocalStorageService', () => {
       await service.saveStatisticsDisplayMode(DisplayMode.Programmer);
       expect(storageSpy.set).toHaveBeenCalledWith(
         'statisticsDisplayMode',
-        DisplayMode.Programmer
+        DisplayMode.Programmer,
       );
     });
 
@@ -189,7 +190,7 @@ describe('LocalStorageService', () => {
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         'Error saving statistics display mode:',
-        error
+        error,
       );
     });
   });
@@ -199,7 +200,7 @@ describe('LocalStorageService', () => {
       storageSpy.get.and.returnValue(Promise.resolve('2026-03'));
       const selectedMonth = await service.getStatisticsSelectedMonth(
         AllMonthsOption.SelectOptionValue,
-        false
+        false,
       );
       expect(selectedMonth).toBe('2026-03');
     });
@@ -210,12 +211,12 @@ describe('LocalStorageService', () => {
 
       const selectedMonth = await service.getStatisticsSelectedMonth(
         AllMonthsOption.SelectOptionValue,
-        false
+        false,
       );
       expect(selectedMonth).toBe('2026-04');
       expect(storageSpy.set).toHaveBeenCalledWith(
         'statisticsSelectedMonth',
-        '2026-04'
+        '2026-04',
       );
     });
 
@@ -226,12 +227,12 @@ describe('LocalStorageService', () => {
 
       const selectedMonth = await service.getStatisticsSelectedMonth(
         AllMonthsOption.SelectOptionValue,
-        isProgrammerDevice
+        isProgrammerDevice,
       );
       expect(selectedMonth).toBe('2026-04');
       expect(storageSpy.set).toHaveBeenCalledWith(
         'statisticsSelectedMonth',
-        '2026-04'
+        '2026-04',
       );
     });
 
@@ -240,12 +241,12 @@ describe('LocalStorageService', () => {
       utilsServiceSpy.getCurrentMonth.and.returnValue('2026-04');
 
       const selectedMonth = await service.getStatisticsSelectedMonth(
-        AllMonthsOption.SelectOptionValue
+        AllMonthsOption.SelectOptionValue,
       );
       expect(selectedMonth).toBe('2026-04');
       expect(storageSpy.set).toHaveBeenCalledWith(
         'statisticsSelectedMonth',
-        '2026-04'
+        '2026-04',
       );
     });
 
@@ -256,23 +257,23 @@ describe('LocalStorageService', () => {
 
       const selectedMonth = await service.getStatisticsSelectedMonth(
         AllMonthsOption.SelectOptionValue,
-        isProgrammerDevice
+        isProgrammerDevice,
       );
       expect(selectedMonth).toBe('2026-03');
       expect(storageSpy.set).toHaveBeenCalledWith(
         'statisticsSelectedMonth',
-        '2026-03'
+        '2026-03',
       );
     });
 
     it('should not update local storage if month did not change', async () => {
       storageSpy.get.and.returnValue(Promise.resolve('2026-04'));
       utilsServiceSpy.getCurrentMonth.and.returnValue('2026-04');
-      
+
       let isProgrammerDevice = true;
       let selectedMonth = await service.getStatisticsSelectedMonth(
         AllMonthsOption.SelectOptionValue,
-        isProgrammerDevice
+        isProgrammerDevice,
       );
       expect(selectedMonth)
         .withContext('Programmer device - selectedMonth')
@@ -284,7 +285,7 @@ describe('LocalStorageService', () => {
       isProgrammerDevice = false;
       selectedMonth = await service.getStatisticsSelectedMonth(
         AllMonthsOption.SelectOptionValue,
-        isProgrammerDevice
+        isProgrammerDevice,
       );
       expect(selectedMonth)
         .withContext('User device - selectedMonth')
@@ -299,7 +300,7 @@ describe('LocalStorageService', () => {
 
       const selectedMonth = await service.getStatisticsSelectedMonth(
         AllMonthsOption.SelectOptionValue,
-        true
+        true,
       );
 
       expect(selectedMonth)
@@ -314,7 +315,7 @@ describe('LocalStorageService', () => {
       storageSpy.get.and.returnValue(Promise.resolve('2026-03'));
       await service.getStatisticsSelectedMonth(
         AllMonthsOption.SelectOptionValue,
-        false
+        false,
       );
       expect(service.statisticsSelectedMonthSubject.value).toBe('2026-03');
     });
@@ -325,21 +326,21 @@ describe('LocalStorageService', () => {
       await service.saveStatisticsSelectedMonth('2026-03');
       expect(storageSpy.set).toHaveBeenCalledWith(
         'statisticsSelectedMonth',
-        '2026-03'
+        '2026-03',
       );
     });
 
     it('should save AllMonthsOption.localStorageValue if selected month length is not 7', async () => {
       await service.saveStatisticsSelectedMonth(
-        AllMonthsOption.SelectOptionValue
+        AllMonthsOption.SelectOptionValue,
       );
 
       expect(storageSpy.set).toHaveBeenCalledWith(
         'statisticsSelectedMonth',
-        AllMonthsOption.localStorageValue
+        AllMonthsOption.localStorageValue,
       );
       expect(service.statisticsSelectedMonthSubject.value).toBe(
-        AllMonthsOption.localStorageValue
+        AllMonthsOption.localStorageValue,
       );
     });
 
@@ -352,7 +353,7 @@ describe('LocalStorageService', () => {
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         'Error saving statistics selected month:',
-        error
+        error,
       );
     });
   });
@@ -367,7 +368,7 @@ describe('LocalStorageService', () => {
     it('should load selected or default language', async () => {
       const loadSelectedOrDefaultLanguageSpy = spyOn(
         service,
-        'loadSelectedOrDefaultLanguage'
+        'loadSelectedOrDefaultLanguage',
       ).and.returnValue(Promise.resolve('en'));
       const translateServiceSpy = createTranslateServiceSpy();
       await service.initializeServicesAsync(translateServiceSpy);
@@ -376,7 +377,7 @@ describe('LocalStorageService', () => {
 
     it('should set default language in translate service when initialization fails', async () => {
       storageSpy.create.and.returnValue(
-        Promise.reject(new Error('init failed'))
+        Promise.reject(new Error('init failed')),
       );
 
       const translateServiceSpy = createTranslateServiceSpy();
@@ -389,11 +390,11 @@ describe('LocalStorageService', () => {
 
     it('should run remaining initialization steps on success', async () => {
       spyOn(service, 'loadSelectedOrDefaultLanguage').and.returnValue(
-        Promise.resolve('en')
+        Promise.resolve('en'),
       );
       const loadFirestoreUidSpy = spyOn(
         service,
-        'loadFirestoreUid'
+        'loadFirestoreUid',
       ).and.returnValue(Promise.resolve(null));
 
       const translateServiceSpy = createTranslateServiceSpy();
@@ -405,7 +406,7 @@ describe('LocalStorageService', () => {
 
     it('should not call fallback translate methods when initialization succeeds', async () => {
       spyOn(service, 'loadSelectedOrDefaultLanguage').and.returnValue(
-        Promise.resolve('en')
+        Promise.resolve('en'),
       );
       spyOn(service, 'loadFirestoreUid').and.returnValue(Promise.resolve(null));
 
@@ -419,20 +420,29 @@ describe('LocalStorageService', () => {
 
     it('should log and fallback if a later initialization step fails', async () => {
       spyOn(service, 'loadSelectedOrDefaultLanguage').and.returnValue(
-        Promise.resolve('en')
+        Promise.resolve('en'),
+      );
+      spyOn(service, 'loadFirestoreUid').and.returnValue(
+        Promise.reject(new Error('Firestore UID load failed')),
       );
       const consoleErrorSpy = spyOn(console, 'error');
-
       const translateServiceSpy = createTranslateServiceSpy();
+      const initializeWithDefaultsSpy = spyOn(
+        service as any,
+        'initializeWithDefaults',
+      ).and.callThrough();
 
       await service.initializeServicesAsync(translateServiceSpy);
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         'App initialization failed:',
-        new Error('target load failed')
+        new Error('Firestore UID load failed'),
       );
       expect(translateServiceSpy.setDefaultLang).toHaveBeenCalledWith('en');
       expect(translateServiceSpy.use).toHaveBeenCalledWith('en');
+      expect(initializeWithDefaultsSpy).toHaveBeenCalledWith(
+        translateServiceSpy,
+      );
     });
   });
 });

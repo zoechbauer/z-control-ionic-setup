@@ -89,8 +89,6 @@ export class SettingsPage implements OnInit, OnDestroy {
         this.selectedLanguage = lang;
         this.isLoading = false;
       }),
-    );
-    this.subscriptions.push(
       this.utilsService.logoClicked$.subscribe(() => {
         this.openFeedbackAccordion();
       }),

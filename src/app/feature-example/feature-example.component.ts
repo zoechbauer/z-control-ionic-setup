@@ -21,7 +21,6 @@ import { ToastService } from '../services/toast.service';
 import { ToastAnchor } from '../shared/enums';
 import { FirebaseFirestoreUtilsService } from '../services/firebase-firestore-utils.service';
 import { FeatureService } from '../services/feature.service';
-import { FeatureResult } from 'functions/src/shared/firebase-firestore.interfaces';
 
 @Component({
   selector: 'app-feature-example',
@@ -79,16 +78,13 @@ export class FeatureExampleComponent implements OnInit {
   }
 
   async search() {
-    this.toastService.showToast(
-      this.translate.instant('FEATURE.TOAST.QUOTA_REDUCED'),
-    );
-
     this.isLoading = true;
     await this.updateIsContingentExceeded();
 
     if (this.isContingentExceeded) {
       this.toastService.showToast(
         this.translate.instant('FEATURE.TOAST.CONTINGENT_EXCEEDED'),
+        ToastAnchor.MainPage,
       );
       this.isLoading = false;
       return;
@@ -105,6 +101,10 @@ export class FeatureExampleComponent implements OnInit {
       }
       this.displayFeatureResults(featureResults);
       this.firestoreUtilsService.requestStatisticsRefresh();
+      this.toastService.showToast(
+        this.translate.instant('FEATURE.TOAST.QUOTA_REDUCED'),
+        ToastAnchor.MainPage,
+      );
     } catch (error: any) {
       if (error?.message?.includes('contingent')) {
         this.toastService.showToast(
@@ -112,7 +112,7 @@ export class FeatureExampleComponent implements OnInit {
           ToastAnchor.MainPage,
         );
       } else {
-        console.error('Translation error:', error);
+        console.error('Feature error:', error);
         this.toastService.showToast(
           this.translate.instant('FEATURE.TOAST.ERROR_CALLING_FEATURE'),
           ToastAnchor.MainPage,
@@ -127,7 +127,7 @@ export class FeatureExampleComponent implements OnInit {
     this.initFormControls();
   }
 
-  private displayFeatureResults(featureResults: FeatureResult): void {
+  private displayFeatureResults(featureResults: any): void {
     this.relatedWords = featureResults.feature['related'].split(', ');
   }
 

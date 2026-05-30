@@ -18,8 +18,6 @@ import { Subscription } from 'rxjs';
 import { HeaderComponent } from '../ui/components/header/header.component';
 import { UtilsService } from '../services/utils.service';
 import { LocalStorageService } from '../services/local-storage.service';
-import { DeviceInfo } from '../shared/firebase-firestore.interfaces';
-import { DeviceUtils } from '../services/device-utils.service';
 import { Tab } from '../shared/enums';
 import { UserStatisticComponent } from '../ui/components/user-statistic/user-statistic.component';
 import { FirebaseFirestoreUtilsService } from '../services/firebase-firestore-utils.service';
@@ -53,10 +51,6 @@ export class MainPage implements OnInit, OnDestroy {
   settingsIcon: string = '<ion-icon name="settings-outline"></ion-icon>';
 
   private readonly subscriptions: Subscription[] = [];
-
-  get deviceInfos(): DeviceInfo {
-    return DeviceUtils.getDeviceInfo();
-  }
 
   constructor(
     public translate: TranslateService,

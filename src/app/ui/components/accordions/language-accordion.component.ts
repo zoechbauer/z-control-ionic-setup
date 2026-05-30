@@ -13,8 +13,6 @@ import {
 } from '@ionic/angular/standalone';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
-import { LocalStorageService } from 'src/app/services/local-storage.service';
-
 @Component({
   selector: 'app-language-accordion',
   templateUrl: './language-accordion.component.html',
@@ -35,7 +33,6 @@ export class LanguageAccordionComponent {
 
   constructor(
     public translate: TranslateService,
-    public localStorage: LocalStorageService,
   ) {}
 
 }

@@ -58,7 +58,7 @@ export class FirebaseFirestoreService {
     private readonly functions: Functions,
     private readonly utilsService: UtilsService,
     private readonly localStorageService: LocalStorageService,
-    private readonly toastService: ToastService
+    private readonly toastService: ToastService,
   ) {
     this.injector = inject(Injector);
   }
@@ -101,14 +101,14 @@ export class FirebaseFirestoreService {
           this.user = this.auth.currentUser;
           if (this.user?.uid) {
             await runInInjectionContext(this.injector, () =>
-              this.addUser(this.user.uid)
+              this.addUser(this.user.uid),
             );
             await this.saveUserIdToLocalStorage(this.user.uid);
           }
         } else {
           // No restored session available -> sign in anonymously once.
           await runInInjectionContext(this.injector, () =>
-            this.signInAnonymously()
+            this.signInAnonymously(),
           );
         }
 
@@ -119,21 +119,21 @@ export class FirebaseFirestoreService {
         }
 
         await runInInjectionContext(this.injector, () =>
-          this.createMissingContingentData()
+          this.createMissingContingentData(),
         );
         await runInInjectionContext(this.injector, () =>
-          this.updateProgrammerDeviceUIDs()
+          this.updateProgrammerDeviceUIDs(),
         );
       } else {
         // Native: Always use Firebase Auth
         await runInInjectionContext(this.injector, () =>
-          this.signInAnonymously()
+          this.signInAnonymously(),
         );
         await runInInjectionContext(this.injector, () =>
-          this.createMissingContingentData()
+          this.createMissingContingentData(),
         );
         await runInInjectionContext(this.injector, () =>
-          this.updateProgrammerDeviceUIDs()
+          this.updateProgrammerDeviceUIDs(),
         );
       }
     } catch (error) {
@@ -175,19 +175,19 @@ export class FirebaseFirestoreService {
   private async signInAnonymously(): Promise<void> {
     if (!this.auth.currentUser) {
       const result = await runInInjectionContext(this.injector, () =>
-        this.authWrapper.signInAnonymously(this.auth)
+        this.authWrapper.signInAnonymously(this.auth),
       );
       this.user = (result as any).user;
       if (this.user?.uid) {
         await runInInjectionContext(this.injector, () =>
-          this.addUser(this.user.uid)
+          this.addUser(this.user.uid),
         );
       }
     } else {
       this.user = this.auth.currentUser;
       if (this.user?.uid) {
         await runInInjectionContext(this.injector, () =>
-          this.addUser(this.user.uid)
+          this.addUser(this.user.uid),
         );
       }
     }
@@ -205,7 +205,7 @@ export class FirebaseFirestoreService {
   private async saveUserIdToLocalStorage(uid: string): Promise<void> {
     try {
       await runInInjectionContext(this.injector, () =>
-        this.localStorageService.saveFirestoreUid(uid)
+        this.localStorageService.saveFirestoreUid(uid),
       );
     } catch (error) {
       console.error('Error saving user UID to localStorage:', error);
@@ -225,7 +225,7 @@ export class FirebaseFirestoreService {
     try {
       const usersRef = this.getCollection(usersCollectionPath);
       const snapshot = await runInInjectionContext(this.injector, () =>
-        this.getDocs(usersRef)
+        this.getDocs(usersRef),
       );
       const users: UserType[] = [];
       snapshot.forEach((docSnap) => {
@@ -234,9 +234,9 @@ export class FirebaseFirestoreService {
         const userCreatedYYYYMM =
           this.utilsService.formatDateTimeFirestoreSearchString(userCreated);
         if (
-          selectedMonth === AllMonthsOption.localStorageValue ||            // all months
-          userCreatedYYYYMM === selectedMonth ||                            // created in selected month
-          this.userHasTranslationsInMonth(data['userId'], selectedMonth)    // has translations in selected month
+          selectedMonth === AllMonthsOption.localStorageValue || // all months
+          userCreatedYYYYMM === selectedMonth || // created in selected month
+          this.userHasTranslationsInMonth(data['userId'], selectedMonth) // has translations in selected month
         ) {
           users.push({
             userId: data['userId'],
@@ -256,9 +256,9 @@ export class FirebaseFirestoreService {
       console.error('Error loading users from user mapping:', error);
       this.toastService.showToast(
         this.translate.instant(
-          'TRANSLATE.CARD_RESULTS.TOAST.ERROR_LOADING_USERS'
+          'TRANSLATE.CARD_RESULTS.TOAST.ERROR_LOADING_USERS',
         ),
-        ToastAnchor.SettingsPage
+        ToastAnchor.SettingsPage,
       );
       return [];
     }
@@ -268,7 +268,7 @@ export class FirebaseFirestoreService {
     const translationsForMonth = this.cachedTranslations.get(month);
     if (translationsForMonth) {
       const hasTranslations = translationsForMonth.some(
-        (stat) => stat.userId === userId && stat.translatedCharCount > 0
+        (stat) => stat.userId === userId && stat.translatedCharCount > 0,
       );
       return hasTranslations;
     }
@@ -284,7 +284,7 @@ export class FirebaseFirestoreService {
   public async addUser(userId: string) {
     try {
       const callable = runInInjectionContext(this.injector, () =>
-        this.getHttpsCallable('addUser')
+        this.getHttpsCallable('addUser'),
       );
       await runInInjectionContext(this.injector, () =>
         (callable as any)({
@@ -293,15 +293,15 @@ export class FirebaseFirestoreService {
           programmerDeviceUIDs: this.getEnvironmentProgrammerDeviceUIDs(),
           deviceInfo: this.deviceInfo,
           isNative: this.utilsService.isNative,
-        })
+        }),
       );
     } catch (error) {
       console.error('Error adding user:', error);
       this.toastService.showToast(
         this.translate.instant(
-          'TRANSLATE.CARD_RESULTS.TOAST.ERROR_ADDING_USER'
+          'TRANSLATE.CARD_RESULTS.TOAST.ERROR_ADDING_USER',
         ),
-        ToastAnchor.MainPage
+        ToastAnchor.MainPage,
       );
     }
   }
@@ -317,21 +317,21 @@ export class FirebaseFirestoreService {
   public async getProgrammerDeviceUIDs(): Promise<ProgrammerDeviceUID[]> {
     try {
       const callable = runInInjectionContext(this.injector, () =>
-        this.getHttpsCallable('getProgrammerDeviceUIDs')
+        this.getHttpsCallable('getProgrammerDeviceUIDs'),
       );
       const result = await runInInjectionContext(this.injector, () =>
         (callable as any)({
           appId: FireStoreConstants.APP_ID,
-        })
+        }),
       );
       return result.data.programmerDevices as ProgrammerDeviceUID[];
     } catch (error) {
       console.error('Error getting all programmer devices:', error);
       this.toastService.showToast(
         this.translate.instant(
-          'TRANSLATE.CARD_RESULTS.TOAST.ERROR_GETTING_PROGRAMMER_DEVICES'
+          'TRANSLATE.CARD_RESULTS.TOAST.ERROR_GETTING_PROGRAMMER_DEVICES',
         ),
-        ToastAnchor.MainPage
+        ToastAnchor.MainPage,
       );
       return [];
     }
@@ -340,21 +340,21 @@ export class FirebaseFirestoreService {
   public async getIsProgrammerDevice(): Promise<boolean> {
     try {
       const callable = runInInjectionContext(this.injector, () =>
-        this.getHttpsCallable('isProgrammerDevice')
+        this.getHttpsCallable('isProgrammerDevice'),
       );
       const result = await runInInjectionContext(this.injector, () =>
         (callable as any)({
           appId: FireStoreConstants.APP_ID,
-        })
+        }),
       );
       return result.data.isProgrammerDevice as boolean;
     } catch (error) {
       console.error('Error getting programmer device status:', error);
       this.toastService.showToast(
         this.translate.instant(
-          'TRANSLATE.CARD_RESULTS.TOAST.ERROR_GETTING_PROGRAMMER_DEVICE_STATUS'
+          'TRANSLATE.CARD_RESULTS.TOAST.ERROR_GETTING_PROGRAMMER_DEVICE_STATUS',
         ),
-        ToastAnchor.MainPage
+        ToastAnchor.MainPage,
       );
       return false;
     }
@@ -379,26 +379,36 @@ export class FirebaseFirestoreService {
 
     try {
       const callable = runInInjectionContext(this.injector, () =>
-        this.getHttpsCallable('updateProgrammerDeviceUIDs')
+        this.getHttpsCallable('updateProgrammerDeviceUIDs'),
       );
       await runInInjectionContext(this.injector, () =>
         (callable as any)({
           appId: FireStoreConstants.APP_ID,
           programmerDeviceUIDs: this.getEnvironmentProgrammerDeviceUIDs(),
-        })
+        }),
       );
     } catch (error) {
       console.error('Error updating programmer devices:', error);
       this.toastService.showToast(
         this.translate.instant(
-          'TRANSLATE.CARD_RESULTS.TOAST.ERROR_UPDATING_PROGRAMMER_DEVICES'
+          'TRANSLATE.CARD_RESULTS.TOAST.ERROR_UPDATING_PROGRAMMER_DEVICES',
         ),
-        ToastAnchor.MainPage
+        ToastAnchor.MainPage,
       );
     }
   }
 
+  /**
+   * Retrieves a list of programmer device UIDs from the environment configuration.
+   * The environment variable should be an array of objects with a single key-value pair,
+   * where the key is the device name and the value is the user ID.
+   * If updating programmer devices is disabled, returns an empty array.
+   */
   private getEnvironmentProgrammerDeviceUIDs(): ProgrammerDeviceUID[] {
+    if (!environment.app.programmerDevices.updateUsermap) {
+      return [];
+    }
+
     const programmerDeviceUIDs: ProgrammerDeviceUID[] = [];
     const devices = environment.app.programmerDevices.devices;
 
@@ -422,16 +432,18 @@ export class FirebaseFirestoreService {
   async createMissingContingentData(): Promise<void> {
     try {
       const callable = runInInjectionContext(this.injector, () =>
-        this.getHttpsCallable('createMissingContingentData')
+        this.getHttpsCallable('createMissingContingentData'),
       );
-      await runInInjectionContext(this.injector, () => (callable as any)({
-        appId: FireStoreConstants.APP_ID,
-      }));
+      await runInInjectionContext(this.injector, () =>
+        (callable as any)({
+          appId: FireStoreConstants.APP_ID,
+        }),
+      );
     } catch (error) {
       console.error('Error creating missing contingent data:', error);
       this.toastService.showToast(
         'Error creating missing contingent data.',
-        ToastAnchor.MainPage
+        ToastAnchor.MainPage,
       );
     }
   }
@@ -450,14 +462,14 @@ export class FirebaseFirestoreService {
    * or an empty object if not found or on error.
    */
   async readContingentData(
-    selectedMonth: string
+    selectedMonth: string,
   ): Promise<FirestoreContingentData> {
     try {
       if (selectedMonth === AllMonthsOption.SelectOptionValue) {
-        return {};  // contingent data is not displayed for 'all months' option
+        return {}; // contingent data is not displayed for 'all months' option
       }
       const dataDocPath = `${FireStoreConstants.getMetaContingentDataDocumentPath(
-        selectedMonth
+        selectedMonth,
       )}`;
       const dataSnap = await runInInjectionContext(this.injector, () => {
         const dataRef = this.getFirestoreDoc(dataDocPath);
@@ -473,7 +485,7 @@ export class FirebaseFirestoreService {
       console.error('Error reading contingent data:', error);
       this.toastService.showToast(
         'Error reading contingent data.',
-        ToastAnchor.MainPage
+        ToastAnchor.MainPage,
       );
       return {};
     }
@@ -484,7 +496,7 @@ export class FirebaseFirestoreService {
   }
 
   private getFirestoreDocSnapshot(
-    docRef: DocumentReference<DocumentData>
+    docRef: DocumentReference<DocumentData>,
   ): Promise<DocumentSnapshot<DocumentData>> {
     return getDoc(docRef);
   }
@@ -500,7 +512,7 @@ export class FirebaseFirestoreService {
       }
       const usageSnap = await runInInjectionContext(this.injector, () => {
         const usageRef = this.getFirestoreDoc(
-          `${FireStoreConstants.getUsersCollectionPath()}/${this.user.uid}`
+          `${FireStoreConstants.getUsersCollectionPath()}/${this.user.uid}`,
         );
         return this.getFirestoreDocSnapshot(usageRef);
       });
@@ -522,13 +534,13 @@ export class FirebaseFirestoreService {
    * @returns Promise<number> Resolves to the total translated character count for all users for the specified month.
    */
   async getTotalCharCount(
-    selectedMonth: string | undefined = undefined
+    selectedMonth: string | undefined = undefined,
   ): Promise<number> {
     try {
       if (!this.user) return 0;
       const usageSnap = await runInInjectionContext(this.injector, () => {
         const usageRef = this.getFirestoreDoc(
-          `${FireStoreConstants.getMetaTotalCharsDocumentPath(selectedMonth)}`
+          `${FireStoreConstants.getMetaTotalCharsDocumentPath(selectedMonth)}`,
         );
         return this.getFirestoreDocSnapshot(usageRef);
       });
@@ -554,7 +566,7 @@ export class FirebaseFirestoreService {
    *  @returns An array of UserTranslationStatistics objects.
    */
   async getAllUserTranslationStatistics(
-    selectedMonth: string
+    selectedMonth: string,
   ): Promise<UserTranslationStatistics[]> {
     try {
       let result: UserTranslationStatistics[] = [];
@@ -571,15 +583,14 @@ export class FirebaseFirestoreService {
           }
         }
       } else {
-        result = await this.getAllUserTranslationStatisticsForMonth(
-          selectedMonth
-        );
+        result =
+          await this.getAllUserTranslationStatisticsForMonth(selectedMonth);
       }
       return result;
     } catch (error) {
       console.error(
         `Error fetching all user statistics for month ${selectedMonth}:`,
-        error
+        error,
       );
       return [];
     }
@@ -591,7 +602,7 @@ export class FirebaseFirestoreService {
    *  @returns An array of UserTranslationStatistics objects.
    */
   private async getAllUserTranslationStatisticsForMonth(
-    selectedMonth: string
+    selectedMonth: string,
   ): Promise<UserTranslationStatistics[]> {
     try {
       const cachedStatistics =
@@ -601,11 +612,11 @@ export class FirebaseFirestoreService {
       }
       // get statistics from firestore
       const usersCollectionPath = `${FireStoreConstants.getUsersCollectionPath(
-        selectedMonth
+        selectedMonth,
       )}`;
       const usersRef = this.getCollection(usersCollectionPath);
       const snapshot = await runInInjectionContext(this.injector, () =>
-        this.getDocs(usersRef)
+        this.getDocs(usersRef),
       );
       const result: UserTranslationStatistics[] = [];
       snapshot.forEach((docSnap) => {
@@ -623,7 +634,7 @@ export class FirebaseFirestoreService {
     } catch (error) {
       console.error(
         `Error fetching all user statistics for month ${selectedMonth}:`,
-        error
+        error,
       );
       return [];
     }
@@ -640,7 +651,7 @@ export class FirebaseFirestoreService {
    *          or when the requested month is the current month.
    */
   private getCachedTranslationsForPreviousMonth(
-    month: string
+    month: string,
   ): UserTranslationStatistics[] | undefined {
     const currentMonth = this.utilsService.getCurrentMonth();
     if (currentMonth !== month) {
@@ -662,19 +673,19 @@ export class FirebaseFirestoreService {
    */
   private saveCachedTranslationsForMonth(
     month: string,
-    data: UserTranslationStatistics[]
+    data: UserTranslationStatistics[],
   ): void {
     this.cachedTranslations.set(month, data);
   }
 
   private getCollection(path: string) {
     return runInInjectionContext(this.injector, () =>
-      collection(this.firestore, path)
+      collection(this.firestore, path),
     );
   }
 
   private getDocs(
-    collectionRef: ReturnType<FirebaseFirestoreService['getCollection']>
+    collectionRef: ReturnType<FirebaseFirestoreService['getCollection']>,
   ): Promise<QuerySnapshot<DocumentData>> {
     return runInInjectionContext(this.injector, () => getDocs(collectionRef));
   }
@@ -722,7 +733,7 @@ export class FirebaseFirestoreService {
       typeof (date as { seconds: unknown }).seconds === 'number'
     ) {
       const fromSeconds = new Date(
-        (date as { seconds: number }).seconds * 1000
+        (date as { seconds: number }).seconds * 1000,
       );
       return Number.isNaN(fromSeconds.getTime()) ? undefined : fromSeconds;
     }

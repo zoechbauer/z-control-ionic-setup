@@ -44,12 +44,11 @@ export class UserDetailComponent {
   @Input() userStatistic!: DisplayedUserStatistics;
   @Input() displayMode!: DisplayMode;
   DisplayMode = DisplayMode;
-  targetLanguagesDisplay: string = '';
 
   constructor(
     public translate: TranslateService,
     private readonly modalCtrl: ModalController,
-    private readonly utilsService: UtilsService
+    private readonly utilsService: UtilsService,
   ) {}
 
   close(): void {
@@ -57,6 +56,9 @@ export class UserDetailComponent {
   }
 
   getAppVersion(): string {
+    if (!this.userStatistic?.deviceInfo?.appVersion?.date) {
+      return '';
+    }
     return `${this.userStatistic.deviceInfo.appVersion.major}.${this.userStatistic.deviceInfo.appVersion.minor} (${this.userStatistic.deviceInfo.appVersion.date})`;
   }
 
@@ -72,5 +74,4 @@ export class UserDetailComponent {
     const platform = this.userStatistic.displayedPlatform;
     return platform === 'native' ? `${platform} - Android App` : platform;
   }
-
 }

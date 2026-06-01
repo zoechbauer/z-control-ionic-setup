@@ -21,9 +21,9 @@ import {
 
 function createUserStat(
   userId = 'U-1',
-  translatedCharCount = 500,
-  lastTranslationDate: Date | null = new Date('2026-03-15T00:00:00Z'),
-  targetLanguages: string[] = ['en']
+  consumedFeatureCharCount = 500,
+  lastFeatureUsageDate: Date | null = new Date('2026-03-15T00:00:00Z'),
+  targetLanguages: string[] = ['en'],
 ): DisplayedUserStatisticsRow {
   return {
     userId,
@@ -45,9 +45,9 @@ function createUserStat(
     },
     displayedPlatform: 'web-desktop',
     displayedModel: 'Model X',
-    translatedCharCount,
+    consumedFeatureCharCount: consumedFeatureCharCount,
     targetLanguages,
-    lastTranslationDate,
+    lastFeatureUsageDate: lastFeatureUsageDate,
     formattedLastActivityDate: '2026-03-15',
     isCurrentUser: false,
   };
@@ -78,14 +78,14 @@ describe('GetStatisticsComponent', () => {
       {
         isPortrait: true,
         isNative: false,
-      }
+      },
     );
     firestoreUtilsServiceSpy = jasmine.createSpyObj(
       'FirebaseFirestoreUtilsService',
       ['getDisplayedUserStatistics', 'getUserStatisticsSummary'],
       {
         statisticsRefresh$: of(void 0),
-      }
+      },
     );
     firestoreServiceSpy = jasmine.createSpyObj(
       'FirebaseFirestoreService',
@@ -93,11 +93,11 @@ describe('GetStatisticsComponent', () => {
       {
         programmerDeviceRefresh$: of(void 0),
         isProgrammerDevice: false,
-        StopTranslationForAllUsers: false,
-      }
+        StopFeatureUsageForAllUsers: false,
+      },
     );
     firestoreServiceSpy.readContingentData.and.returnValue(
-      Promise.resolve({ StopTranslationForAllUsers: false })
+      Promise.resolve({ StopFeatureUsageForAllUsers: false }),
     );
     localStorageServiceSpy = jasmine.createSpyObj(
       'LocalStorageService',
@@ -111,7 +111,7 @@ describe('GetStatisticsComponent', () => {
       {
         statisticsDisplayMode$: of(DisplayMode.User),
         statisticsSelectedMonth$: of('2026-04'),
-      }
+      },
     );
 
     TestBed.configureTestingModule({
@@ -159,7 +159,7 @@ describe('GetStatisticsComponent', () => {
       it('should call UtilsService.formatDateTimeISO when dateTime is valid', () => {
         component.getFormatDateTime(new Date('2026-03-09T00:00:00Z'));
         expect(utilsServiceSpy.formatDateTimeISO).toHaveBeenCalledWith(
-          new Date('2026-03-09T00:00:00Z')
+          new Date('2026-03-09T00:00:00Z'),
         );
       });
 
@@ -182,7 +182,7 @@ describe('GetStatisticsComponent', () => {
         component.displayMode = DisplayMode.Programmer;
         component.getFormatDateTime(new Date('2026-03-09T00:00:00Z'));
         expect(utilsServiceSpy.formatDateTimeISO).toHaveBeenCalledWith(
-          new Date('2026-03-09T00:00:00Z')
+          new Date('2026-03-09T00:00:00Z'),
         );
       });
 
@@ -190,7 +190,7 @@ describe('GetStatisticsComponent', () => {
         component.displayMode = DisplayMode.User;
         component.getFormatDateTime(new Date('2026-03-09T00:00:00Z'));
         expect(utilsServiceSpy.formatDateISO).toHaveBeenCalledWith(
-          new Date('2026-03-09T00:00:00Z')
+          new Date('2026-03-09T00:00:00Z'),
         );
       });
     });
@@ -204,7 +204,7 @@ describe('GetStatisticsComponent', () => {
       it('should call UtilsService.formatDateISO when dateTime is valid', () => {
         component.getFormatDateTime(new Date('2026-03-09T00:00:00Z'));
         expect(utilsServiceSpy.formatDateISO).toHaveBeenCalledWith(
-          new Date('2026-03-09T00:00:00Z')
+          new Date('2026-03-09T00:00:00Z'),
         );
       });
 
@@ -242,7 +242,7 @@ describe('GetStatisticsComponent', () => {
         const result = component.getSectionHeader('SECTION.HEADER_KEY');
 
         expect(result).toBe(
-          `SECTION.HEADER_KEY: ${AllMonthsOption.SelectOptionValue}`
+          `SECTION.HEADER_KEY: ${AllMonthsOption.SelectOptionValue}`,
         );
       });
 
@@ -373,7 +373,7 @@ describe('GetStatisticsComponent', () => {
         translatedCharCount: number,
         targetLanguages: string[],
         formattedLastActivityDate: string,
-        isCurrentUser = false
+        isCurrentUser = false,
       ) {
         const createdAt = new Date('2026-03-10');
         const lastUpdated = new Date('2026-03-15');
@@ -398,9 +398,9 @@ describe('GetStatisticsComponent', () => {
           },
           displayedPlatform: platform,
           displayedModel,
-          translatedCharCount,
+          consumedFeatureCharCount: translatedCharCount,
           targetLanguages,
-          lastTranslationDate: translatedCharCount > 0 ? lastUpdated : null,
+          lastFeatureUsageDate: translatedCharCount > 0 ? lastUpdated : null,
           formattedLastActivityDate,
           isCurrentUser,
         });
@@ -416,7 +416,7 @@ describe('GetStatisticsComponent', () => {
           'web-desktop',
           1000,
           ['en', 'nl'],
-          '2026-03-15'
+          '2026-03-15',
         );
         addStatisticsData(
           'U-2',
@@ -426,7 +426,7 @@ describe('GetStatisticsComponent', () => {
           'web-mobile',
           2000,
           ['en', 'nl', 'fr'],
-          '2026-03-15'
+          '2026-03-15',
         );
         addStatisticsData(
           'U-4',
@@ -436,7 +436,7 @@ describe('GetStatisticsComponent', () => {
           'web-mobile',
           0,
           [],
-          '2026-03-10'
+          '2026-03-10',
         );
         addStatisticsData(
           'P-1',
@@ -446,7 +446,7 @@ describe('GetStatisticsComponent', () => {
           'native',
           3000,
           ['en', 'nl', 'fr', 'es', 'it'],
-          '2026-03-15'
+          '2026-03-15',
         );
         addStatisticsData(
           'P-2',
@@ -456,7 +456,7 @@ describe('GetStatisticsComponent', () => {
           'web-desktop',
           0,
           [],
-          '2026-03-10'
+          '2026-03-10',
         );
         return statisticsData;
       }
@@ -465,7 +465,7 @@ describe('GetStatisticsComponent', () => {
         statisticsData = createStatiticsData();
         component['statisticsData'] = {
           displayedUserStatistics: statisticsData,
-          userTranslationStatistics: [],
+          userFeatureStatistics: [],
           users: [],
           programmerDeviceUIDs: [],
         };
@@ -474,7 +474,7 @@ describe('GetStatisticsComponent', () => {
       it('should call applyUserStatsFilter when onSearchTermChange is used', () => {
         const spy = spyOn<any>(
           component,
-          'applyUserStatsFilter'
+          'applyUserStatsFilter',
         ).and.callThrough();
 
         component.onSearchTermChange('U-1');
@@ -489,61 +489,61 @@ describe('GetStatisticsComponent', () => {
         component.onSearchTermChange('');
         expect(component.filteredUserStatsRows.length).toBe(5);
         expect(component.filteredUserStatsRows.map((r) => r.userId)).toEqual(
-          expectedIds
+          expectedIds,
         );
 
         component.onSearchTermChange(undefined);
         expect(component.filteredUserStatsRows.length).toBe(5);
         expect(component.filteredUserStatsRows.map((r) => r.userId)).toEqual(
-          expectedIds
+          expectedIds,
         );
 
         component.onSearchTermChange(null);
         expect(component.filteredUserStatsRows.length).toBe(5);
         expect(component.filteredUserStatsRows.map((r) => r.userId)).toEqual(
-          expectedIds
+          expectedIds,
         );
       });
 
       it('should filter by user id', () => {
         component.onSearchTermChange('U-1');
         expect(component['filteredUserStatsRows'].map((r) => r.userId)).toEqual(
-          ['U-1']
+          ['U-1'],
         );
       });
 
       it('should filter by user name', () => {
         component.onSearchTermChange('User Name for U-1');
         expect(component['filteredUserStatsRows'].map((r) => r.userId)).toEqual(
-          ['U-1']
+          ['U-1'],
         );
       });
 
       it('should filter by user type user', () => {
         component.onSearchTermChange('U-');
         expect(component['filteredUserStatsRows'].map((r) => r.userId)).toEqual(
-          ['U-1', 'U-2', 'U-4']
+          ['U-1', 'U-2', 'U-4'],
         );
       });
 
       it('should filter by user type programmer', () => {
         component.onSearchTermChange('P-');
         expect(component['filteredUserStatsRows'].map((r) => r.userId)).toEqual(
-          ['P-1', 'P-2']
+          ['P-1', 'P-2'],
         );
       });
 
       it('should filter by platform', () => {
         component.onSearchTermChange('web-desktop');
         expect(component['filteredUserStatsRows'].map((r) => r.userId)).toEqual(
-          ['U-1', 'P-2']
+          ['U-1', 'P-2'],
         );
       });
 
       it('should filter by model', () => {
         component.onSearchTermChange('Model 1');
         expect(component['filteredUserStatsRows'].map((r) => r.userId)).toEqual(
-          ['U-1', 'U-2']
+          ['U-1', 'U-2'],
         );
       });
 
@@ -566,60 +566,60 @@ describe('GetStatisticsComponent', () => {
       it('should filter rows which have at least 3 target languages with >> operator', () => {
         component.onSearchTermChange('>>2');
         component['filteredUserStatsRows'].sort((a, b) =>
-          a.userId.localeCompare(b.userId)
+          a.userId.localeCompare(b.userId),
         );
         expect(component['filteredUserStatsRows'].map((r) => r.userId)).toEqual(
-          ['P-1', 'U-2']
+          ['P-1', 'U-2'],
         );
       });
 
       it('should filter rows which have less or equal to 3 target languages with << operator', () => {
         component.onSearchTermChange('<<4');
         component['filteredUserStatsRows'].sort((a, b) =>
-          a.userId.localeCompare(b.userId)
+          a.userId.localeCompare(b.userId),
         );
         expect(component['filteredUserStatsRows'].map((r) => r.userId)).toEqual(
-          ['P-2', 'U-1', 'U-2', 'U-4']
+          ['P-2', 'U-1', 'U-2', 'U-4'],
         );
       });
 
       it('should filter rows which have not target languages with << operator', () => {
         component.onSearchTermChange('<<1');
         component['filteredUserStatsRows'].sort((a, b) =>
-          a.userId.localeCompare(b.userId)
+          a.userId.localeCompare(b.userId),
         );
         expect(component['filteredUserStatsRows'].map((r) => r.userId)).toEqual(
-          ['P-2', 'U-4']
+          ['P-2', 'U-4'],
         );
       });
 
       it('should filter rows which have at least 2000 translated chars with > operator', () => {
         component.onSearchTermChange('>1999');
         component['filteredUserStatsRows'].sort((a, b) =>
-          a.userId.localeCompare(b.userId)
+          a.userId.localeCompare(b.userId),
         );
         expect(component['filteredUserStatsRows'].map((r) => r.userId)).toEqual(
-          ['P-1', 'U-2']
+          ['P-1', 'U-2'],
         );
       });
 
       it('should filter rows which have less or equal to 1000 translated chars with < operator', () => {
         component.onSearchTermChange('<1001');
         component['filteredUserStatsRows'].sort((a, b) =>
-          a.userId.localeCompare(b.userId)
+          a.userId.localeCompare(b.userId),
         );
         expect(component['filteredUserStatsRows'].map((r) => r.userId)).toEqual(
-          ['P-2', 'U-1', 'U-4']
+          ['P-2', 'U-1', 'U-4'],
         );
       });
 
       it('should filter rows which have no translated chars with < operator', () => {
         component.onSearchTermChange('<1');
         component['filteredUserStatsRows'].sort((a, b) =>
-          a.userId.localeCompare(b.userId)
+          a.userId.localeCompare(b.userId),
         );
         expect(component['filteredUserStatsRows'].map((r) => r.userId)).toEqual(
-          ['P-2', 'U-4']
+          ['P-2', 'U-4'],
         );
       });
     });
@@ -627,10 +627,10 @@ describe('GetStatisticsComponent', () => {
     describe('onFilterData', () => {
       beforeEach(() => {
         localStorageServiceSpy.saveStatisticsDisplayMode.and.returnValue(
-          Promise.resolve()
+          Promise.resolve(),
         );
         localStorageServiceSpy.saveStatisticsSelectedMonth.and.returnValue(
-          Promise.resolve()
+          Promise.resolve(),
         );
 
         component.filterSelectedMonth = '2026-04';
@@ -647,7 +647,7 @@ describe('GetStatisticsComponent', () => {
 
         expect(component.displayMode).toBe(DisplayMode.Programmer);
         expect(
-          localStorageServiceSpy.saveStatisticsDisplayMode
+          localStorageServiceSpy.saveStatisticsDisplayMode,
         ).toHaveBeenCalledWith(DisplayMode.Programmer);
       });
 
@@ -661,14 +661,14 @@ describe('GetStatisticsComponent', () => {
         expect(component.filterSelectedMonth).toBe('2026-03');
         expect(component.selectedMonthForStatisticsSections).toBe('2026-03');
         expect(
-          localStorageServiceSpy.saveStatisticsSelectedMonth
+          localStorageServiceSpy.saveStatisticsSelectedMonth,
         ).toHaveBeenCalledWith('2026-03');
       });
 
       it('should handle error when saving selected month to local storage', async () => {
         const consoleErrorSpy = spyOn(console, 'error');
         localStorageServiceSpy.saveStatisticsSelectedMonth.and.returnValue(
-          Promise.reject(new Error('Storage error'))
+          Promise.reject(new Error('Storage error')),
         );
         spyOn(component, 'init').and.resolveTo();
         component.filterSelectedMonth = '2026-03';
@@ -679,11 +679,11 @@ describe('GetStatisticsComponent', () => {
         expect(component.selectedMonthForStatisticsSections).toBe('2026-03');
         expect(component.searchTerm).toBe('');
         expect(
-          localStorageServiceSpy.saveStatisticsSelectedMonth
+          localStorageServiceSpy.saveStatisticsSelectedMonth,
         ).toHaveBeenCalledWith('2026-03');
         expect(consoleErrorSpy).toHaveBeenCalledWith(
           'Error saving selected month to local storage:',
-          new Error('Storage error')
+          new Error('Storage error'),
         );
       });
 
@@ -697,14 +697,14 @@ describe('GetStatisticsComponent', () => {
 
         expect(component.displayMode).toBe(DisplayMode.User);
         expect(
-          localStorageServiceSpy.saveStatisticsDisplayMode
+          localStorageServiceSpy.saveStatisticsDisplayMode,
         ).toHaveBeenCalledWith(DisplayMode.User);
       });
 
       it('should handle error when saving display mode to local storage', async () => {
         const consoleErrorSpy = spyOn(console, 'error');
         localStorageServiceSpy.saveStatisticsDisplayMode.and.returnValue(
-          Promise.reject(new Error('Storage error'))
+          Promise.reject(new Error('Storage error')),
         );
         component.displayMode = DisplayMode.Programmer;
         spyOn(component, 'init').and.resolveTo();
@@ -713,11 +713,11 @@ describe('GetStatisticsComponent', () => {
 
         expect(component.displayMode).toBe(DisplayMode.User);
         expect(
-          localStorageServiceSpy.saveStatisticsDisplayMode
+          localStorageServiceSpy.saveStatisticsDisplayMode,
         ).toHaveBeenCalledWith(DisplayMode.User);
         expect(consoleErrorSpy).toHaveBeenCalledWith(
           'Error saving display mode to local storage:',
-          new Error('Storage error')
+          new Error('Storage error'),
         );
       });
 
@@ -760,7 +760,7 @@ describe('GetStatisticsComponent', () => {
         expect(openUserDetailSpy).toHaveBeenCalledWith(
           lang,
           userStatistic,
-          component.displayMode
+          component.displayMode,
         );
       });
     });
@@ -842,7 +842,7 @@ describe('GetStatisticsComponent', () => {
         const initSpy = spyOn(component, 'init');
         const setupSubscriptionsSpy = spyOn(
           component as any,
-          'setupSubscriptions'
+          'setupSubscriptions',
         );
         component.ngOnInit();
 
@@ -857,19 +857,19 @@ describe('GetStatisticsComponent', () => {
             'isProgrammerDevice',
             {
               get: () => true,
-            }
+            },
           );
           const loadFirestoreUidSpy =
             localStorageServiceSpy.loadFirestoreUid.and.returnValue(
-              Promise.resolve('test-uid')
+              Promise.resolve('test-uid'),
             );
           const getStatisticsDisplayModeSpy =
             localStorageServiceSpy.getStatisticsDisplayMode.and.returnValue(
-              Promise.resolve(DisplayMode.Programmer)
+              Promise.resolve(DisplayMode.Programmer),
             );
           const readContingentDataSpy =
             firestoreServiceSpy.readContingentData.and.returnValue(
-              Promise.resolve({ StopTranslationForAllUsers: false })
+              Promise.resolve({ StopFeatureUsageForAllUsers: false }),
             );
           component.isProgrammerDevice = false;
           component.searchTerm = 'test';
@@ -884,42 +884,42 @@ describe('GetStatisticsComponent', () => {
           expect(component.currentUserUid).toBe('test-uid');
           expect(component.displayMode).toBe(DisplayMode.Programmer);
           expect(component.contingentData).toEqual({
-            StopTranslationForAllUsers: false,
+            StopFeatureUsageForAllUsers: false,
           });
           expect(component.isProgrammerDevice).toBeTrue();
         });
 
         it('should load statistics data', async () => {
           const displayedUserStatisticsExtract: any[] = [
-            { userId: 'U-1', translatedCharCount: 100000 },
-            { userId: 'U-2', translatedCharCount: 70000 },
-            { userId: 'P-1', translatedCharCount: 30000 },
+            { userId: 'U-1', consumedFeatureCharCount: 100000 },
+            { userId: 'U-2', consumedFeatureCharCount: 70000 },
+            { userId: 'P-1', consumedFeatureCharCount: 30000 },
           ];
           const getDisplayedUserStatisticsSpy =
             firestoreUtilsServiceSpy.getDisplayedUserStatistics.and.returnValue(
               Promise.resolve({
                 displayedUserStatistics: displayedUserStatisticsExtract,
-                userTranslationStatistics: [],
+                userFeatureStatistics: [],
                 users: [],
                 programmerDeviceUIDs: [],
-              })
+              }),
             );
           const getUserStatisticsSummarySpy =
             firestoreUtilsServiceSpy.getUserStatisticsSummary.and.returnValue(
-              []
+              [],
             );
           const readContingentDataSpy =
             firestoreServiceSpy.readContingentData.and.returnValue(
               Promise.resolve({
-                StopTranslationForAllUsers: false,
-                maxFreeTranslateCharsPerMonth: 500000,
-                maxFreeTranslateCharsPerUserPerMonth: 10000,
-                maxFreeTranslateCharsBuffer: 5000,
-              })
+                StopFeatureUsageForAllUsers: false,
+                maxFreeFeatureCharsPerMonth: 500000,
+                maxFreeFeatureCharsPerMonthForUser: 10000,
+                maxFreeFeatureCharsBufferPerMonth: 5000,
+              }),
             );
           const getTotalCharCountSpy =
             firestoreServiceSpy.getTotalCharCount.and.returnValue(
-              Promise.resolve(200000)
+              Promise.resolve(200000),
             );
 
           await component.init();
@@ -949,21 +949,21 @@ describe('GetStatisticsComponent', () => {
         it('should log error if loading statistics data fails', async () => {
           const consoleErrorSpy = spyOn(console, 'error');
           firestoreUtilsServiceSpy.getDisplayedUserStatistics.and.returnValue(
-            Promise.reject(new Error('Failed to load statistics'))
+            Promise.reject(new Error('Failed to load statistics')),
           );
 
           await component.init();
 
           expect(consoleErrorSpy).toHaveBeenCalledWith(
             'GetStatisticsComponent: Error loading statistics',
-            new Error('Failed to load statistics')
+            new Error('Failed to load statistics'),
           );
         });
 
         it('should call setFilterValues', async () => {
           const setFilterValuesSpy = spyOn(
             component as any,
-            'setFilterValues'
+            'setFilterValues',
           ).and.callThrough();
 
           await component.init();
@@ -974,14 +974,14 @@ describe('GetStatisticsComponent', () => {
       describe('setFilterValues', () => {
         it('should set displayMode, filterSelectedMonth based on local storage values, and load allFilterMonthValues', async () => {
           localStorageServiceSpy.getStatisticsDisplayMode.and.returnValue(
-            Promise.resolve(DisplayMode.Programmer)
+            Promise.resolve(DisplayMode.Programmer),
           );
           localStorageServiceSpy.getStatisticsSelectedMonth.and.returnValue(
-            Promise.resolve('2026-04')
+            Promise.resolve('2026-04'),
           );
           const getAllFirestoreSearchStringsForMonthSpy =
             utilsServiceSpy.getAllFirestoreSearchStringsForMonth.and.returnValue(
-              ['2026-02', '2026-03', '2026-04']
+              ['2026-02', '2026-03', '2026-04'],
             );
           component.displayMode = DisplayMode.User;
           component.selectedDisplayMode = DisplayMode.User;
@@ -992,10 +992,10 @@ describe('GetStatisticsComponent', () => {
           await fixture.whenStable();
 
           expect(
-            localStorageServiceSpy.getStatisticsDisplayMode
+            localStorageServiceSpy.getStatisticsDisplayMode,
           ).toHaveBeenCalled();
           expect(
-            localStorageServiceSpy.getStatisticsSelectedMonth
+            localStorageServiceSpy.getStatisticsSelectedMonth,
           ).toHaveBeenCalled();
           expect(getAllFirestoreSearchStringsForMonthSpy).toHaveBeenCalled();
 
@@ -1098,13 +1098,13 @@ describe('GetStatisticsComponent', () => {
         const statisticsContent =
           fixture.nativeElement.querySelector('.filter-section');
         const displayModeSegment = fixture.nativeElement.querySelector(
-          '.filter-section .display-mode'
+          '.filter-section .display-mode',
         );
         const filterByMonthSegment = fixture.nativeElement.querySelector(
-          '.filter-section .filter-month'
+          '.filter-section .filter-month',
         );
         const filterDataButton = fixture.nativeElement.querySelector(
-          '.filter-section .filter-data-btn'
+          '.filter-section .filter-data-btn',
         );
         expect(statisticsContent).withContext('statisticsContent').toBeTruthy();
         expect(displayModeSegment)
@@ -1123,13 +1123,13 @@ describe('GetStatisticsComponent', () => {
         const statisticsContent =
           fixture.nativeElement.querySelector('.filter-section');
         const displayModeSegment = fixture.nativeElement.querySelector(
-          '.filter-section .display-mode'
+          '.filter-section .display-mode',
         );
         const filterByMonthSegment = fixture.nativeElement.querySelector(
-          '.filter-section .filter-month'
+          '.filter-section .filter-month',
         );
         const filterDataButton = fixture.nativeElement.querySelector(
-          '.filter-section .filter-data-btn'
+          '.filter-section .filter-data-btn',
         );
         expect(statisticsContent).withContext('statisticsContent').toBeNull();
         expect(displayModeSegment).withContext('displayModeSegment').toBeNull();
@@ -1140,30 +1140,30 @@ describe('GetStatisticsComponent', () => {
       });
     });
 
-    describe('display stop translation for all users message', () => {
+    describe('display stop feature for all users message', () => {
       it('should not show section if isAllMonthsSelected is true', () => {
         component.filterSelectedMonth = AllMonthsOption.SelectOptionValue;
         fixture.detectChanges();
         const stopTranslationSection = fixture.nativeElement.querySelector(
-          '.global-stop-section'
+          '.global-stop-section',
         );
         expect(stopTranslationSection).toBeNull();
       });
 
-      it('should show stop translation message when isStopped is true', () => {
+      it('should show stop feature message when isStopped is true', () => {
         component.isStopped = true;
         fixture.detectChanges();
         const stopTranslationMessage = fixture.nativeElement.querySelector(
-          '.stopped.global-stop-flag'
+          '.stopped.global-stop-flag',
         );
         expect(stopTranslationMessage).toBeTruthy();
       });
 
-      it('should not show stop translation message when isStopped is false', () => {
+      it('should not show stop feature message when isStopped is false', () => {
         component.isStopped = false;
         fixture.detectChanges();
         const stopTranslationMessage = fixture.nativeElement.querySelector(
-          '.stopped.global-stop-flag'
+          '.stopped.global-stop-flag',
         );
         expect(stopTranslationMessage).toBeNull();
       });
@@ -1174,10 +1174,10 @@ describe('GetStatisticsComponent', () => {
         component.filterSelectedMonth = '2026-03';
         fixture.detectChanges();
         const monthlySection = fixture.nativeElement.querySelector(
-          '.total-contingent-monthly'
+          '.total-contingent-monthly',
         );
         const allMonthsSection = fixture.nativeElement.querySelector(
-          '.total-contingent-all-months'
+          '.total-contingent-all-months',
         );
         expect(monthlySection).toBeTruthy();
         expect(allMonthsSection).toBeNull();
@@ -1187,10 +1187,10 @@ describe('GetStatisticsComponent', () => {
         component.filterSelectedMonth = AllMonthsOption.SelectOptionValue;
         fixture.detectChanges();
         const monthlySection = fixture.nativeElement.querySelector(
-          '.total-contingent-monthly'
+          '.total-contingent-monthly',
         );
         const allMonthsSection = fixture.nativeElement.querySelector(
-          '.total-contingent-all-months'
+          '.total-contingent-all-months',
         );
         expect(monthlySection).toBeNull();
         expect(allMonthsSection).toBeTruthy();
@@ -1201,7 +1201,7 @@ describe('GetStatisticsComponent', () => {
         component.totalCharCount = 100001;
         fixture.detectChanges();
         const totalDifferenceInfo = fixture.nativeElement.querySelector(
-          '.total-all-users-difference'
+          '.total-all-users-difference',
         );
         expect(totalDifferenceInfo).toBeTruthy();
       });
@@ -1211,7 +1211,7 @@ describe('GetStatisticsComponent', () => {
         component.totalCharCount = 100000;
         fixture.detectChanges();
         const totalDifferenceInfo = fixture.nativeElement.querySelector(
-          '.total-all-users-difference'
+          '.total-all-users-difference',
         );
         expect(totalDifferenceInfo).toBeNull();
       });
@@ -1224,7 +1224,7 @@ describe('GetStatisticsComponent', () => {
         fixture.detectChanges();
 
         const statisticsContent = fixture.nativeElement.querySelector(
-          '.user-statistics-overview'
+          '.user-statistics-overview',
         );
         expect(statisticsContent).toBeTruthy();
       });
@@ -1235,7 +1235,7 @@ describe('GetStatisticsComponent', () => {
         fixture.detectChanges();
 
         const statisticsContent = fixture.nativeElement.querySelector(
-          '.user-statistics-overview'
+          '.user-statistics-overview',
         );
         expect(statisticsContent).toBeNull();
       });
@@ -1246,7 +1246,7 @@ describe('GetStatisticsComponent', () => {
         fixture.detectChanges();
 
         const statisticsContent = fixture.nativeElement.querySelector(
-          '.user-statistics-overview'
+          '.user-statistics-overview',
         );
         expect(statisticsContent).toBeNull();
       });
@@ -1259,7 +1259,7 @@ describe('GetStatisticsComponent', () => {
         fixture.detectChanges();
 
         const searchBar = fixture.nativeElement.querySelector(
-          '.user-stat-details ion-searchbar'
+          '.user-stat-details ion-searchbar',
         );
         expect(searchBar).toBeTruthy();
       });
@@ -1270,7 +1270,7 @@ describe('GetStatisticsComponent', () => {
         fixture.detectChanges();
 
         const searchBar = fixture.nativeElement.querySelector(
-          '.user-stat-details ion-searchbar'
+          '.user-stat-details ion-searchbar',
         );
         expect(searchBar).toBeNull();
       });
@@ -1281,7 +1281,7 @@ describe('GetStatisticsComponent', () => {
         fixture.detectChanges();
 
         const searchBar = fixture.nativeElement.querySelector(
-          '.user-stat-details ion-searchbar'
+          '.user-stat-details ion-searchbar',
         );
         expect(searchBar).toBeNull();
       });
@@ -1322,7 +1322,7 @@ describe('GetStatisticsComponent', () => {
     describe('JSON raw data section - details toggles', () => {
       let rawDebugRoot: HTMLDetailsElement;
       let displayedValuesDetail: HTMLDetailsElement;
-      let translationStatsDetail: HTMLDetailsElement;
+      let featureStatsDetail: HTMLDetailsElement;
       let userMappingDetail: HTMLDetailsElement;
       let programmerDevicesDetail: HTMLDetailsElement;
 
@@ -1338,7 +1338,7 @@ describe('GetStatisticsComponent', () => {
         component.displayMode = DisplayMode.Programmer;
         component.statisticsData = {
           displayedUserStatistics: [],
-          userTranslationStatistics: [],
+          userFeatureStatistics: [],
           users: [],
           programmerDeviceUIDs: [],
         };
@@ -1352,12 +1352,12 @@ describe('GetStatisticsComponent', () => {
         fixture.detectChanges();
 
         const details = fixture.nativeElement.querySelectorAll(
-          '.debug-section details'
+          '.debug-section details',
         ) as NodeListOf<HTMLDetailsElement>;
 
         rawDebugRoot = details[0];
         displayedValuesDetail = details[1];
-        translationStatsDetail = details[2];
+        featureStatsDetail = details[2];
         userMappingDetail = details[3];
         programmerDevicesDetail = details[4];
       });
@@ -1371,8 +1371,8 @@ describe('GetStatisticsComponent', () => {
         expect(component.showProgrammerDevicesDetail).toBeFalse();
       });
 
-      it('should flip only translation statistics boolean when its details is toggled', () => {
-        toggle(translationStatsDetail, true);
+      it('should flip only feature statistics boolean when its details is toggled', () => {
+        toggle(featureStatsDetail, true);
 
         expect(component.showDisplayedValuesDetail).toBeFalse();
         expect(component.showTranslationStatisticsDetail).toBeTrue();
@@ -1433,7 +1433,7 @@ describe('GetStatisticsComponent', () => {
             createUserStat('U-1', 10000, new Date('2026-03-15T00:00:00Z')),
             createUserStat('U-2', 9000, null),
           ],
-          userTranslationStatistics: [],
+          userFeatureStatistics: [],
           users: [],
           programmerDeviceUIDs: [],
         };
@@ -1443,15 +1443,15 @@ describe('GetStatisticsComponent', () => {
         fixture.detectChanges();
 
         const rows = fixture.nativeElement.querySelectorAll(
-          '.user-stat-details ion-row.detail-row'
+          '.user-stat-details ion-row.detail-row',
         );
 
         expect(rows.length).toBe(2);
         expect(
-          rows[0].classList.contains('user-contingent-exceeded')
+          rows[0].classList.contains('user-contingent-exceeded'),
         ).toBeTrue();
         expect(
-          rows[1].classList.contains('user-contingent-exceeded')
+          rows[1].classList.contains('user-contingent-exceeded'),
         ).toBeFalse();
       });
 
@@ -1459,7 +1459,7 @@ describe('GetStatisticsComponent', () => {
         fixture.detectChanges();
 
         const rows = fixture.nativeElement.querySelectorAll(
-          '.user-stat-details ion-row.detail-row'
+          '.user-stat-details ion-row.detail-row',
         );
 
         expect(rows.length).toBe(2);
@@ -1467,7 +1467,7 @@ describe('GetStatisticsComponent', () => {
         expect(rows[1].classList.contains('my-device')).toBeTrue();
       });
 
-      it('should use creationDate when lastTranslationDate is null', () => {
+      it('should use creationDate when lastFeatureDate is null', () => {
         fixture.detectChanges();
 
         const formattedDates = utilsServiceSpy.formatDateISO.calls
@@ -1484,10 +1484,10 @@ describe('GetStatisticsComponent', () => {
         fixture.detectChanges();
 
         const platformColumn = fixture.nativeElement.querySelector(
-          '.user-stat-details ion-col.platform-info'
+          '.user-stat-details ion-col.platform-info',
         );
         const platformColumnWithModelInfo = fixture.nativeElement.querySelector(
-          '.user-stat-details ion-col.platform-info .model-info'
+          '.user-stat-details ion-col.platform-info .model-info',
         );
 
         expect(platformColumn).toBeTruthy();
@@ -1499,10 +1499,10 @@ describe('GetStatisticsComponent', () => {
         fixture.detectChanges();
 
         const platformColumn = fixture.nativeElement.querySelector(
-          '.user-stat-details ion-col.platform-info'
+          '.user-stat-details ion-col.platform-info',
         );
         const platformColumnWithModelInfo = fixture.nativeElement.querySelector(
-          '.user-stat-details ion-col.platform-info .model-info'
+          '.user-stat-details ion-col.platform-info .model-info',
         );
 
         expect(platformColumn).toBeTruthy();
@@ -1515,7 +1515,7 @@ describe('GetStatisticsComponent', () => {
         component.isLoading = false;
       });
 
-      it('should apply stopped class when translations are globally stopped', () => {
+      it('should apply stopped class when features are globally stopped', () => {
         component.isStopped = true;
         fixture.detectChanges();
 
@@ -1533,7 +1533,7 @@ describe('GetStatisticsComponent', () => {
         fixture.detectChanges();
 
         const checksumText = fixture.nativeElement.querySelector(
-          'p.total-all-users-difference'
+          'p.total-all-users-difference',
         );
         const remainingValue =
           fixture.nativeElement.querySelector('span.exceeded');
@@ -1553,7 +1553,7 @@ describe('GetStatisticsComponent', () => {
               'de',
             ]),
           ],
-          userTranslationStatistics: [],
+          userFeatureStatistics: [],
           users: [],
           programmerDeviceUIDs: [],
         };
@@ -1566,17 +1566,17 @@ describe('GetStatisticsComponent', () => {
         fixture.detectChanges();
 
         const languageHeaderIcon = fixture.nativeElement.querySelector(
-          '.user-stat-details ion-row.header-row ion-icon[name="language-outline"]'
+          '.user-stat-details ion-row.header-row ion-icon[name="language-outline"]',
         );
         const detailCols = fixture.nativeElement.querySelectorAll(
-          '.user-stat-details ion-row.detail-row ion-col'
+          '.user-stat-details ion-row.detail-row ion-col',
         );
 
         expect(languageHeaderIcon).toBeNull();
         expect(detailCols.length).toBe(5);
       });
 
-      it('should hide the translation-date column in portrait mode', () => {
+      it('should hide the feature-date column in portrait mode', () => {
         component.displayMode = DisplayMode.Programmer;
         Object.defineProperty(utilsServiceSpy, 'isPortrait', {
           value: true,
@@ -1585,31 +1585,31 @@ describe('GetStatisticsComponent', () => {
 
         fixture.detectChanges();
 
-        const translationDateCell = fixture.nativeElement.querySelector(
-          '.user-stat-details .translation-date'
+        const featureDateCell = fixture.nativeElement.querySelector(
+          '.user-stat-details .feature-date',
         );
 
-        expect(translationDateCell).toBeNull();
+        expect(featureDateCell).toBeNull();
       });
     });
 
-    describe('translation date', () => {
-      let translationDate: Date;
+    describe('feature date', () => {
+      let featureDate: Date;
       let createdDate: Date;
       let statisticData: StatisticsData;
 
       beforeEach(() => {
-        translationDate = new Date('2026-03-15T12:34:56Z');
+        featureDate = new Date('2026-03-15T12:34:56Z');
         createdDate = new Date('2026-03-10T08:00:00Z');
 
         statisticData = {
           displayedUserStatistics: [
             {
-              ...createUserStat('U-1', 1000, translationDate, ['en', 'de']),
+              ...createUserStat('U-1', 1000, featureDate, ['en', 'de']),
               userCreatedAt: createdDate,
             },
           ],
-          userTranslationStatistics: [],
+          userFeatureStatistics: [],
           users: [],
           programmerDeviceUIDs: [],
         };
@@ -1617,7 +1617,7 @@ describe('GetStatisticsComponent', () => {
         (component as any).isPortrait = false;
       });
 
-      it('should display lastTranslationDate when available', () => {
+      it('should display lastFeatureDate when available', () => {
         spyOn(component, 'getFormatDateTime').and.callFake((date: Date) => {
           return date ? date.toISOString().split('T')[0] : '';
         });
@@ -1626,33 +1626,33 @@ describe('GetStatisticsComponent', () => {
         component.displayMode = DisplayMode.User;
         fixture.detectChanges();
 
-        const translationDateCell = fixture.nativeElement.querySelector(
-          '.user-stat-details .detail-row .translation-date'
+        const featureDateCell = fixture.nativeElement.querySelector(
+          '.user-stat-details .detail-row .feature-date',
         );
 
-        expect(translationDateCell).toBeTruthy();
-        expect(translationDateCell.textContent.trim()).toBe('2026-03-15');
+        expect(featureDateCell).toBeTruthy();
+        expect(featureDateCell.textContent.trim()).toBe('2026-03-15');
       });
 
-      it('should use creationDate when lastTranslationDate is null', () => {
+      it('should use creationDate when lastFeatureDate is null', () => {
         spyOn(component, 'getFormatDateTime').and.callFake((date: Date) => {
           return date ? date.toISOString().split('T')[0] : '';
         });
 
-        statisticData.displayedUserStatistics[0].lastTranslationDate = null;
+        statisticData.displayedUserStatistics[0].lastFeatureUsageDate = null;
         component.statisticsData = statisticData;
         component.displayMode = DisplayMode.User;
         fixture.detectChanges();
 
-        const translationDateCell = fixture.nativeElement.querySelector(
-          '.user-stat-details .detail-row .translation-date'
+        const featureDateCell = fixture.nativeElement.querySelector(
+          '.user-stat-details .detail-row .feature-date',
         );
 
-        expect(translationDateCell).toBeTruthy();
-        expect(translationDateCell.textContent.trim()).toBe('2026-03-10');
+        expect(featureDateCell).toBeTruthy();
+        expect(featureDateCell.textContent.trim()).toBe('2026-03-10');
       });
 
-      it('should hide translation-date column when portrait mode', () => {
+      it('should hide feature-date column when portrait mode', () => {
         spyOn(component, 'getFormatDateTime').and.returnValue('2026-03-15');
 
         component.statisticsData = statisticData;
@@ -1661,53 +1661,53 @@ describe('GetStatisticsComponent', () => {
 
         fixture.detectChanges();
 
-        const translationDateCell = fixture.nativeElement.querySelector(
-          '.user-stat-details .detail-row .translation-date'
+        const featureDateCell = fixture.nativeElement.querySelector(
+          '.user-stat-details .detail-row .feature-date',
         );
 
-        expect(translationDateCell).toBeNull();
+        expect(featureDateCell).toBeNull();
       });
 
       it('should call getFormatDateTime with correct date parameter', () => {
         const getFormatDateTimeSpy = spyOn(
           component,
-          'getFormatDateTime'
+          'getFormatDateTime',
         ).and.returnValue('2026-03-15');
 
         component.statisticsData = statisticData;
         component.displayMode = DisplayMode.User;
         fixture.detectChanges();
 
-        expect(getFormatDateTimeSpy).toHaveBeenCalledWith(translationDate);
+        expect(getFormatDateTimeSpy).toHaveBeenCalledWith(featureDate);
       });
 
-      it('should verify conditional logic: uses lastTranslationDate when present, falls back to userCreatedAt when null', () => {
+      it('should verify conditional logic: uses lastFeatureDate when present, falls back to userCreatedAt when null', () => {
         spyOn(component, 'getFormatDateTime').and.callFake((date: Date) => {
           return date ? date.toISOString().split('T')[0] : '';
         });
 
-        // Test case 1: lastTranslationDate present
+        // Test case 1: lastFeatureDate present
         component.statisticsData = statisticData;
         component.displayMode = DisplayMode.User;
         fixture.detectChanges();
 
-        let translationDateCell = fixture.nativeElement.querySelector(
-          '.user-stat-details .detail-row .translation-date'
+        let featureDateCell = fixture.nativeElement.querySelector(
+          '.user-stat-details .detail-row .feature-date',
         );
-        const dateWithLastTranslation = translationDateCell.textContent.trim();
+        const dateWithLastTranslation = featureDateCell.textContent.trim();
 
         // Test case 2: lastTranslationDate null
-        statisticData.displayedUserStatistics[0].lastTranslationDate = null;
+        statisticData.displayedUserStatistics[0].lastFeatureUsageDate = null;
         component.statisticsData = {
           ...statisticData,
           displayedUserStatistics: [...statisticData.displayedUserStatistics],
         };
         fixture.detectChanges();
 
-        translationDateCell = fixture.nativeElement.querySelector(
-          '.user-stat-details .detail-row .translation-date'
+        featureDateCell = fixture.nativeElement.querySelector(
+          '.user-stat-details .detail-row .feature-date',
         );
-        const dateWithCreation = translationDateCell.textContent.trim();
+        const dateWithCreation = featureDateCell.textContent.trim();
 
         // Verify they use different dates
         expect(dateWithLastTranslation).toBe('2026-03-15');
@@ -1728,7 +1728,7 @@ describe('GetStatisticsComponent', () => {
 
         component.statisticsData = {
           displayedUserStatistics: [createUserStat()],
-          userTranslationStatistics: [],
+          userFeatureStatistics: [],
           users: [],
           programmerDeviceUIDs: [],
         };
@@ -1739,7 +1739,7 @@ describe('GetStatisticsComponent', () => {
         fixture.detectChanges();
 
         const button = fixture.nativeElement.querySelector(
-          '.user-stat-details .info-btn'
+          '.user-stat-details .info-btn',
         );
 
         button.dispatchEvent(new Event('click'));
@@ -1747,7 +1747,7 @@ describe('GetStatisticsComponent', () => {
 
         expect(showDetailInfosSpy).toHaveBeenCalledWith(
           'en',
-          jasmine.objectContaining({ userId: 'U-1' })
+          jasmine.objectContaining({ userId: 'U-1' }),
         );
       });
     });
@@ -1763,14 +1763,14 @@ describe('GetStatisticsComponent', () => {
 
         const text = (fixture.nativeElement.textContent || '').replace(
           /\s+/g,
-          ' '
+          ' ',
         );
 
         expect(text).toContain(
-          'Google Firebase/Firestore speichert folgende Daten:'
+          'Google Firebase/Firestore speichert folgende Daten:',
         );
         expect(text).not.toContain(
-          'Google Firebase/Firestore stores the following data:'
+          'Google Firebase/Firestore stores the following data:',
         );
       });
 
@@ -1780,14 +1780,14 @@ describe('GetStatisticsComponent', () => {
 
         const text = (fixture.nativeElement.textContent || '').replace(
           /\s+/g,
-          ' '
+          ' ',
         );
 
         expect(text).toContain(
-          'Google Firebase/Firestore stores the following data:'
+          'Google Firebase/Firestore stores the following data:',
         );
         expect(text).not.toContain(
-          'Google Firebase/Firestore speichert folgende Daten:'
+          'Google Firebase/Firestore speichert folgende Daten:',
         );
       });
 
@@ -1797,14 +1797,14 @@ describe('GetStatisticsComponent', () => {
 
         const text = (fixture.nativeElement.textContent || '').replace(
           /\s+/g,
-          ' '
+          ' ',
         );
 
         expect(text).toContain(
-          'Google Firebase/Firestore stores the following data:'
+          'Google Firebase/Firestore stores the following data:',
         );
         expect(text).not.toContain(
-          'Google Firebase/Firestore speichert folgende Daten:'
+          'Google Firebase/Firestore speichert folgende Daten:',
         );
       });
     });

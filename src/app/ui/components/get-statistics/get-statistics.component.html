@@ -56,13 +56,13 @@
     <!-- Section: Global Stop Flag -->
     <div class="stat-section global-stop-section" *ngIf="!isAllMonthsSelected">
       <h3>
-        {{ getSectionHeader("SETTINGS.STATISTICS.LABEL.GLOBAL_TRANS_STATUS") }}
+        {{ getSectionHeader("SETTINGS.STATISTICS.LABEL.GLOBAL_FEATURE_STATUS") }}
       </h3>
       <p [class.stopped]="isStopped" class="global-stop-flag">
         {{
           isStopped
-            ? ("SETTINGS.STATISTICS.LABEL.GLOBAL_TRANS_STOPPED" | translate)
-            : ("SETTINGS.STATISTICS.LABEL.GLOBAL_TRANS_ACTIVE" | translate)
+            ? ("SETTINGS.STATISTICS.LABEL.GLOBAL_FEATURE_STOPPED" | translate)
+            : ("SETTINGS.STATISTICS.LABEL.GLOBAL_FEATURE_ACTIVE" | translate)
         }}
       </p>
     </div>
@@ -70,7 +70,7 @@
     <!-- Section: Total Contingent -->
     <div class="stat-section">
       <h3>
-        {{ getSectionHeader("SETTINGS.STATISTICS.LABEL.TOTAL_CONTINGENT") }}
+        {{ getSectionHeader("SETTINGS.STATISTICS.LABEL.TOTAL_FEATURE_CONTINGENT") }}
       </h3>
       <div *ngIf="!isAllMonthsSelected" class="total-contingent-monthly">
         <p
@@ -156,7 +156,7 @@
           }}</ion-col>
           <ion-col size="5">{{ userStat.name }}</ion-col>
           <ion-col size="2" class="ion-text-right">{{
-            userStat.countTranslations
+            userStat.countFeatureUsage
           }}</ion-col>
           <ion-col size="2" class="ion-text-right">{{
             userStat.countRegistrations
@@ -184,7 +184,7 @@
         </div>
       </div>
       <ion-grid>
-        <ion-row class="header-row">
+        <ion-row class="header-row ion-align-items-end">
           <ion-col>{{ "SETTINGS.STATISTICS.GRID.USER" | translate }}</ion-col>
           <ion-col class="used-chars">{{
             "SETTINGS.STATISTICS.GRID.USED"
@@ -202,7 +202,7 @@
             "SETTINGS.STATISTICS.GRID.PLATFORM" | translate
           }}</ion-col>
           <ion-col *ngIf="!hideColumn">{{
-            "SETTINGS.STATISTICS.GRID.LAST_TRANSLATION" | translate
+            "SETTINGS.STATISTICS.GRID.LAST_FEATURE_USAGE" | translate
           }}</ion-col>
           <ion-col size="1"></ion-col>
         </ion-row>
@@ -210,13 +210,13 @@
           class="detail-row"
           *ngFor="let userStat of filteredUserStatsRows; trackBy: trackByUserId"
           [class.user-contingent-exceeded]="
-            userStat.translatedCharCount >= userLimit
+            userStat.consumedFeatureCharCount >= userLimit
           "
           [class.my-device]="userStat.isCurrentUser"
         >
           <ion-col>{{ userStat.userName }}</ion-col>
           <ion-col class="used-chars">{{
-            userStat.translatedCharCount
+            userStat.consumedFeatureCharCount
               | number : "1.0-0" : (lang === "de" ? "de-DE" : "en-US")
           }}</ion-col>
           <ion-col *ngIf="!hideColumnIfUserOrPortrait" size="1">{{
@@ -233,7 +233,7 @@
               ><br />{{ userStat.displayedModel }}</span
             >
           </ion-col>
-          <ion-col *ngIf="!hideColumn" class="translation-date">{{
+          <ion-col *ngIf="!hideColumn" class="feature-date">{{
             userStat.formattedLastActivityDate
           }}</ion-col>
           <ion-col size="1">
@@ -278,9 +278,9 @@
             showTranslationStatisticsDetail = translationStatsDetail.open
           "
         >
-          <summary>Translation Statistics</summary>
+          <summary>Feature Statistics</summary>
           <pre *ngIf="showTranslationStatisticsDetail">{{
-            statisticsData?.userTranslationStatistics | json
+            statisticsData?.userFeatureStatistics | json
           }}</pre>
         </details>
 

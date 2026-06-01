@@ -141,16 +141,16 @@
     "STATISTICS": {
       "ACCORDION": "Statistik für {{yearMonth}} abrufen",
       "LABEL": {
-        "GLOBAL_TRANS_STATUS": "Übersetzungs-Status",
-        "GLOBAL_TRANS_STOPPED": "Übersetzung gestoppt für alle Benutzer",
-        "GLOBAL_TRANS_ACTIVE": "Übersetzung aktiv für alle Benutzer",
-        "TOTAL_CONTINGENT": "Gesamtes Übersetzungskontingent",
+        "GLOBAL_FEATURE_STATUS": "Feature-Status",
+        "GLOBAL_FEATURE_STOPPED": "Feature gestoppt für alle Benutzer",
+        "GLOBAL_FEATURE_ACTIVE": "Feature aktiv für alle Benutzer",
+        "TOTAL_FEATURE_CONTINGENT": "Gesamtes Feature-Kontingent",
         "USED": "Verbrauchte Summe",
         "BUFFER": "Puffer",
         "AVAILABLE": "Noch verfügbar",
         "CHECKSUM_ALL_USERS": "Verbraucht von allen Benutzern",
         "CHARS": "Zeichen",
-        "GRID_INFO_NOTE": "Absteigend sortiert nach Datum der letzten Übersetzung",
+        "GRID_INFO_NOTE": "Absteigend sortiert nach Datum der letzten Feature-Nutzung",
         "GRID_SEARCH_INFO": "Text=Benutz.|Plattf., <|>=verbraucht, <<|>>=Sprachen",
         "USER_STATISTICS_OVERVIEW": "Benutzer-Statistik Übersicht",
         "JSON_DATA": "Rohdaten (JSON) - nur für Debug"
@@ -170,14 +170,14 @@
         }
       },
       "GRID": {
-        "USER_CONTINGENT": "Benutzer-Übersetzungskontingent",
+        "USER_CONTINGENT": "Benutzer-Feature-Kontingent",
         "USER": "Benutzer",
         "USED": "Verbraucht von {{limit}}",
         "PLATFORM": "Plattform",
-        "LAST_TRANSLATION": "Letzte Übersetzung"
+        "LAST_FEATURE_USAGE": "Letzte Feature-Nutzung"
       },
       "USER_DETAIL": {
-        "TITLE": "Benutzer-Übersetzungs-Informationen",
+        "TITLE": "Benutzer-Feature-Informationen",
         "USER_INFORMATION": {
           "TITLE": "Benutzerinformationen",
           "LABEL": {
@@ -200,13 +200,12 @@
             "MODEL": "Modell"
           }
         },
-        "TRANSLATION_STATISTICS": {
-          "TITLE": "Übersetzungsstatistik",
+        "FEATURE_STATISTICS": {
+          "TITLE": "Feature-Statistik",
           "LABEL": {
-            "TRANSLATED_CHARS": "Übersetzte Zeichen",
+            "CONSUMED_CHARS": "Verbrauchte Zeichen",
             "LANGUAGE": "Sprache",
-            "TARGET_LANGUAGES": "Zielsprachen",
-            "LAST_TRANSLATION": "Letzte Übersetzung"
+            "LAST_FEATURE_USAGE": "Letzte Feature-Nutzung"
           }
         },
         "USER_AGENT": {

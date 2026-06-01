@@ -269,9 +269,9 @@ describe('HelpModalComponent', () => {
       );
     });
 
-    it('should return max free translate chars length per month from AppConstants', () => {
-      expect(component.maxFreeTranslateCharsLengthPerMonth).toBe(
-        AppConstants.maxFreeTranslateCharsPerMonth
+    it('should return max free feature chars length per month from AppConstants', () => {
+      expect(component.maxFreeFeatureCharsLengthPerMonth).toBe(
+        AppConstants.maxFreeFeatureCharsPerMonth
       );
     });
   });

@@ -27,7 +27,7 @@ export class GetMobileAppComponent {
 
   constructor() {}
 
-  get maxTranslateCharsLengthPerMonth(): number {
-    return AppConstants.maxFreeTranslateCharsPerMonth;
+  get maxFeatureCharsLengthPerMonth(): number {
+    return AppConstants.maxFreeFeatureCharsPerMonth;
   }
 }

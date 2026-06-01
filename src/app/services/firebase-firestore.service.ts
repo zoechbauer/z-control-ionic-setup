@@ -25,10 +25,11 @@ import { UtilsService } from './utils.service';
 import { LocalStorageService } from './local-storage.service';
 import {
   FirestoreContingentData,
-  UserTranslationStatistics,
+  UserFeatureUsageStatistics,
   UserType,
   ProgrammerDeviceUID,
   DeviceInfo,
+  ContingentData,
 } from '../shared/firebase-firestore.interfaces';
 import { ToastService } from './toast.service';
 import { AllMonthsOption, ToastAnchor } from '../shared/enums';
@@ -45,9 +46,9 @@ export class FirebaseFirestoreService {
   private readonly injector: Injector;
   private user!: angularFireAuth.User;
   private cachedIsProgrammerDevice: boolean = false;
-  private readonly cachedTranslations = new Map<
+  private readonly cachedFeatureUsage = new Map<
     string,
-    UserTranslationStatistics[]
+    UserFeatureUsageStatistics[]
   >();
 
   constructor(
@@ -217,7 +218,7 @@ export class FirebaseFirestoreService {
    * User mappings are stored in {collection}/userMapping/users
    * Each document contains: userId, name, type ('P' or 'U'), createdAt
    *
-   * @param selectedMonth The month for which to retrieve user translation statistics.
+   * @param selectedMonth The month for which to retrieve user feature usage statistics.
    * @returns An array of UserType objects representing users in the user mapping collection for the specified month.
    */
   public async getUsers(selectedMonth: string): Promise<UserType[]> {
@@ -236,7 +237,7 @@ export class FirebaseFirestoreService {
         if (
           selectedMonth === AllMonthsOption.localStorageValue || // all months
           userCreatedYYYYMM === selectedMonth || // created in selected month
-          this.userHasTranslationsInMonth(data['userId'], selectedMonth) // has translations in selected month
+          this.userHasFeatureUsageInMonth(data['userId'], selectedMonth) // has feature usage in selected month
         ) {
           users.push({
             userId: data['userId'],
@@ -264,13 +265,13 @@ export class FirebaseFirestoreService {
     }
   }
 
-  private userHasTranslationsInMonth(userId: string, month: string): boolean {
-    const translationsForMonth = this.cachedTranslations.get(month);
-    if (translationsForMonth) {
-      const hasTranslations = translationsForMonth.some(
-        (stat) => stat.userId === userId && stat.translatedCharCount > 0,
+  private userHasFeatureUsageInMonth(userId: string, month: string): boolean {
+    const featureUsageForMonth = this.cachedFeatureUsage.get(month);
+    if (featureUsageForMonth) {
+      const hasFeatureUsage = featureUsageForMonth.some(
+        (stat) => stat.userId === userId && stat.consumedFeatureCharCount > 0,
       );
-      return hasTranslations;
+      return hasFeatureUsage;
     }
     return false;
   }
@@ -453,17 +454,15 @@ export class FirebaseFirestoreService {
   }
 
   /**
-   * Reads the contingent data document for the selected month from Firestore.
+   * Reads the contingent data document for the selected month from Firestore and converts it to application format.
    * Retrieves the meta contingent data containing configuration and limits.
    * If the document does not exist, returns an empty object and logs an error.
    *
    * @param selectedMonth The month for which to read the contingent data.
-   * @returns Promise<FirestoreContingentData> The contingent data object,
+   * @returns Promise<ContingentData> The contingent data object,
    * or an empty object if not found or on error.
    */
-  async readContingentData(
-    selectedMonth: string,
-  ): Promise<FirestoreContingentData> {
+  async readContingentData(selectedMonth: string): Promise<ContingentData> {
     try {
       if (selectedMonth === AllMonthsOption.SelectOptionValue) {
         return {}; // contingent data is not displayed for 'all months' option
@@ -477,7 +476,9 @@ export class FirebaseFirestoreService {
       });
       if ((dataSnap as any).exists()) {
         const data = (dataSnap as any).data() as FirestoreContingentData;
-        return data || {};
+        const contingentData: ContingentData =
+          this.convertFirestoreToAppContingentData(data);
+        return contingentData;
       } else {
         return {};
       }
@@ -499,6 +500,30 @@ export class FirebaseFirestoreService {
     docRef: DocumentReference<DocumentData>,
   ): Promise<DocumentSnapshot<DocumentData>> {
     return getDoc(docRef);
+  }
+
+  /**
+   * Converts Firestore contingent data to application format.
+   * Maps Firestore field names to application field names and applies default values from environment configuration.
+   * @param firestoreData The Firestore contingent data to convert.
+   * @returns {ContingentData} The converted contingent data.
+   */
+  private convertFirestoreToAppContingentData(
+    firestoreData: FirestoreContingentData,
+  ): ContingentData {
+    return {
+      StopFeatureUsageForAllUsers:
+        firestoreData.StopTranslationForAllUsers ?? true,
+      maxFreeFeatureCharsPerMonth:
+        firestoreData.maxFreeTranslateCharsPerMonth ??
+        environment.app.maxFreeFeatureCharsPerMonth,
+      maxFreeFeatureCharsBufferPerMonth:
+        firestoreData.maxFreeTranslateCharsBufferPerMonth ??
+        environment.app.maxFreeFeatureCharsBufferPerMonth,
+      maxFreeFeatureCharsPerMonthForUser:
+        firestoreData.maxFreeTranslateCharsPerMonthForUser ??
+        environment.app.maxFreeFeatureCharsPerMonthForUser,
+    };
   }
 
   /**
@@ -527,11 +552,11 @@ export class FirebaseFirestoreService {
   }
 
   /**
-   * Retrieves the total number of translated characters across all users for the selected month from Firestore.
+   * Retrieves the total number of feature usage characters across all users for the selected month from Firestore.
    * If the total document does not exist (e.g., at the start of a new month), the function returns 0.
    *
    * @param selectedMonth The month for which to retrieve the total character count.
-   * @returns Promise<number> Resolves to the total translated character count for all users for the specified month.
+   * @returns Promise<number> Resolves to the total feature usage character count for all users for the specified month.
    */
   async getTotalCharCount(
     selectedMonth: string | undefined = undefined,
@@ -561,15 +586,15 @@ export class FirebaseFirestoreService {
   }
 
   /**
-   * Retrieves translation statistics for all users for the selected month or all months from Firestore.
-   *  @param selectedMonth The month for which to retrieve user translation statistics or all for all user translation statistics.
-   *  @returns An array of UserTranslationStatistics objects.
+   * Retrieves feature usage statistics for all users for the selected month or all months from Firestore.
+   *  @param selectedMonth The month for which to retrieve user feature usage statistics or all for all user feature usage statistics.
+   *  @returns An array of UserFeatureUsageStatistics objects.
    */
-  async getAllUserTranslationStatistics(
+  async getAllUserFeatureUsageStatistics(
     selectedMonth: string,
-  ): Promise<UserTranslationStatistics[]> {
+  ): Promise<UserFeatureUsageStatistics[]> {
     try {
-      let result: UserTranslationStatistics[] = [];
+      let result: UserFeatureUsageStatistics[] = [];
 
       if (selectedMonth === AllMonthsOption.localStorageValue) {
         const allMonths =
@@ -578,18 +603,18 @@ export class FirebaseFirestoreService {
         for (const month of allMonths) {
           if (month !== AllMonthsOption.localStorageValue) {
             const statsForMonth =
-              await this.getAllUserTranslationStatisticsForMonth(month);
+              await this.getAllUserFeatureUsageStatisticsForMonth(month);
             result = result.concat(statsForMonth);
           }
         }
       } else {
         result =
-          await this.getAllUserTranslationStatisticsForMonth(selectedMonth);
+          await this.getAllUserFeatureUsageStatisticsForMonth(selectedMonth);
       }
       return result;
     } catch (error) {
       console.error(
-        `Error fetching all user statistics for month ${selectedMonth}:`,
+        `Error fetching feature usage statistics for all user and month ${selectedMonth}:`,
         error,
       );
       return [];
@@ -597,16 +622,16 @@ export class FirebaseFirestoreService {
   }
 
   /**
-   * Retrieves translation statistics for all users for the selected month.
-   *  @param selectedMonth The month for which to retrieve user translation statistics.
-   *  @returns An array of UserTranslationStatistics objects.
+   * Retrieves feature usage statistics for all users for the selected month.
+   *  @param selectedMonth The month for which to retrieve user feature usage statistics.
+   *  @returns An array of UserFeatureUsageStatistics objects.
    */
-  private async getAllUserTranslationStatisticsForMonth(
+  private async getAllUserFeatureUsageStatisticsForMonth(
     selectedMonth: string,
-  ): Promise<UserTranslationStatistics[]> {
+  ): Promise<UserFeatureUsageStatistics[]> {
     try {
       const cachedStatistics =
-        this.getCachedTranslationsForPreviousMonth(selectedMonth);
+        this.getCachedFeatureUsageForPreviousMonth(selectedMonth);
       if (cachedStatistics) {
         return cachedStatistics;
       }
@@ -618,22 +643,22 @@ export class FirebaseFirestoreService {
       const snapshot = await runInInjectionContext(this.injector, () =>
         this.getDocs(usersRef),
       );
-      const result: UserTranslationStatistics[] = [];
+      const result: UserFeatureUsageStatistics[] = [];
       snapshot.forEach((docSnap) => {
         const data = docSnap.data();
         result.push({
           userId: docSnap.id,
-          translatedCharCount: data['charCount'] || 0,
+          consumedFeatureCharCount: data['charCount'] || 0,
           targetLanguages: data['targetLanguages'] || [],
-          lastTranslationDate: this.getFirestoreDate(data['lastUpdated']),
+          lastFeatureUsageDate: this.getFirestoreDate(data['lastUpdated']),
         });
       });
 
-      this.saveCachedTranslationsForMonth(selectedMonth, result);
+      this.saveCachedFeatureUsageForMonth(selectedMonth, result);
       return result;
     } catch (error) {
       console.error(
-        `Error fetching all user statistics for month ${selectedMonth}:`,
+        `Error fetching feature usage statistics for all user and month ${selectedMonth}:`,
         error,
       );
       return [];
@@ -641,21 +666,21 @@ export class FirebaseFirestoreService {
   }
 
   /**
-   * Returns cached translation statistics for a non-current month.
+   * Returns cached feature usage statistics for a non-current month.
    *
    * The current month is intentionally excluded so fresh data is always
-   * loaded from Firestore for ongoing translations.
+   * loaded from Firestore for ongoing feature usage.
    *
    * @param month Month key in YYYY-MM format.
    * @returns Cached statistics for the month, or undefined if not cached
    *          or when the requested month is the current month.
    */
-  private getCachedTranslationsForPreviousMonth(
+  private getCachedFeatureUsageForPreviousMonth(
     month: string,
-  ): UserTranslationStatistics[] | undefined {
+  ): UserFeatureUsageStatistics[] | undefined {
     const currentMonth = this.utilsService.getCurrentMonth();
     if (currentMonth !== month) {
-      const cached = this.cachedTranslations.get(month);
+      const cached = this.cachedFeatureUsage.get(month);
       if (cached) {
         return cached;
       }
@@ -664,18 +689,18 @@ export class FirebaseFirestoreService {
   }
 
   /**
-   * Stores translation statistics in the month cache.
+   * Stores feature usage statistics in the month cache.
    *
    * Existing entries for the same month are replaced.
    *
    * @param month Month key in YYYY-MM format.
-   * @param data Translation statistics to cache for the given month.
+   * @param data Feature usage statistics to cache for the given month.
    */
-  private saveCachedTranslationsForMonth(
+  private saveCachedFeatureUsageForMonth(
     month: string,
-    data: UserTranslationStatistics[],
+    data: UserFeatureUsageStatistics[],
   ): void {
-    this.cachedTranslations.set(month, data);
+    this.cachedFeatureUsage.set(month, data);
   }
 
   private getCollection(path: string) {

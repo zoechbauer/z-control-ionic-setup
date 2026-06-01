@@ -5,9 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { FirebaseFirestoreUtilsService } from './firebase-firestore-utils.service.js';
-import {
-  FeatureResult,
-} from './shared/firebase-firestore.interfaces.js';
+import { FeatureResult } from './shared/firebase-firestore.interfaces.js';
 import { FirebaseFirestoreService } from './firebase-firestore.service.js';
 import { FireStoreConstants } from './shared/app.constants.js';
 
@@ -23,18 +21,10 @@ admin.initializeApp();
  */
 export const secureFeature = onCall(async (request) => {
   const auth = request.auth;
-  if (!auth) {
-    throw new HttpsError('unauthenticated', 'User must be authenticated.');
-  }
-
   const appId = request.data?.appId;
-  if (typeof appId !== 'string' || appId.trim() === '') {
-    throw new HttpsError('invalid-argument', 'appId must be provided.');
-  }
-
   const text = request.data?.text;
 
-  await validateSecureFeatureRequest(auth, text);
+  await validateSecureFeatureRequest(auth, text, appId);
 
   const collection = FireStoreConstants.getCollectionByAppId(appId);
   await FirebaseFirestoreUtilsService.validateContingentOrThrow(
@@ -45,8 +35,7 @@ export const secureFeature = onCall(async (request) => {
   const firestoreService = new FirebaseFirestoreService(collection, auth!.uid);
   await firestoreService.addTranslatedChars(text.length, []);
 
-  const functionResult: FeatureResult =
-    await executeFunctionApiOrThrow(text);
+  const functionResult: FeatureResult = await executeFunctionApiOrThrow(text);
   return functionResult;
 });
 
@@ -57,12 +46,16 @@ export const secureFeature = onCall(async (request) => {
 async function validateSecureFeatureRequest(
   auth: any,
   text: string,
+  appId: string,
 ): Promise<void> {
   if (!auth) {
     throw new HttpsError('unauthenticated', 'User must be authenticated.');
   }
   if (!text) {
     throw new HttpsError('invalid-argument', 'Missing required parameters.');
+  }
+  if (typeof appId !== 'string' || appId.trim() === '') {
+    throw new HttpsError('invalid-argument', 'appId must be provided.');
   }
 }
 
@@ -87,7 +80,7 @@ async function executeFunctionApiOrThrow(text: string): Promise<FeatureResult> {
 
     const data = (await response.json()) as Array<{ word?: string }>;
     console.log('Function API response data:', data);
-    
+
     const relatedWords = data
       .map((item) => item.word)
       .filter((w): w is string => typeof w === 'string' && w.length > 0)
@@ -96,7 +89,7 @@ async function executeFunctionApiOrThrow(text: string): Promise<FeatureResult> {
     return {
       feature: {
         input: text,
-        related: relatedWords || 'no related words found',
+        related: relatedWords,
       },
     };
   } catch (error: unknown) {

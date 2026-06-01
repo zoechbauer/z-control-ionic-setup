@@ -26,11 +26,11 @@ import { AllMonthsOption, DisplayMode, LogoType } from 'src/app/shared/enums';
 import { FirebaseFirestoreService } from 'src/app/services/firebase-firestore.service';
 import { environment } from 'src/environments/environment';
 import {
-  FirestoreContingentData,
   DisplayedUserStatistics,
   StatisticsData,
   UserStatisticsSummary,
   DisplayedUserStatisticsRow,
+  ContingentData,
 } from 'src/app/shared/firebase-firestore.interfaces';
 import { UtilsService } from 'src/app/services/utils.service';
 import { LocalStorageService } from 'src/app/services/local-storage.service';
@@ -89,7 +89,7 @@ export class GetStatisticsComponent implements OnInit, OnDestroy {
 
   // Statistics data
   isLoading = true;
-  contingentData: FirestoreContingentData | null = null;
+  contingentData: ContingentData | null = null;
   isStopped = false;
   totalCharCount = 0;
   allUsersCharCount = 0;
@@ -109,7 +109,7 @@ export class GetStatisticsComponent implements OnInit, OnDestroy {
     private readonly firestoreService: FirebaseFirestoreService,
     private readonly firestoreUtilsService: FirebaseFirestoreUtilsService,
     private readonly localStorageService: LocalStorageService,
-    private readonly utilsService: UtilsService
+    private readonly utilsService: UtilsService,
   ) {}
 
   get statisticsData(): StatisticsData | null {
@@ -122,10 +122,10 @@ export class GetStatisticsComponent implements OnInit, OnDestroy {
       (userStat) => ({
         ...userStat,
         formattedLastActivityDate: this.getFormatDateTime(
-          userStat.lastTranslationDate ?? userStat.userCreatedAt
+          userStat.lastFeatureUsageDate ?? userStat.userCreatedAt,
         ),
         isCurrentUser: this.isCurrentUser(userStat.userId),
-      })
+      }),
     );
     this.applyUserStatsFilter();
   }
@@ -170,7 +170,7 @@ export class GetStatisticsComponent implements OnInit, OnDestroy {
         if (this.isProgrammerDevice !== newValue) {
           this.isProgrammerDevice = newValue;
         }
-      })
+      }),
     );
   }
 
@@ -196,45 +196,45 @@ export class GetStatisticsComponent implements OnInit, OnDestroy {
 
       // Read control flags
       this.contingentData = await this.firestoreService.readContingentData(
-        this.filterSelectedMonth
+        this.filterSelectedMonth,
       );
-      this.isStopped = !!this.contingentData.StopTranslationForAllUsers;
+      this.isStopped = !!this.contingentData.StopFeatureUsageForAllUsers;
 
       // Total contingent
       this.totalLimit =
-        this.contingentData.maxFreeTranslateCharsPerMonth ??
-        environment.app.maxFreeTranslateCharsPerMonth;
+        this.contingentData.maxFreeFeatureCharsPerMonth ??
+        environment.app.maxFreeFeatureCharsPerMonth;
       this.totalBuffer =
-        this.contingentData.maxFreeTranslateCharsBufferPerMonth ??
-        environment.app.maxFreeTranslateCharsBufferPerMonth;
+        this.contingentData.maxFreeFeatureCharsBufferPerMonth ??
+        environment.app.maxFreeFeatureCharsBufferPerMonth;
       this.totalCharCount = await this.firestoreService.getTotalCharCount(
-        this.filterSelectedMonth
+        this.filterSelectedMonth,
       );
       this.totalRemaining = Math.max(
         0,
-        this.totalLimit - this.totalBuffer - this.totalCharCount
+        this.totalLimit - this.totalBuffer - this.totalCharCount,
       );
 
       // User contingent
       this.userLimit =
-        this.contingentData.maxFreeTranslateCharsPerMonthForUser ??
-        environment.app.maxFreeTranslateCharsPerMonthForUser;
+        this.contingentData.maxFreeFeatureCharsPerMonthForUser ??
+        environment.app.maxFreeFeatureCharsPerMonthForUser;
 
       // user statistics and info
       this.statisticsData =
         await this.firestoreUtilsService.getDisplayedUserStatistics(
-          this.isProgrammerDevice
+          this.isProgrammerDevice,
         );
       this.userStatisticsSummaryData =
         this.firestoreUtilsService.getUserStatisticsSummary(
-          this.statisticsData?.displayedUserStatistics ?? []
+          this.statisticsData?.displayedUserStatistics ?? [],
         );
 
       // Calculate the sum of all users' translated characters
       this.allUsersCharCount =
         this.statisticsData?.displayedUserStatistics.reduce(
-          (sum, userStat) => sum + userStat.translatedCharCount,
-          0
+          (sum, userStat) => sum + userStat.consumedFeatureCharCount,
+          0,
         ) ?? 0;
     } catch (error) {
       console.error('GetStatisticsComponent: Error loading statistics', error);
@@ -298,8 +298,8 @@ export class GetStatisticsComponent implements OnInit, OnDestroy {
 
       this.filteredUserStatsRows = rows.filter((u) =>
         operator === '>'
-          ? u.translatedCharCount > value
-          : u.translatedCharCount < value
+          ? u.consumedFeatureCharCount > value
+          : u.consumedFeatureCharCount < value,
       );
       return;
     }
@@ -310,7 +310,7 @@ export class GetStatisticsComponent implements OnInit, OnDestroy {
       (u) =>
         u.userName.toLowerCase().includes(lower) ||
         (u.displayedPlatform ?? '').toLowerCase().includes(lower) ||
-        (u.displayedModel ?? '').toLowerCase().includes(lower)
+        (u.displayedModel ?? '').toLowerCase().includes(lower),
     );
   }
 
@@ -321,7 +321,7 @@ export class GetStatisticsComponent implements OnInit, OnDestroy {
       selectedMonth = this.translate.instant(AllMonthsOption.SelectOptionValue);
     } else {
       selectedMonth = this.translate.instant(
-        this.selectedMonthForStatisticsSections
+        this.selectedMonthForStatisticsSections,
       );
     }
 
@@ -338,7 +338,7 @@ export class GetStatisticsComponent implements OnInit, OnDestroy {
     this.filterSelectedMonth =
       await this.localStorageService.getStatisticsSelectedMonth(
         AllMonthsOption.SelectOptionValue,
-        this.isProgrammerDevice
+        this.isProgrammerDevice,
       );
     this.selectedMonthForStatisticsSections = this.filterSelectedMonth;
   }
@@ -369,7 +369,7 @@ export class GetStatisticsComponent implements OnInit, OnDestroy {
 
   async showDetailInfos(
     lang: string,
-    userStatistic: DisplayedUserStatistics
+    userStatistic: DisplayedUserStatistics,
   ): Promise<void> {
     this.utilsService.openUserDetail(lang, userStatistic, this.displayMode);
   }

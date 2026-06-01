@@ -2,6 +2,21 @@
 
 Welcome to the latest updates for the **z-control IONIC Setup** app.
 
+## [0.4] – 2026-06-01
+
+### 🐛 Fixes
+
+- Renamed "Translator" to "Feature" across the UI to better reflect that this app demonstrates feature implementation in the z-control IONIC Setup project, rather than acting as a standalone translator.
+
+### 🔧 Internal
+
+- Renamed "Translation statistics" to "Feature statistics" across the app.
+- Updated feature usage/statistics handling and related limits to match the new terminology.
+- Updated English and German translations for consistent wording.
+- Updated frontend tests and added backend tests for secure-feature.
+- Maintained high test quality with 100% backend coverage (133 tests) and 99.55% frontend coverage (504 tests).
+
+
 ## [0.3] – 2026-05-30
 
 ### 🔧 Internal

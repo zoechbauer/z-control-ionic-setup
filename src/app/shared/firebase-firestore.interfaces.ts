@@ -6,11 +6,18 @@ export interface FirestoreContingentData {
   maxFreeTranslateCharsPerMonthForUser?: number;
 }
 
+export interface ContingentData {
+  StopFeatureUsageForAllUsers?: boolean;
+  maxFreeFeatureCharsPerMonth?: number;
+  maxFreeFeatureCharsBufferPerMonth?: number;
+  maxFreeFeatureCharsPerMonthForUser?: number;
+}
+
 export interface DisplayedUserContingentData {
   userNameKey: string;
-  freeTranslateCharsPerMonth: number;
-  translatedCharCountCurrentMonth: number;
-  availableCharCountCurrentMonth: number;
+  freeFeatureCharsPerMonth: number;
+  consumedFeatureCharCountCurrentMonth: number;
+  availableFeatureCharCountCurrentMonth: number;
 }
 export interface DisplayedUserStatistics {
   userId: string;
@@ -23,26 +30,26 @@ export interface DisplayedUserStatistics {
   deviceInfo: DeviceInfo;
   displayedPlatform: string;
   displayedModel: string;
-  translatedCharCount: number;
+  consumedFeatureCharCount: number;
   targetLanguages: string[];
-  lastTranslationDate: Date | null;
+  lastFeatureUsageDate: Date | null;
 }
 export interface DisplayedUserStatisticsRow extends DisplayedUserStatistics {
   formattedLastActivityDate: string;
   isCurrentUser: boolean;
-};
+}
 export interface UserStatisticsSummary {
   category: string;
   name: string;
-  countTranslations: number;
+  countFeatureUsage: number;
   countRegistrations: number;
 }
 
-export interface UserTranslationStatistics {
+export interface UserFeatureUsageStatistics {
   userId: string;
-  translatedCharCount: number;
+  consumedFeatureCharCount: number;
   targetLanguages: string[];
-  lastTranslationDate?: Date;
+  lastFeatureUsageDate?: Date;
 }
 
 export interface UserType {
@@ -58,7 +65,7 @@ export interface UserType {
 
 export interface StatisticsData {
   displayedUserStatistics: DisplayedUserStatistics[];
-  userTranslationStatistics: UserTranslationStatistics[];
+  userFeatureStatistics: UserFeatureUsageStatistics[];
   users: UserType[];
   programmerDeviceUIDs: ProgrammerDeviceUID[];
 }

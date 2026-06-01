@@ -50,8 +50,8 @@ export class HelpModalComponent implements OnInit, OnDestroy {
     private readonly localStorage: LocalStorageService
   ) {}
 
-  get maxFreeTranslateCharsLengthPerMonth() {
-    return AppConstants.maxFreeTranslateCharsPerMonth;
+  get maxFreeFeatureCharsLengthPerMonth() {
+    return AppConstants.maxFreeFeatureCharsPerMonth;
   }
 
   get isNative(): boolean {

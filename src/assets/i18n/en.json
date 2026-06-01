@@ -141,16 +141,16 @@
     "STATISTICS": {
       "ACCORDION": "Get Statistics for {{yearMonth}}",
       "LABEL": {
-        "GLOBAL_TRANS_STATUS": "Translation Status",
-        "GLOBAL_TRANS_STOPPED": "Translation stopped for all users",
-        "GLOBAL_TRANS_ACTIVE": "Translation active for all users",
-        "TOTAL_CONTINGENT": "Total Translation Contingent",
+        "GLOBAL_FEATURE_STATUS": "Feature Status",
+        "GLOBAL_FEATURE_STOPPED": "Feature stopped for all users",
+        "GLOBAL_FEATURE_ACTIVE": "Feature active for all users",
+        "TOTAL_FEATURE_CONTINGENT": "Total Feature Contingent",
         "USED": "Used",
         "BUFFER": "Buffer",
         "AVAILABLE": "Available",
         "CHECKSUM_ALL_USERS": "Used by all users",
         "CHARS": "Characters",
-        "GRID_INFO_NOTE": "Sorted in descending order by the date of the last translation",
+        "GRID_INFO_NOTE": "Sorted in descending order by the date of the last feature usage",
         "GRID_SEARCH_INFO": "Text=User & Platform, <|>=used chars, <<|>>=lang",
         "USER_STATISTICS_OVERVIEW": "User Statistics Overview",
         "JSON_DATA": "Raw Data (JSON) - Debug Only"
@@ -170,14 +170,14 @@
         }
       },
       "GRID": {
-        "USER_CONTINGENT": "User Translation Contingent",
+        "USER_CONTINGENT": "User Feature Contingent",
         "USER": "User",
         "USED": "Used of {{limit}}",
         "PLATFORM": "Platform",
-        "LAST_TRANSLATION": "Last Translation"
+        "LAST_FEATURE_USAGE": "Last Feature Usage"
       },
       "USER_DETAIL": {
-        "TITLE": "User Translation Information",
+        "TITLE": "User Feature Information",
         "USER_INFORMATION": {
           "TITLE": "User Information",
           "LABEL": {
@@ -200,13 +200,12 @@
             "MODEL": "Model"
           }
         },
-        "TRANSLATION_STATISTICS": {
-          "TITLE": "Translation Statistics",
+        "FEATURE_STATISTICS": {
+          "TITLE": "Feature Statistics",
           "LABEL": {
-            "TRANSLATED_CHARS": "Translated Characters",
+            "CONSUMED_CHARS": "Consumed Characters",
             "LANGUAGE": "Language",
-            "TARGET_LANGUAGES": "Target Languages",
-            "LAST_TRANSLATION": "Last Translation"
+            "LAST_FEATURE_USAGE": "Last Feature Usage"
           }
         },
         "USER_AGENT": {

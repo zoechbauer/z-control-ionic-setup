@@ -45,19 +45,19 @@
           >
             <ion-col>{{ contingentData.userNameKey | translate }}</ion-col>
             <ion-col>{{
-              contingentData.translatedCharCountCurrentMonth
+              contingentData.consumedFeatureCharCountCurrentMonth
                 | number
                   : "1.0-0"
                   : (translate.currentLang === "de" ? "de-DE" : "en-US")
             }}</ion-col>
             <ion-col>{{
-              contingentData.freeTranslateCharsPerMonth
+              contingentData.freeFeatureCharsPerMonth
                 | number
                   : "1.0-0"
                   : (translate.currentLang === "de" ? "de-DE" : "en-US")
             }}</ion-col>
             <ion-col>{{
-              contingentData.availableCharCountCurrentMonth
+              contingentData.availableFeatureCharCountCurrentMonth
                 | number
                   : "1.0-0"
                   : (translate.currentLang === "de" ? "de-DE" : "en-US")

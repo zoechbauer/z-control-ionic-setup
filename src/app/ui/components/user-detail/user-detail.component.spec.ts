@@ -3,7 +3,6 @@ import { IonicModule, ModalController } from '@ionic/angular';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { provideIonicAngular } from '@ionic/angular/standalone';
 import { TranslateService } from '@ngx-translate/core';
-import { of } from 'rxjs';
 
 import { UtilsService } from 'src/app/services/utils.service';
 import { createTranslateServiceMock } from 'src/app/testing/translate-service.mock';
@@ -55,7 +54,7 @@ describe('UserDetailComponent', () => {
       {
         isPortrait: true,
         isNative: false,
-      }
+      },
     );
 
     TestBed.configureTestingModule({
@@ -82,7 +81,7 @@ describe('UserDetailComponent', () => {
     component = fixture.componentInstance;
 
     mockTranslateService = TestBed.inject(
-      TranslateService
+      TranslateService,
     ) as jasmine.SpyObj<TranslateService>;
 
     component.lang = 'en';
@@ -101,6 +100,26 @@ describe('UserDetailComponent', () => {
       spyOn(component['modalCtrl'], 'dismiss').and.callThrough();
       component.close();
       expect(component['modalCtrl'].dismiss).toHaveBeenCalled();
+    });
+
+    describe('getAppVersion()', () => {
+      it('should return the correct app version string format', () => {
+        component.userStatistic.deviceInfo.appVersion = {
+          major: 2,
+          minor: 5,
+          date: '2026-04-01',
+        };
+        expect(component.getAppVersion()).toBe('2.5 (2026-04-01)');
+      });
+
+      it('should return empty string if appVersion.date is missing', () => {
+        component.userStatistic.deviceInfo.appVersion = {
+          major: 0,
+          minor: 0,
+          date: '',
+        };
+        expect(component.getAppVersion()).toBe('');
+      });
     });
 
     describe('formatting and display logic', () => {
@@ -131,7 +150,7 @@ describe('UserDetailComponent', () => {
       it('should call UtilsService.formatDateTimeISO when dateTime is valid', () => {
         component.getFormatDateTime(new Date('2026-03-09T00:00:00Z'));
         expect(utilsServiceSpy.formatDateTimeISO).toHaveBeenCalledWith(
-          new Date('2026-03-09T00:00:00Z')
+          new Date('2026-03-09T00:00:00Z'),
         );
       });
 
@@ -160,7 +179,7 @@ describe('UserDetailComponent', () => {
       it('should call UtilsService.formatDateISO when dateTime is valid', () => {
         component.getFormatDateTime(new Date('2026-03-09T00:00:00Z'));
         expect(utilsServiceSpy.formatDateISO).toHaveBeenCalledWith(
-          new Date('2026-03-09T00:00:00Z')
+          new Date('2026-03-09T00:00:00Z'),
         );
       });
 
@@ -192,7 +211,7 @@ describe('UserDetailComponent', () => {
         const deviceElement: HTMLElement =
           fixture.nativeElement.querySelector('.user-type');
         expect(deviceElement.textContent).toContain(
-          'SETTINGS.STATISTICS.USER_DETAIL.USER_INFORMATION.LABEL.USER_TYPE_USER'
+          'SETTINGS.STATISTICS.USER_DETAIL.USER_INFORMATION.LABEL.USER_TYPE_USER',
         );
       });
 
@@ -205,7 +224,7 @@ describe('UserDetailComponent', () => {
         const deviceElement: HTMLElement =
           fixture.nativeElement.querySelector('.user-type');
         expect(deviceElement.textContent).toContain(
-          'SETTINGS.STATISTICS.USER_DETAIL.USER_INFORMATION.LABEL.USER_TYPE_PROGRAMMER'
+          'SETTINGS.STATISTICS.USER_DETAIL.USER_INFORMATION.LABEL.USER_TYPE_PROGRAMMER',
         );
       });
     });

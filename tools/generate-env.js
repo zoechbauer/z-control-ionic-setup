@@ -42,14 +42,14 @@ function makeEnv(prod = false) {
     app: {
       name: v("APP_NAME", "My App"),
       showTabsBar: v("SHOW_TABS_BAR", "false").toLowerCase() === "true",
-      maxFreeTranslateCharsPerMonthForUser: Number(
-        v("MAX_FREE_TRANSLATE_CHARS_PER_MONTH_FOR_USER", "10000"),
+      maxFreeFeatureCharsPerMonthForUser: Number(
+        v("MAX_FREE_FEATURE_CHARS_PER_MONTH_FOR_USER", "10000"),
       ),
-      maxFreeTranslateCharsPerMonth: Number(
-        v("MAX_FREE_TRANSLATE_CHARS_PER_MONTH", "500000"),
+      maxFreeFeatureCharsPerMonth: Number(
+        v("MAX_FREE_FEATURE_CHARS_PER_MONTH", "500000"),
       ),
-      maxFreeTranslateCharsBufferPerMonth: Number(
-        v("MAX_FREE_TRANSLATE_CHARS_BUFFER_PER_MONTH", "5000"),
+      maxFreeFeatureCharsBufferPerMonth: Number(
+        v("MAX_FREE_FEATURE_CHARS_BUFFER_PER_MONTH", "5000"),
       ),
       useFirebaseEmulator:
         v("USE_FIREBASE_EMULATOR", "false").toLowerCase() === "true",

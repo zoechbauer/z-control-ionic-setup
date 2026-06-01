@@ -6,10 +6,10 @@ import { environment } from 'src/environments/environment';
 import {
   DisplayedUserContingentData,
   DisplayedUserStatistics,
-  FirestoreContingentData,
   StatisticsData,
   UserStatisticsSummary,
-  UserTranslationStatistics,
+  UserFeatureUsageStatistics,
+  ContingentData,
 } from '../shared/firebase-firestore.interfaces';
 import { LocalStorageService } from './local-storage.service';
 import {
@@ -57,22 +57,22 @@ export class FirebaseFirestoreUtilsService {
   /**
    * Retrieves displayed user statistics from Firestore.
    *
-   * Fetches all user translation statistics and user information for the selected month
+   * Fetches feature usage statistics for all users and user information for the selected month
    * (or all months), then aggregates and combines them into a StatisticsData result.
    *
    * When the same userId appears in multiple records (e.g. across months), the records
    * are aggregated: char counts are summed, target languages are unioned, and the latest
-   * translation date is kept.
+   * feature usage date is kept.
    *
-   * Users with no translation activity (translatedCharCount === 0) are excluded unless
-   * the display mode is Programmer. Results are sorted by last translation date descending,
+   * Users with no feature usage activity (consumedFeatureCharCount === 0) are excluded unless
+   * the display mode is Programmer. Results are sorted by last feature usage date descending,
    * with ties broken by user creation date descending.
    *
    * On a programmer device, programmer device UIDs are also fetched and included.
    *
    * @param {boolean} isProgrammerDevice - Indicates whether the device is a programmer device.
    * @returns {Promise<StatisticsData>} A promise resolving to statistics data containing
-   *          displayed user statistics, raw user translation statistics, all users,
+   *          displayed user statistics, raw user feature usage statistics, all users,
    *          and programmer device UIDs (empty if not a programmer device).
    */
   async getDisplayedUserStatistics(
@@ -80,7 +80,7 @@ export class FirebaseFirestoreUtilsService {
   ): Promise<StatisticsData> {
     let statisticsData: StatisticsData = {
       displayedUserStatistics: [],
-      userTranslationStatistics: [],
+      userFeatureStatistics: [],
       users: [],
       programmerDeviceUIDs: [],
     };
@@ -94,12 +94,12 @@ export class FirebaseFirestoreUtilsService {
         isProgrammerDevice,
       );
 
-    const userTranslationStatistics: UserTranslationStatistics[] =
-      await this.firestoreService.getAllUserTranslationStatistics(
+    const userFeatureUsageStatistics: UserFeatureUsageStatistics[] =
+      await this.firestoreService.getAllUserFeatureUsageStatistics(
         this.statisticsSelectedMonth,
       );
 
-    statisticsData.userTranslationStatistics = userTranslationStatistics;
+    statisticsData.userFeatureStatistics = userFeatureUsageStatistics;
 
     statisticsData.users = await this.firestoreService.getUsers(
       this.statisticsSelectedMonth,
@@ -111,31 +111,31 @@ export class FirebaseFirestoreUtilsService {
     }
 
     statisticsData.users.forEach((userInfo) => {
-      const userTranslationInfos = userTranslationStatistics.filter(
+      const userFeatureUsageInfos = userFeatureUsageStatistics.filter(
         (u) => u.userId === userInfo.userId,
       );
 
-      const aggregatedTranslationInfo: UserTranslationStatistics | undefined =
-        userTranslationInfos.length > 0
+      const aggregatedFeatureUsageInfo: UserFeatureUsageStatistics | undefined =
+        userFeatureUsageInfos.length > 0
           ? {
               userId: userInfo.userId,
-              translatedCharCount: userTranslationInfos.reduce(
-                (sum, info) => sum + (info.translatedCharCount || 0),
+              consumedFeatureCharCount: userFeatureUsageInfos.reduce(
+                (sum, info) => sum + (info.consumedFeatureCharCount || 0),
                 0,
               ),
               targetLanguages: Array.from(
                 new Set(
-                  userTranslationInfos.reduce<string[]>(
+                  userFeatureUsageInfos.reduce<string[]>(
                     (allLanguages, info) =>
                       allLanguages.concat(info.targetLanguages || []),
                     [],
                   ),
                 ),
               ),
-              lastTranslationDate: userTranslationInfos.reduce<
+              lastFeatureUsageDate: userFeatureUsageInfos.reduce<
                 Date | undefined
               >((latest, info) => {
-                const current = info.lastTranslationDate;
+                const current = info.lastFeatureUsageDate;
                 /* istanbul ignore next */
                 if (!current) return latest;
                 if (!latest || current.getTime() > latest.getTime()) {
@@ -167,16 +167,16 @@ export class FirebaseFirestoreUtilsService {
         },
         displayedPlatform: DeviceUtils.getWebPlatform(userInfo),
         displayedModel: DeviceUtils.getModel(userInfo),
-        translatedCharCount:
-          aggregatedTranslationInfo?.translatedCharCount ?? 0,
-        targetLanguages: aggregatedTranslationInfo?.targetLanguages ?? [],
-        lastTranslationDate:
-          aggregatedTranslationInfo?.lastTranslationDate ?? null,
+        consumedFeatureCharCount:
+          aggregatedFeatureUsageInfo?.consumedFeatureCharCount ?? 0,
+        targetLanguages: aggregatedFeatureUsageInfo?.targetLanguages ?? [],
+        lastFeatureUsageDate:
+          aggregatedFeatureUsageInfo?.lastFeatureUsageDate ?? null,
       };
 
       if (
         this.statisticsDisplayMode === DisplayMode.Programmer ||
-        stat.translatedCharCount > 0
+        stat.consumedFeatureCharCount > 0
       ) {
         statisticsData.displayedUserStatistics.push(stat);
       }
@@ -184,10 +184,10 @@ export class FirebaseFirestoreUtilsService {
 
     statisticsData.displayedUserStatistics.sort(
       (a, b) =>
-        (b.lastTranslationDate?.getTime() ?? 0) -
-          (a.lastTranslationDate?.getTime() ?? 0) ||
+        (b.lastFeatureUsageDate?.getTime() ?? 0) -
+          (a.lastFeatureUsageDate?.getTime() ?? 0) ||
         (b.userCreatedAt?.getTime() ?? 0) - (a.userCreatedAt?.getTime() ?? 0),
-    ); // Sort by last translation date desc and userCreatedAt desc
+    ); // Sort by last feature usage date desc and userCreatedAt desc
     return statisticsData;
   }
 
@@ -201,8 +201,8 @@ export class FirebaseFirestoreUtilsService {
    * 4. Target language count (1-5)
    *
    * Each row includes:
-   * - countTranslations: users with translatedCharCount > 0
-   * - countRegistrations: users with translatedCharCount === 0
+   * - countFeatureUsage: users with consumedFeatureCharCount > 0
+   * - countRegistrations: users with consumedFeatureCharCount === 0
    *
    * @param statisticsData The list of displayed user statistics used as input.
    * @returns A flattened array of summary rows grouped by category.
@@ -304,7 +304,7 @@ export class FirebaseFirestoreUtilsService {
       .map(([normalizedModel, displayedModel]) => ({
         category,
         name: displayedModel,
-        countTranslations: this.countTranslationsForType(
+        countFeatureUsage: this.countFeatureUsageForType(
           statisticsData,
           normalizedModel,
         ),
@@ -356,7 +356,7 @@ export class FirebaseFirestoreUtilsService {
       rows.push({
         category,
         name: type,
-        countTranslations: this.countTranslationsForType(statisticsData, type),
+        countFeatureUsage: this.countFeatureUsageForType(statisticsData, type),
         countRegistrations: this.countRegistrationsForType(
           statisticsData,
           type,
@@ -367,15 +367,15 @@ export class FirebaseFirestoreUtilsService {
   }
 
   /**
-   * Counts users with at least one translation for the given type.
+   * Counts users with at least one feature usage for the given type.
    *
    * Supports user type, platform, language-count buckets, and normalized model names.
    *
    * @param statisticsData Source user statistics.
    * @param type Type discriminator used for matching.
-   * @returns Number of users with translatedCharCount > 0.
+   * @returns Number of users with consumedFeatureCharCount > 0.
    */
-  private countTranslationsForType(
+  private countFeatureUsageForType(
     statisticsData: DisplayedUserStatistics[],
     type: StatisticsSummaryName | string,
   ): number {
@@ -383,25 +383,27 @@ export class FirebaseFirestoreUtilsService {
       if (this.isLanguageCountType(type)) {
         return (
           userStat.targetLanguages.length === Number(type) &&
-          userStat.translatedCharCount > 0
+          userStat.consumedFeatureCharCount > 0
         );
       }
       switch (type) {
         case StatisticsSummaryName.Programmer:
         case StatisticsSummaryName.User:
-          return userStat.userType === type && userStat.translatedCharCount > 0;
+          return (
+            userStat.userType === type && userStat.consumedFeatureCharCount > 0
+          );
         case StatisticsSummaryName.Native:
         case StatisticsSummaryName.WebMobile:
         case StatisticsSummaryName.WebDesktop:
           return (
             userStat.displayedPlatform === type &&
-            userStat.translatedCharCount > 0
+            userStat.consumedFeatureCharCount > 0
           );
         default:
           return (
             this.normalizeModelForCompare(userStat.displayedModel) ===
               this.normalizeModelForCompare(type) &&
-            userStat.translatedCharCount > 0
+            userStat.consumedFeatureCharCount > 0
           );
       }
     }).length;
@@ -412,13 +414,13 @@ export class FirebaseFirestoreUtilsService {
   }
 
   /**
-   * Counts users with no translations for the given type.
+   * Counts users with no feature usage for the given type.
    *
    * Supports user type, platform, language-count buckets, and normalized model names.
    *
    * @param statisticsData Source user statistics.
    * @param type Type discriminator used for matching.
-   * @returns Number of users with translatedCharCount === 0.
+   * @returns Number of users with consumedFeatureCharCount === 0.
    */
   private countRegistrationsForType(
     statisticsData: DisplayedUserStatistics[],
@@ -428,27 +430,28 @@ export class FirebaseFirestoreUtilsService {
       if (this.isLanguageCountType(type)) {
         return (
           userStat.targetLanguages.length === Number(type) &&
-          userStat.translatedCharCount === 0
+          userStat.consumedFeatureCharCount === 0
         );
       }
       switch (type) {
         case StatisticsSummaryName.Programmer:
         case StatisticsSummaryName.User:
           return (
-            userStat.userType === type && userStat.translatedCharCount === 0
+            userStat.userType === type &&
+            userStat.consumedFeatureCharCount === 0
           );
         case StatisticsSummaryName.Native:
         case StatisticsSummaryName.WebMobile:
         case StatisticsSummaryName.WebDesktop:
           return (
             userStat.displayedPlatform === type &&
-            userStat.translatedCharCount === 0
+            userStat.consumedFeatureCharCount === 0
           );
         default:
           return (
             this.normalizeModelForCompare(userStat.displayedModel) ===
               this.normalizeModelForCompare(type) &&
-            userStat.translatedCharCount === 0
+            userStat.consumedFeatureCharCount === 0
           );
       }
     }).length;
@@ -492,9 +495,9 @@ export class FirebaseFirestoreUtilsService {
   }
 
   /**
-   * Retrieves displayed user contingent data for translation limits.
+   * Retrieves displayed user contingent data for feature usage limits.
    *
-   * Fetches the current translation contingent information for both the current user
+   * Fetches the current feature usage contingent information for both the current user
    * and all users combined. Automatically refreshes the month context if the month has changed.
    * Calculates available character counts based on configured limits and buffers.
    *
@@ -505,7 +508,7 @@ export class FirebaseFirestoreUtilsService {
     DisplayedUserContingentData[]
   > {
     // Read all control flags from Firestore
-    const contingentData: FirestoreContingentData =
+    const contingentData: ContingentData =
       await this.firestoreService.readContingentData(
         this.utilsService.getCurrentMonth(),
       );
@@ -513,44 +516,44 @@ export class FirebaseFirestoreUtilsService {
     // calculate data for current user
     const userCharCount = await this.firestoreService.getCharCountForUser();
     const limit =
-      contingentData.maxFreeTranslateCharsPerMonthForUser ??
-      environment.app.maxFreeTranslateCharsPerMonthForUser;
+      contingentData.maxFreeFeatureCharsPerMonthForUser ??
+      environment.app.maxFreeFeatureCharsPerMonthForUser;
     let availableCharCountCurrentMonth = Math.max(0, limit - userCharCount);
     const currentUserContingentData: DisplayedUserContingentData = {
       userNameKey: 'MAIN_STATISTICS.CARD.GRID.USER_NAME_YOU',
-      translatedCharCountCurrentMonth: userCharCount,
-      freeTranslateCharsPerMonth: limit,
-      availableCharCountCurrentMonth: availableCharCountCurrentMonth,
+      consumedFeatureCharCountCurrentMonth: userCharCount,
+      freeFeatureCharsPerMonth: limit,
+      availableFeatureCharCountCurrentMonth: availableCharCountCurrentMonth,
     };
     displayedContingentData.push(currentUserContingentData);
 
     // calculate data for all users
     const totalCharCount = await this.firestoreService.getTotalCharCount();
     const totalLimit =
-      contingentData.maxFreeTranslateCharsPerMonth ??
-      environment.app.maxFreeTranslateCharsPerMonth;
+      contingentData.maxFreeFeatureCharsPerMonth ??
+      environment.app.maxFreeFeatureCharsPerMonth;
     const totalBuffer =
-      contingentData.maxFreeTranslateCharsBufferPerMonth ??
-      environment.app.maxFreeTranslateCharsBufferPerMonth;
+      contingentData.maxFreeFeatureCharsBufferPerMonth ??
+      environment.app.maxFreeFeatureCharsBufferPerMonth;
     availableCharCountCurrentMonth = Math.max(
       0,
       totalLimit - totalBuffer - totalCharCount,
     );
     const allUserContingentData: DisplayedUserContingentData = {
       userNameKey: 'MAIN_STATISTICS.CARD.GRID.USER_NAME_ALL',
-      translatedCharCountCurrentMonth: totalCharCount,
-      freeTranslateCharsPerMonth: totalLimit - totalBuffer,
-      availableCharCountCurrentMonth: availableCharCountCurrentMonth,
+      consumedFeatureCharCountCurrentMonth: totalCharCount,
+      freeFeatureCharsPerMonth: totalLimit - totalBuffer,
+      availableFeatureCharCountCurrentMonth: availableCharCountCurrentMonth,
     };
     displayedContingentData.push(allUserContingentData);
     return displayedContingentData;
   }
 
   /**
-   * Checks if the translation contingent has been exceeded.
+   * Checks if the feature usage contingent has been exceeded.
    *
    * This method verifies, in order:
-   * 1. If translation is globally stopped for all users.
+   * 1. If feature usage is globally stopped for all users.
    * 2. If the total contingent for all users is exceeded.
    * 3. If the contingent for the current user is exceeded.
    * Returns true if any of these conditions are met, otherwise false.
@@ -559,13 +562,13 @@ export class FirebaseFirestoreUtilsService {
    */
   async isContingentExceeded(): Promise<boolean> {
     // Read all control flags from Firestore
-    const flags: FirestoreContingentData =
+    const flags: ContingentData =
       await this.firestoreService.readContingentData(
         this.utilsService.getCurrentMonth(),
       );
 
-    // 1. If translation is globally stopped for all users
-    if (flags.StopTranslationForAllUsers) {
+    // 1. If feature usage is globally stopped for all users
+    if (flags.StopFeatureUsageForAllUsers) {
       return true;
     }
     // 2. If the total contingent for all users is exceeded
@@ -580,24 +583,24 @@ export class FirebaseFirestoreUtilsService {
   }
 
   private async isContingentForUserExceeded(
-    flags: FirestoreContingentData,
+    flags: ContingentData,
   ): Promise<boolean> {
     const limit =
-      flags.maxFreeTranslateCharsPerMonthForUser ??
-      environment.app.maxFreeTranslateCharsPerMonthForUser;
+      flags.maxFreeFeatureCharsPerMonthForUser ??
+      environment.app.maxFreeFeatureCharsPerMonthForUser;
     const charCount = await this.firestoreService.getCharCountForUser();
     return charCount >= limit;
   }
 
   private async isTotalContingentExceeded(
-    flags: FirestoreContingentData,
+    flags: ContingentData,
   ): Promise<boolean> {
     const limit =
-      flags.maxFreeTranslateCharsPerMonth ??
-      environment.app.maxFreeTranslateCharsPerMonth;
+      flags.maxFreeFeatureCharsPerMonth ??
+      environment.app.maxFreeFeatureCharsPerMonth;
     const buffer =
-      flags.maxFreeTranslateCharsBufferPerMonth ??
-      environment.app.maxFreeTranslateCharsBufferPerMonth;
+      flags.maxFreeFeatureCharsBufferPerMonth ??
+      environment.app.maxFreeFeatureCharsBufferPerMonth;
     const charCount = await this.firestoreService.getTotalCharCount();
     return charCount >= limit - buffer;
   }

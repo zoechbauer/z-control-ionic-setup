@@ -8,6 +8,7 @@ export interface FirestoreContingentData {
 }
 
 export interface SecureFeatureData {
+  appId: string;
   text: string;
 }
 export interface FeatureResult {

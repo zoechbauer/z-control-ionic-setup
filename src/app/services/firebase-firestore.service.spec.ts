@@ -4,15 +4,14 @@ import { Firestore } from '@angular/fire/firestore';
 import { Functions } from '@angular/fire/functions';
 import { TranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
-import * as firestoreFns from '@angular/fire/firestore';
-import * as functionsFns from '@angular/fire/functions';
 
 import { FirebaseFirestoreService } from './firebase-firestore.service';
 import { UtilsService } from './utils.service';
 import {
+  ContingentData,
   FirestoreContingentData,
   ProgrammerDeviceUID,
-  UserTranslationStatistics,
+  UserFeatureUsageStatistics,
   UserType,
 } from '../shared/firebase-firestore.interfaces';
 import { LocalStorageService } from './local-storage.service';
@@ -190,8 +189,11 @@ describe('FirebaseFirestoreService', () => {
     });
 
     it('should return contingent data when document exists', async () => {
-      const flags: FirestoreContingentData = {
-        StopTranslationForAllUsers: true,
+      const flags: ContingentData = {
+        StopFeatureUsageForAllUsers: true,
+        maxFreeFeatureCharsPerMonth: 1000,
+        maxFreeFeatureCharsBufferPerMonth: 100,
+        maxFreeFeatureCharsPerMonthForUser: 500,
       };
 
       const fakeRef = { id: 'fake-ref' } as any;
@@ -200,6 +202,10 @@ describe('FirebaseFirestoreService', () => {
         exists: () => true,
         data: () => flags,
       } as any);
+      spyOn<any>(
+        service,
+        'convertFirestoreToAppContingentData',
+      ).and.returnValue(flags);
 
       const result = await service.readContingentData('2026-04');
 
@@ -259,6 +265,60 @@ describe('FirebaseFirestoreService', () => {
         ToastAnchor.MainPage,
       );
     });
+
+    describe('convertFirestoreToAppContingentData', () => {
+      it('should convert Firestore data to app contingent data', () => {
+        const firestoreContingentData: FirestoreContingentData = {
+          StopTranslationForAllUsers: true,
+          maxFreeTranslateCharsPerMonth: 1000,
+          maxFreeTranslateCharsBufferPerMonth: 100,
+          maxFreeTranslateCharsPerMonthForUser: 500,
+        };
+        const contingentData: ContingentData = {
+          StopFeatureUsageForAllUsers: true,
+          maxFreeFeatureCharsPerMonth: 1000,
+          maxFreeFeatureCharsBufferPerMonth: 100,
+          maxFreeFeatureCharsPerMonthForUser: 500,
+        };
+        const result = (service as any).convertFirestoreToAppContingentData(
+          firestoreContingentData,
+        );
+        expect(result).toEqual(contingentData);
+      });
+
+      it('should set StopFeatureUsageForAllUsers to true if StopTranslationForAllUsers is missing', () => {
+        const firestoreContingentData: FirestoreContingentData = {
+          maxFreeTranslateCharsPerMonth: 1000,
+          maxFreeTranslateCharsBufferPerMonth: 100,
+          maxFreeTranslateCharsPerMonthForUser: 500,
+        };
+        const result = (service as any).convertFirestoreToAppContingentData(
+          firestoreContingentData,
+        );
+        expect(result.StopFeatureUsageForAllUsers).toBeTrue();
+      });
+
+      it('should use environment values if Firestore data is missing', () => {
+        const firestoreContingentData: FirestoreContingentData = {};
+        const result = (service as any).convertFirestoreToAppContingentData(
+          firestoreContingentData,
+        );
+        expect(result.maxFreeFeatureCharsPerMonth).toEqual(
+          environment.app.maxFreeFeatureCharsPerMonth,
+        );
+        expect(result.maxFreeFeatureCharsBufferPerMonth).toEqual(
+          environment.app.maxFreeFeatureCharsBufferPerMonth,
+        );
+        expect(result.maxFreeFeatureCharsPerMonthForUser).toEqual(
+          environment.app.maxFreeFeatureCharsPerMonthForUser,
+        );
+      });
+
+      it('should set StopFeatureUsageForAllUsers to true if no data is provided', () => {
+        const result = (service as any).convertFirestoreToAppContingentData({});
+        expect(result.StopFeatureUsageForAllUsers).toBeTrue();
+      });
+    });
   });
 
   describe('createMissingContingentData', () => {
@@ -306,7 +366,7 @@ describe('FirebaseFirestoreService', () => {
   });
 
   describe('getCharCountForUser', () => {
-    it('should return character count and target languages for user when document exist', async () => {
+    it('should return feature usage count for user when document exist', async () => {
       (service as any).user = { uid: 'test-uid' } as any;
       const expectedResult = 123;
 
@@ -457,8 +517,8 @@ describe('FirebaseFirestoreService', () => {
     });
   });
 
-  describe('getAllUserTranslationStatisticsForMonth', () => {
-    it('should return mapped user translation statistics when snapshot has docs', async () => {
+  describe('getAllUserFeatureUsageStatisticsForMonth', () => {
+    it('should return mapped user feature usage statistics when snapshot has docs', async () => {
       const snapshotMock = {
         forEach: (cb: (doc: any) => void) => {
           cb({
@@ -490,20 +550,20 @@ describe('FirebaseFirestoreService', () => {
 
       const result = await (
         service as any
-      ).getAllUserTranslationStatisticsForMonth('2026-03');
+      ).getAllUserFeatureUsageStatisticsForMonth('2026-03');
 
       expect(result).toEqual([
         {
           userId: 'U-1',
-          translatedCharCount: 100,
+          consumedFeatureCharCount: 100,
           targetLanguages: ['en'],
-          lastTranslationDate: new Date('2026-03-01T00:00:00.000Z'),
+          lastFeatureUsageDate: new Date('2026-03-01T00:00:00.000Z'),
         },
         {
           userId: 'U-2',
-          translatedCharCount: 200,
+          consumedFeatureCharCount: 200,
           targetLanguages: ['fr'],
-          lastTranslationDate: new Date('2026-03-01T00:00:00.000Z'),
+          lastFeatureUsageDate: new Date('2026-03-01T00:00:00.000Z'),
         },
       ]);
     });
@@ -533,44 +593,44 @@ describe('FirebaseFirestoreService', () => {
 
       const result = await (
         service as any
-      ).getAllUserTranslationStatisticsForMonth('2026-03');
+      ).getAllUserFeatureUsageStatisticsForMonth('2026-03');
 
       expect(result).toEqual([
         {
           userId: 'U-1',
-          translatedCharCount: 100,
+          consumedFeatureCharCount: 100,
           targetLanguages: [],
-          lastTranslationDate: new Date('2026-03-01T00:00:00.000Z'),
+          lastFeatureUsageDate: new Date('2026-03-01T00:00:00.000Z'),
         },
         {
           userId: 'U-2',
-          translatedCharCount: 0,
+          consumedFeatureCharCount: 0,
           targetLanguages: [],
-          lastTranslationDate: undefined,
+          lastFeatureUsageDate: undefined,
         },
       ]);
     });
 
     it('should return cached data on subsequent calls for same month', async () => {
-      const userTranslationStatistics: UserTranslationStatistics[] = [
+      const userFeatureUsageStatistics: UserFeatureUsageStatistics[] = [
         {
           userId: 'U-1',
-          translatedCharCount: 100,
+          consumedFeatureCharCount: 100,
           targetLanguages: ['en'],
-          lastTranslationDate: new Date('2026-03-01T00:00:00.000Z'),
+          lastFeatureUsageDate: new Date('2026-03-01T00:00:00.000Z'),
         },
       ];
       spyOn<any>(
         service,
-        'getCachedTranslationsForPreviousMonth',
-      ).and.returnValue(userTranslationStatistics);
+        'getCachedFeatureUsageForPreviousMonth',
+      ).and.returnValue(userFeatureUsageStatistics);
       spyOn<any>(service, 'getDocs').and.resolveTo({} as any); // should not be called
 
       const result = await (
         service as any
-      ).getAllUserTranslationStatisticsForMonth('2026-03');
+      ).getAllUserFeatureUsageStatisticsForMonth('2026-03');
 
-      expect(result).toEqual(userTranslationStatistics);
+      expect(result).toEqual(userFeatureUsageStatistics);
       expect(service['getDocs']).not.toHaveBeenCalled();
     });
 
@@ -583,23 +643,23 @@ describe('FirebaseFirestoreService', () => {
 
       const result = await (
         service as any
-      ).getAllUserTranslationStatisticsForMonth('2026-03');
+      ).getAllUserFeatureUsageStatisticsForMonth('2026-03');
 
       expect(result).toEqual([]);
       expect(console.error).toHaveBeenCalledWith(
-        'Error fetching all user statistics for month 2026-03:',
+        'Error fetching feature usage statistics for all user and month 2026-03:',
         new Error('getDocs failed'),
       );
     });
 
-    describe('getCachedTranslationsForPreviousMonth', () => {
+    describe('getCachedFeatureUsageForPreviousMonth', () => {
       const previousMonth = '2026-03';
-      const cachedData: UserTranslationStatistics[] = [
+      const cachedData: UserFeatureUsageStatistics[] = [
         {
           userId: 'U-1',
-          translatedCharCount: 100,
+          consumedFeatureCharCount: 100,
           targetLanguages: ['en'],
-          lastTranslationDate: new Date('2026-03-01T00:00:00.000Z'),
+          lastFeatureUsageDate: new Date('2026-03-01T00:00:00.000Z'),
         },
       ];
 
@@ -608,9 +668,9 @@ describe('FirebaseFirestoreService', () => {
       });
 
       it('should return cached data for previous month', () => {
-        (service as any).cachedTranslations.set(previousMonth, cachedData);
+        (service as any).cachedFeatureUsage.set(previousMonth, cachedData);
 
-        const result = (service as any).getCachedTranslationsForPreviousMonth(
+        const result = (service as any).getCachedFeatureUsageForPreviousMonth(
           previousMonth,
         );
 
@@ -619,9 +679,9 @@ describe('FirebaseFirestoreService', () => {
 
       it('should return undefined for current month even if data is cached', () => {
         const currentMonth = utilsServiceMock.getCurrentMonth();
-        (service as any).cachedTranslations.set(currentMonth, cachedData);
+        (service as any).cachedFeatureUsage.set(currentMonth, cachedData);
 
-        const result = (service as any).getCachedTranslationsForPreviousMonth(
+        const result = (service as any).getCachedFeatureUsageForPreviousMonth(
           currentMonth,
         );
 
@@ -630,7 +690,7 @@ describe('FirebaseFirestoreService', () => {
 
       it('should return undefined when no cached data exists for previous month', () => {
         // do not populate the cache
-        const result = (service as any).getCachedTranslationsForPreviousMonth(
+        const result = (service as any).getCachedFeatureUsageForPreviousMonth(
           previousMonth,
         );
 
@@ -638,9 +698,9 @@ describe('FirebaseFirestoreService', () => {
       });
 
       it('should return undefined when cache is empty', () => {
-        (service as any).cachedTranslations.clear();
+        (service as any).cachedFeatureUsage.clear();
 
-        const result = (service as any).getCachedTranslationsForPreviousMonth(
+        const result = (service as any).getCachedFeatureUsageForPreviousMonth(
           previousMonth,
         );
 
@@ -649,25 +709,25 @@ describe('FirebaseFirestoreService', () => {
     });
   });
 
-  describe('getAllUserTranslationStatistics', () => {
-    it('should delegate to getAllUserTranslationStatisticsForMonth for a specific month', async () => {
-      const stats: UserTranslationStatistics[] = [
+  describe('getAllUserFeatureUsageStatistics', () => {
+    it('should delegate to getAllUserFeatureUsageStatisticsForMonth for a specific month', async () => {
+      const stats: UserFeatureUsageStatistics[] = [
         {
           userId: 'U-1',
-          translatedCharCount: 100,
+          consumedFeatureCharCount: 100,
           targetLanguages: ['en'],
-          lastTranslationDate: new Date('2026-03-01T00:00:00.000Z'),
+          lastFeatureUsageDate: new Date('2026-03-01T00:00:00.000Z'),
         },
       ];
       spyOn<any>(
         service,
-        'getAllUserTranslationStatisticsForMonth',
+        'getAllUserFeatureUsageStatisticsForMonth',
       ).and.resolveTo(stats);
 
-      const result = await service.getAllUserTranslationStatistics('2026-03');
+      const result = await service.getAllUserFeatureUsageStatistics('2026-03');
 
       expect(
-        (service as any).getAllUserTranslationStatisticsForMonth,
+        (service as any).getAllUserFeatureUsageStatisticsForMonth,
       ).toHaveBeenCalledOnceWith('2026-03');
       expect(result).toEqual(stats);
     });
@@ -683,30 +743,30 @@ describe('FirebaseFirestoreService', () => {
         'getAllFirestoreSearchStringsForMonth',
       ).and.returnValue(allMonths);
 
-      const statsForMarch: UserTranslationStatistics[] = [
+      const statsForMarch: UserFeatureUsageStatistics[] = [
         {
           userId: 'U-1',
-          translatedCharCount: 100,
+          consumedFeatureCharCount: 100,
           targetLanguages: ['en'],
-          lastTranslationDate: new Date('2026-03-01T00:00:00.000Z'),
+          lastFeatureUsageDate: new Date('2026-03-01T00:00:00.000Z'),
         },
       ];
-      const statsForFeb: UserTranslationStatistics[] = [
+      const statsForFeb: UserFeatureUsageStatistics[] = [
         {
           userId: 'U-2',
-          translatedCharCount: 200,
+          consumedFeatureCharCount: 200,
           targetLanguages: ['fr'],
-          lastTranslationDate: new Date('2026-02-01T00:00:00.000Z'),
+          lastFeatureUsageDate: new Date('2026-02-01T00:00:00.000Z'),
         },
       ];
       spyOn<any>(
         service,
-        'getAllUserTranslationStatisticsForMonth',
+        'getAllUserFeatureUsageStatisticsForMonth',
       ).and.callFake(async (month: string) =>
         month === '2026-03' ? statsForMarch : statsForFeb,
       );
 
-      const result = await service.getAllUserTranslationStatistics(
+      const result = await service.getAllUserFeatureUsageStatistics(
         AllMonthsOption.localStorageValue,
       );
 
@@ -714,13 +774,13 @@ describe('FirebaseFirestoreService', () => {
         utilsServiceMock.getAllFirestoreSearchStringsForMonth,
       ).toHaveBeenCalled();
       expect(
-        (service as any).getAllUserTranslationStatisticsForMonth,
+        (service as any).getAllUserFeatureUsageStatisticsForMonth,
       ).toHaveBeenCalledWith('2026-03');
       expect(
-        (service as any).getAllUserTranslationStatisticsForMonth,
+        (service as any).getAllUserFeatureUsageStatisticsForMonth,
       ).toHaveBeenCalledWith('2026-02');
       expect(
-        (service as any).getAllUserTranslationStatisticsForMonth,
+        (service as any).getAllUserFeatureUsageStatisticsForMonth,
       ).not.toHaveBeenCalledWith(AllMonthsOption.localStorageValue);
       expect(result).toEqual([...statsForMarch, ...statsForFeb]);
     });
@@ -733,18 +793,18 @@ describe('FirebaseFirestoreService', () => {
       ).and.returnValue(allMonths);
       spyOn<any>(
         service,
-        'getAllUserTranslationStatisticsForMonth',
+        'getAllUserFeatureUsageStatisticsForMonth',
       ).and.resolveTo([]);
 
-      await service.getAllUserTranslationStatistics(
+      await service.getAllUserFeatureUsageStatistics(
         AllMonthsOption.localStorageValue,
       );
 
       expect(
-        (service as any).getAllUserTranslationStatisticsForMonth,
+        (service as any).getAllUserFeatureUsageStatisticsForMonth,
       ).toHaveBeenCalledTimes(1);
       expect(
-        (service as any).getAllUserTranslationStatisticsForMonth,
+        (service as any).getAllUserFeatureUsageStatisticsForMonth,
       ).not.toHaveBeenCalledWith(AllMonthsOption.localStorageValue);
     });
 
@@ -755,13 +815,13 @@ describe('FirebaseFirestoreService', () => {
         'getAllFirestoreSearchStringsForMonth',
       ).and.throwError('unexpected failure');
 
-      const result = await service.getAllUserTranslationStatistics(
+      const result = await service.getAllUserFeatureUsageStatistics(
         AllMonthsOption.localStorageValue,
       );
 
       expect(result).toEqual([]);
       expect(console.error).toHaveBeenCalledWith(
-        `Error fetching all user statistics for month ${AllMonthsOption.localStorageValue}:`,
+        `Error fetching feature usage statistics for all user and month ${AllMonthsOption.localStorageValue}:`,
         jasmine.any(Error),
       );
     });
@@ -865,7 +925,7 @@ describe('FirebaseFirestoreService', () => {
       const result = await service.getIsProgrammerDevice();
 
       expect(httpsCallableSpy).toHaveBeenCalledWith('isProgrammerDevice');
-      expect(callableSpy).toHaveBeenCalledWith({ appId});
+      expect(callableSpy).toHaveBeenCalledWith({ appId });
       expect(result).toBeTrue();
     });
 
@@ -881,7 +941,7 @@ describe('FirebaseFirestoreService', () => {
       const result = await service.getIsProgrammerDevice();
 
       expect(httpsCallableSpy).toHaveBeenCalledWith('isProgrammerDevice');
-      expect(callableSpy).toHaveBeenCalledWith({ appId});
+      expect(callableSpy).toHaveBeenCalledWith({ appId });
       expect(result).toBeFalse();
     });
 
@@ -1235,17 +1295,17 @@ describe('FirebaseFirestoreService', () => {
       expect(result).toEqual([users[1]]);
     });
 
-    it('should include user from another creation month when cached translations exist for selected month', async () => {
+    it('should include user from another creation month when cached feature usage exist for selected month', async () => {
       spyOn<any>(service, 'getDocs').and.resolveTo(
         createSnapshotMock(users) as any,
       );
 
-      (service as any).cachedTranslations.set('2026-03', [
+      (service as any).cachedFeatureUsage.set('2026-03', [
         {
           userId: 'uid2',
-          translatedCharCount: 10,
+          consumedFeatureCharCount: 10,
           targetLanguages: ['de'],
-          lastTranslationDate: new Date('2026-03-10T00:00:00.000Z'),
+          lastFeatureUsageDate: new Date('2026-03-10T00:00:00.000Z'),
         },
       ]);
 
@@ -1254,17 +1314,17 @@ describe('FirebaseFirestoreService', () => {
       expect(result).toEqual([users[0], users[1]]);
     });
 
-    it('should not include user from another month when cached translatedCharCount is zero', async () => {
+    it('should not include user from another month when cached consumedFeatureCharCount is zero', async () => {
       spyOn<any>(service, 'getDocs').and.resolveTo(
         createSnapshotMock(users) as any,
       );
 
-      (service as any).cachedTranslations.set('2026-03', [
+      (service as any).cachedFeatureUsage.set('2026-03', [
         {
           userId: 'uid2',
-          translatedCharCount: 0,
+          consumedFeatureCharCount: 0,
           targetLanguages: ['de'],
-          lastTranslationDate: new Date('2026-03-10T00:00:00.000Z'),
+          lastFeatureUsageDate: new Date('2026-03-10T00:00:00.000Z'),
         },
       ]);
 
@@ -1526,6 +1586,29 @@ describe('FirebaseFirestoreService', () => {
       expect(authWrapperMock.onAuthStateChanged).toHaveBeenCalled();
       expect(unsubSpy).toHaveBeenCalled();
     });
+
+    it('should resolve via timeout fallback and unsubscribe if callback never fires', async () => {
+      jasmine.clock().install();
+      try {
+        const unsubSpy = jasmine.createSpy('unsub');
+
+        authWrapperMock.onAuthStateChanged.and.callFake(
+          (_auth: any, _cb: Function) => unsubSpy,
+        );
+
+        const waitPromise = (service as any).waitForAuthReady();
+
+        expect(authWrapperMock.onAuthStateChanged).toHaveBeenCalled();
+        expect(unsubSpy).not.toHaveBeenCalled();
+
+        jasmine.clock().tick(3000);
+        await waitPromise;
+
+        expect(unsubSpy).toHaveBeenCalledTimes(1);
+      } finally {
+        jasmine.clock().uninstall();
+      }
+    });
   });
 
   describe('wrapper coverage via public methods', () => {
@@ -1578,23 +1661,23 @@ describe('FirebaseFirestoreService', () => {
     });
 
     describe('getCollection and getDocs', () => {
-      it('should execute getCollection path directly in getAllUserTranslationStatisticsForMonth and handle failure', async () => {
+      it('should execute getCollection path directly in getAllUserFeatureUsageStatisticsForMonth and handle failure', async () => {
         spyOn(console, 'error');
         spyOn(utilsServiceMock, 'getCurrentMonth').and.returnValue('2026-03');
 
         // month !== currentMonth to avoid cache shortcut
         const result = await (
           service as any
-        ).getAllUserTranslationStatisticsForMonth('2026-02');
+        ).getAllUserFeatureUsageStatisticsForMonth('2026-02');
 
         expect(result).toEqual([]);
         expect(console.error).toHaveBeenCalledWith(
-          'Error fetching all user statistics for month 2026-02:',
+          'Error fetching feature usage statistics for all user and month 2026-02:',
           jasmine.anything(),
         );
       });
 
-      it('should execute getDocs path directly in getAllUserTranslationStatisticsForMonth and handle failure', async () => {
+      it('should execute getDocs path directly in getAllUserFeatureUsageStatisticsForMonth and handle failure', async () => {
         spyOn(console, 'error');
         spyOn(utilsServiceMock, 'getCurrentMonth').and.returnValue('2026-03');
         spyOn<any>(service, 'getCollection').and.returnValue({} as any);
@@ -1602,11 +1685,11 @@ describe('FirebaseFirestoreService', () => {
         // month !== currentMonth to avoid cache shortcut
         const result = await (
           service as any
-        ).getAllUserTranslationStatisticsForMonth('2026-02');
+        ).getAllUserFeatureUsageStatisticsForMonth('2026-02');
 
         expect(result).toEqual([]);
         expect(console.error).toHaveBeenCalledWith(
-          'Error fetching all user statistics for month 2026-02:',
+          'Error fetching feature usage statistics for all user and month 2026-02:',
           jasmine.anything(),
         );
       });

@@ -9,6 +9,9 @@ export const environment = {
   app: {
     name: '__APP_NAME__',
     showTabsBar: __SHOW_TABS_BAR__,
+    maxFreeFeatureCharsPerMonthForUser: __MAX_FREE_FEATURE_CHARS_PER_MONTH_FOR_USER__,
+    maxFreeFeatureCharsPerMonth: __MAX_FREE_FEATURE_CHARS_PER_MONTH__,
+    maxFreeFeatureCharsBufferPerMonth: __MAX_FREE_FEATURE_CHARS_BUFFER_PER_MONTH__,
     useFirebaseEmulator: __USE_FIREBASE_EMULATOR__,
     programmerDevices: {
       updateUsermap: __PROGRAMMER_DEVICES_UPDATE_USERMAP__,

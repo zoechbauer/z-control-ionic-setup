@@ -136,12 +136,12 @@
     </ion-row>
     }
 
-    <!-- Translation Stats Section -->
+    <!-- Feature Stats Section -->
     <ion-row class="section-header">
       <ion-col>
         <h2>
           {{
-            "SETTINGS.STATISTICS.USER_DETAIL.TRANSLATION_STATISTICS.TITLE"
+            "SETTINGS.STATISTICS.USER_DETAIL.FEATURE_STATISTICS.TITLE"
               | translate
           }}
         </h2>
@@ -150,18 +150,18 @@
     <ion-row class="data-row">
       <ion-col size="4" class="label"
         >{{
-          "SETTINGS.STATISTICS.USER_DETAIL.TRANSLATION_STATISTICS.LABEL.TRANSLATED_CHARS"
+          "SETTINGS.STATISTICS.USER_DETAIL.FEATURE_STATISTICS.LABEL.CONSUMED_CHARS"
             | translate
         }}:</ion-col
       >
       <ion-col size="8" class="value">{{
-        userStatistic.translatedCharCount
+        userStatistic.consumedFeatureCharCount
       }}</ion-col>
     </ion-row>
     <ion-row class="data-row">
       <ion-col size="4" class="label"
         >{{
-          "SETTINGS.STATISTICS.USER_DETAIL.TRANSLATION_STATISTICS.LABEL.LANGUAGE"
+          "SETTINGS.STATISTICS.USER_DETAIL.FEATURE_STATISTICS.LABEL.LANGUAGE"
             | translate
         }}:</ion-col
       >
@@ -172,23 +172,12 @@
     <ion-row class="data-row">
       <ion-col size="4" class="label"
         >{{
-          "SETTINGS.STATISTICS.USER_DETAIL.TRANSLATION_STATISTICS.LABEL.TARGET_LANGUAGES"
-            | translate
-        }}:</ion-col
-      >
-      <ion-col size="8" class="value">
-        <span [innerHTML]="targetLanguagesDisplay"></span>
-      </ion-col>
-    </ion-row>
-    <ion-row class="data-row">
-      <ion-col size="4" class="label"
-        >{{
-          "SETTINGS.STATISTICS.USER_DETAIL.TRANSLATION_STATISTICS.LABEL.LAST_TRANSLATION"
+          "SETTINGS.STATISTICS.USER_DETAIL.FEATURE_STATISTICS.LABEL.LAST_FEATURE_USAGE"
             | translate
         }}:</ion-col
       >
       <ion-col size="8" class="value">{{
-        getFormatDateTime(userStatistic.lastTranslationDate)
+        getFormatDateTime(userStatistic.lastFeatureUsageDate)
       }}</ion-col>
     </ion-row>
 

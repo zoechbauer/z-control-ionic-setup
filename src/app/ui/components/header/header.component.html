@@ -13,7 +13,7 @@
       ></app-logo>
     </ion-buttons>
     <ion-title *ngIf="onMainFeatureTab">
-      <b>{{ !isLargeScreen ? ('HEADER.CURRENT_PAGE.MAIN_SHORT' | translate) : ('HEADER.CURRENT_PAGE.MAIN_LONG' | translate:{countTargetLanguages: selectedTargetLanguages.length}) }}</b>
+      <b>{{ !isLargeScreen ? ('HEADER.CURRENT_PAGE.MAIN_SHORT' | translate) : ('HEADER.CURRENT_PAGE.MAIN_LONG' | translate) }}</b>
     </ion-title>
     <ion-title *ngIf="onSettingsTab">
       <ion-title>{{ "SETTINGS.TITLE" | translate }}</ion-title>

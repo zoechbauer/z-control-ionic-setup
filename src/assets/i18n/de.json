@@ -3,7 +3,12 @@
   "APP": {
     "NAME": "z-control IONIC Setup",
     "LOADING_DATA": "Daten werden geladen...",
-    "UNDER_CONSTRUCTION": "Diese Funktion ist in Arbeit."
+    "UNDER_CONSTRUCTION": "Diese Funktion ist in Arbeit.",
+    "MAIN": {
+      "TOAST": {
+        "ERROR_CALLING_FEATURE": "Fehler beim Aufruf der Hauptfunktion. Bitte versuchen Sie es später erneut oder verwenden Sie ein anderes Wort."
+      }
+    }
   },
   "------ header page": "-------",
   "HEADER": {
@@ -59,7 +64,8 @@
     "TOAST": {
       "QUOTA_REDUCED": "Das monatliche Kontingent wurde reduziert.",
       "CONTINGENT_EXCEEDED": "Feature-Kontingent überschritten. Bitte versuchen Sie es nächsten Monat erneut.",
-      "ERROR_CALLING_FEATURE": "Fehler beim Aufruf der Hauptfunktion. Bitte versuchen Sie es später erneut."
+      "ERROR_CALLING_FEATURE": "Fehler beim Aufruf der Hauptfunktion. Bitte versuchen Sie es später erneut oder verwenden Sie ein anderes Wort.",
+      "ERROR_CREATING_MISSING_CONTINGENT_DATA": "Fehler beim Erstellen fehlender Kontingentdaten."
     }
   },
 
@@ -151,7 +157,7 @@
         "CHECKSUM_ALL_USERS": "Verbraucht von allen Benutzern",
         "CHARS": "Zeichen",
         "GRID_INFO_NOTE": "Absteigend sortiert nach Datum der letzten Feature-Nutzung",
-        "GRID_SEARCH_INFO": "Text=Benutz.|Plattf., <|>=verbraucht, <<|>>=Sprachen",
+        "GRID_SEARCH_INFO": "Text für Benutzer|Plattform; Verbrauchte Zeichen: >|<",
         "USER_STATISTICS_OVERVIEW": "Benutzer-Statistik Übersicht",
         "JSON_DATA": "Rohdaten (JSON) - nur für Debug"
       },

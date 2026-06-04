@@ -32,7 +32,7 @@ vi.mock('./firebase-firestore.service.js', () => ({
 
 vi.mock('./firebase-firestore-utils.service.js', () => ({
   FirebaseFirestoreUtilsService: {
-    validateContingentOrThrow: vi.fn(),
+    validateFeatureContingentOrThrow: vi.fn(),
   },
 }));
 
@@ -59,18 +59,18 @@ describe('secureFeature', () => {
     (secureFeature as any)(makeRequest(data, uid));
 
   const mockFirestoreInstance = (
-    addTranslatedCharsImpl?: ReturnType<typeof vi.fn>,
+    addConsumedFeatureCharsImpl?: ReturnType<typeof vi.fn>,
   ) => {
-    const addTranslatedChars =
-      addTranslatedCharsImpl ?? vi.fn().mockResolvedValue(undefined);
+    const addConsumedFeatureChars =
+      addConsumedFeatureCharsImpl ?? vi.fn().mockResolvedValue(undefined);
 
     vi.mocked(FirebaseFirestoreService).mockImplementation(function (
       this: any,
     ) {
-      this.addTranslatedChars = addTranslatedChars;
+      this.addConsumedFeatureChars = addConsumedFeatureChars;
     } as any);
 
-    return { addTranslatedChars };
+    return { addConsumedFeatureChars };
   };
 
   beforeEach(() => {
@@ -192,25 +192,29 @@ describe('secureFeature', () => {
   describe('service interactions', () => {
     it('validates contingent using auth uid', async () => {
       vi.mocked(
-        FirebaseFirestoreUtilsService.validateContingentOrThrow,
-      ).mockRejectedValue(new Error('Translation contingent exceeded'));
+        FirebaseFirestoreUtilsService.validateFeatureContingentOrThrow,
+      ).mockRejectedValue(new Error('Feature contingent exceeded'));
 
       await expect(invoke(VALID_DATA, USER_ID)).rejects.toThrow();
 
       expect(
-        vi.mocked(FirebaseFirestoreUtilsService.validateContingentOrThrow),
+        vi.mocked(
+          FirebaseFirestoreUtilsService.validateFeatureContingentOrThrow,
+        ),
       ).toHaveBeenCalledWith(COLLECTION, USER_ID);
     });
 
-    it('calls addTranslatedChars with computed count and empty selected languages', async () => {
+    it('calls addConsumedFeatureChars with computed count', async () => {
       vi.mocked(
-        FirebaseFirestoreUtilsService.validateContingentOrThrow,
+        FirebaseFirestoreUtilsService.validateFeatureContingentOrThrow,
       ).mockResolvedValue(undefined);
 
       const text = 'Hallo';
       const expectedCharCount = text.length;
-      const { addTranslatedChars } = mockFirestoreInstance(
-        vi.fn().mockRejectedValue(new Error('Error adding translated chars')),
+      const { addConsumedFeatureChars } = mockFirestoreInstance(
+        vi
+          .fn()
+          .mockRejectedValue(new Error('Error adding consumed feature chars')),
       );
 
       await expect(invoke({ appId, text }, USER_ID)).rejects.toThrow();
@@ -219,7 +223,7 @@ describe('secureFeature', () => {
         COLLECTION,
         USER_ID,
       );
-      expect(addTranslatedChars).toHaveBeenCalledWith(expectedCharCount, []);
+      expect(addConsumedFeatureChars).toHaveBeenCalledWith(expectedCharCount);
     });
   });
 
@@ -230,13 +234,13 @@ describe('secureFeature', () => {
 
     it('calls datamuse API with text', async () => {
       vi.mocked(
-        FirebaseFirestoreUtilsService.validateContingentOrThrow,
+        FirebaseFirestoreUtilsService.validateFeatureContingentOrThrow,
       ).mockResolvedValue(undefined);
 
       const text = 'London';
       const expectedCharCount = text.length;
 
-      const { addTranslatedChars } = mockFirestoreInstance(
+      const { addConsumedFeatureChars } = mockFirestoreInstance(
         vi.fn().mockResolvedValue(undefined),
       );
 
@@ -266,7 +270,7 @@ describe('secureFeature', () => {
         COLLECTION,
         USER_ID,
       );
-      expect(addTranslatedChars).toHaveBeenCalledWith(expectedCharCount, []);
+      expect(addConsumedFeatureChars).toHaveBeenCalledWith(expectedCharCount);
       expect(fetchMock).toHaveBeenCalledTimes(1);
       expect(fetchMock).toHaveBeenCalledWith(
         'https://api.datamuse.com/words?ml=London&max=5',
@@ -279,7 +283,7 @@ describe('secureFeature', () => {
 
     it('throws internal error if fetch fails', async () => {
       vi.mocked(
-        FirebaseFirestoreUtilsService.validateContingentOrThrow,
+        FirebaseFirestoreUtilsService.validateFeatureContingentOrThrow,
       ).mockResolvedValue(undefined);
       const fetchMock = vi.fn().mockResolvedValue({
         ok: false,
@@ -293,13 +297,36 @@ describe('secureFeature', () => {
         invoke(
           {
             appId,
-            text: 'Hallo',
+            text: 'London',
           },
           USER_ID,
         ),
       ).rejects.toMatchObject({
         code: 'internal',
-        message: 'Function API error: Function API error: 400 Bad Request',
+        message: 'Function API error: 400 Bad Request',
+      });
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('throws internal error if fetch throws an error', async () => {
+      vi.mocked(
+        FirebaseFirestoreUtilsService.validateFeatureContingentOrThrow,
+      ).mockResolvedValue(undefined);
+      const fetchMock = vi.fn().mockRejectedValue(new Error('Network error'));
+
+      vi.stubGlobal('fetch', fetchMock);
+
+      await expect(
+        invoke(
+          {
+            appId,
+            text: 'London',
+          },
+          USER_ID,
+        ),
+      ).rejects.toMatchObject({
+        code: 'internal',
+        message: 'Function API error: Network error',
       });
       expect(fetchMock).toHaveBeenCalledTimes(1);
     });

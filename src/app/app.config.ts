@@ -53,14 +53,20 @@ export const appConfig: ApplicationConfig = {
     // DRY: Helper to get emulator host or undefined if not using emulator
     (() => {
       const getEmulatorHost = () => {
-        const allowedHosts = ['localhost', '10.0.0.68']; // Add more if needed
-        const host = globalThis.location.hostname;
-        if (
-          allowedHosts.includes(host) &&
-          environment.app.useFirebaseEmulator
-        ) {
-          return host === 'localhost' ? 'localhost' : '10.0.0.68'; // Replace with your IP if needed
+        if (!environment.app.useFirebaseEmulator) {
+          return undefined;
         }
+
+        const host = globalThis.location.hostname;
+
+        if (host === 'localhost' || host === '127.0.0.1') {
+          return '127.0.0.1';
+        }
+
+        if (host === '10.0.0.68') {
+          return '10.0.0.68';
+        }
+
         return undefined;
       };
 

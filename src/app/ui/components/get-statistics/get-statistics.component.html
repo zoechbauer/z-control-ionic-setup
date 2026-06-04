@@ -56,7 +56,9 @@
     <!-- Section: Global Stop Flag -->
     <div class="stat-section global-stop-section" *ngIf="!isAllMonthsSelected">
       <h3>
-        {{ getSectionHeader("SETTINGS.STATISTICS.LABEL.GLOBAL_FEATURE_STATUS") }}
+        {{
+          getSectionHeader("SETTINGS.STATISTICS.LABEL.GLOBAL_FEATURE_STATUS")
+        }}
       </h3>
       <p [class.stopped]="isStopped" class="global-stop-flag">
         {{
@@ -70,7 +72,9 @@
     <!-- Section: Total Contingent -->
     <div class="stat-section">
       <h3>
-        {{ getSectionHeader("SETTINGS.STATISTICS.LABEL.TOTAL_FEATURE_CONTINGENT") }}
+        {{
+          getSectionHeader("SETTINGS.STATISTICS.LABEL.TOTAL_FEATURE_CONTINGENT")
+        }}
       </h3>
       <div *ngIf="!isAllMonthsSelected" class="total-contingent-monthly">
         <p
@@ -80,7 +84,7 @@
           {{ "SETTINGS.STATISTICS.LABEL.CHECKSUM_ALL_USERS" | translate }}:
           {{
             allUsersCharCount
-              | number : "1.0-0" : (lang === "de" ? "de-DE" : "en-US")
+              | number: "1.0-0" : (lang === "de" ? "de-DE" : "en-US")
           }}
           {{ "SETTINGS.STATISTICS.LABEL.CHARS" | translate }}
         </p>
@@ -88,18 +92,18 @@
           <strong>{{ "SETTINGS.STATISTICS.LABEL.USED" | translate }}:</strong>
           {{
             totalCharCount
-              | number : "1.0-0" : (lang === "de" ? "de-DE" : "en-US")
+              | number: "1.0-0" : (lang === "de" ? "de-DE" : "en-US")
           }}
           /
           {{
-            totalLimit | number : "1.0-0" : (lang === "de" ? "de-DE" : "en-US")
+            totalLimit | number: "1.0-0" : (lang === "de" ? "de-DE" : "en-US")
           }}
           {{ "SETTINGS.STATISTICS.LABEL.CHARS" | translate }}
         </p>
         <p>
           <strong>{{ "SETTINGS.STATISTICS.LABEL.BUFFER" | translate }}:</strong>
           {{
-            totalBuffer | number : "1.0-0" : (lang === "de" ? "de-DE" : "en-US")
+            totalBuffer | number: "1.0-0" : (lang === "de" ? "de-DE" : "en-US")
           }}
           {{ "SETTINGS.STATISTICS.LABEL.CHARS" | translate }}
         </p>
@@ -109,7 +113,7 @@
           </strong>
           <span [class.exceeded]="totalRemaining === 0">{{
             totalRemaining
-              | number : "1.0-0" : (lang === "de" ? "de-DE" : "en-US")
+              | number: "1.0-0" : (lang === "de" ? "de-DE" : "en-US")
           }}</span>
           {{ "SETTINGS.STATISTICS.LABEL.CHARS" | translate }}
         </p>
@@ -119,7 +123,7 @@
           {{ "SETTINGS.STATISTICS.LABEL.CHECKSUM_ALL_USERS" | translate }}:
           {{
             allUsersCharCount
-              | number : "1.0-0" : (lang === "de" ? "de-DE" : "en-US")
+              | number: "1.0-0" : (lang === "de" ? "de-DE" : "en-US")
           }}
           {{ "SETTINGS.STATISTICS.LABEL.CHARS" | translate }}
         </p>
@@ -195,9 +199,6 @@
                       | number: "1.0-0" : (lang === "de" ? "de-DE" : "en-US")),
                   }
           }}</ion-col>
-          <ion-col size="1" *ngIf="!hideColumnIfUserOrPortrait"
-            ><ion-icon name="language-outline"></ion-icon>
-          </ion-col>
           <ion-col>{{
             "SETTINGS.STATISTICS.GRID.PLATFORM" | translate
           }}</ion-col>
@@ -217,10 +218,7 @@
           <ion-col>{{ userStat.userName }}</ion-col>
           <ion-col class="used-chars">{{
             userStat.consumedFeatureCharCount
-              | number : "1.0-0" : (lang === "de" ? "de-DE" : "en-US")
-          }}</ion-col>
-          <ion-col *ngIf="!hideColumnIfUserOrPortrait" size="1">{{
-            userStat.targetLanguages.length
+              | number: "1.0-0" : (lang === "de" ? "de-DE" : "en-US")
           }}</ion-col>
           <ion-col class="platform-info"
             >{{ userStat.displayedPlatform
@@ -320,29 +318,23 @@
     <p>Google Firebase/Firestore stores the following data:</p>
     <ul>
       <li>Device information</li>
-      <li>Number of translated characters</li>
-      <li>Selected target languages</li>
-      <li>Date of last translation</li>
+      <li>Number of processed characters</li>
+      <li>Date of last feature usage</li>
       <li>Anonymized user ID</li>
     </ul>
     <p>
       This data allows us to manage each user’s monthly usage quota. Once a user
-      reaches their monthly limit, no further translation requests are processed
-      for the remainder of the month. Instead, a simulated translation with
-      status information is displayed. At the beginning of the next month, the
-      quota resets automatically and the user can resume normal translations.
+      reaches their monthly limit, no further feature requests are processed
+      for the remainder of the month. At the beginning of the next month, the
+      quota resets automatically and the user can resume normal feature usage.
       z-control allows the application to retrieve device information to
       determine the platform (native app, web desktop, or web mobile) from which
-      translation requests are sent. Wenn du möchtest, kann ich die Texte auch
-      kürzer, technischer, formeller oder noch stärker auf UX‑Lesbarkeit
-      optimieren.
+      feature requests are sent.
     </p>
     <p class="small-text">
       <i>z-control</i> allows the application to retrieve device information to
       determine the platform (native app, web desktop, or web mobile) from which
-      translation requests are sent. Wenn du möchtest, kann ich die Texte auch
-      kürzer, technischer, formeller oder noch stärker auf UX‑Lesbarkeit
-      optimieren.
+      feature requests are sent.
     </p>
   </div>
   <app-spinner *ngIf="isLoading && isNative"></app-spinner>
@@ -355,23 +347,21 @@
     <p>Google Firebase/Firestore speichert folgende Daten:</p>
     <ul>
       <li>Geräte-Informationen</li>
-      <li>Anzahl der übersetzten Zeichen</li>
-      <li>ausgewählte Zielsprachen</li>
-      <li>Datum der letzten Übersetzung</li>
+      <li>Anzahl der verarbeiteten Zeichen</li>
+      <li>Datum der letzten Featurenutzung</li>
       <li>Anonymisierte Benutzer-ID</li>
     </ul>
     <p>
       Diese Daten helfen uns, das monatliche Nutzungskontingent pro Benutzer zu
       verwalten. Sobald ein Benutzer sein monatliches Kontingent erreicht hat,
-      werden für den restlichen Monat keine weiteren Übersetzungsanfragen
-      verarbeitet. Stattdessen erscheint eine simulierte Übersetzung mit
-      Statushinweisen. Zu Beginn des nächsten Monats wird das Kontingent
-      automatisch zurückgesetzt und der Benutzer kann wieder regulär übersetzen.
+      werden für den restlichen Monat keine weiteren Featureanfragen
+      verarbeitet. Zu Beginn des nächsten Monats wird das Kontingent
+      automatisch zurückgesetzt und der Benutzer kann wieder regulär Featureanfragen stellen.
     </p>
     <p class="small-text">
       <i>z-control</i> ermöglicht es der Anwendung, Geräteinformationen
       auszulesen, um die Plattform zu erkennen (native App, Web-Desktop oder
-      Web-Mobile), von der aus Übersetzungsanfragen gesendet werden.
+      Web-Mobile), von der aus Featureanfragen gesendet werden.
     </p>
   </div>
   <app-spinner *ngIf="isLoading && isNative"></app-spinner>

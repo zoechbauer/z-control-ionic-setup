@@ -13,7 +13,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.resolve(__dirname, '../../.env.local') });
 
-admin.initializeApp();
+if (admin.apps?.length === 0) {
+  admin.initializeApp();
+}
 
 /**
  * Callable function that validates input, enforces contingent limits, updates usage,
@@ -27,15 +29,16 @@ export const secureFeature = onCall(async (request) => {
   await validateSecureFeatureRequest(auth, text, appId);
 
   const collection = FireStoreConstants.getCollectionByAppId(appId);
-  await FirebaseFirestoreUtilsService.validateContingentOrThrow(
+  await FirebaseFirestoreUtilsService.validateFeatureContingentOrThrow(
     collection,
     auth!.uid,
   );
 
-  const firestoreService = new FirebaseFirestoreService(collection, auth!.uid);
-  await firestoreService.addTranslatedChars(text.length, []);
-
   const functionResult: FeatureResult = await executeFunctionApiOrThrow(text);
+
+  const firestoreService = new FirebaseFirestoreService(collection, auth!.uid);
+  await firestoreService.addConsumedFeatureChars(text.length);
+
   return functionResult;
 });
 
@@ -79,7 +82,6 @@ async function executeFunctionApiOrThrow(text: string): Promise<FeatureResult> {
     }
 
     const data = (await response.json()) as Array<{ word?: string }>;
-    console.log('Function API response data:', data);
 
     const relatedWords = data
       .map((item) => item.word)
@@ -93,6 +95,9 @@ async function executeFunctionApiOrThrow(text: string): Promise<FeatureResult> {
       },
     };
   } catch (error: unknown) {
+    if (error instanceof HttpsError) {
+      throw error; // already formatted, don't wrap again
+    }
     const message = error instanceof Error ? error.message : String(error);
     throw new HttpsError('internal', `Function API error: ${message}`);
   }

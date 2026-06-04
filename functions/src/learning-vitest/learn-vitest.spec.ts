@@ -61,6 +61,57 @@ describe('Learn Vitest', () => {
     });
   });
 
+  describe('describe.each for parameterized tests', () => {
+    const invalidCases = [
+      { number: null, expected: 'number must be defined' },
+      { number: undefined, expected: 'number must be defined' },
+      { number: 'not a number', expected: 'number must be defined' },
+    ];
+
+    describe.each(invalidCases)('invalid number cases', ({ number, expected }) => {
+      it(`should throw error for number: ${number}`, () => {
+        const validateNumber = (num: any) => {
+          if (num === undefined || num === null || typeof num !== 'number') {
+            throw new Error(expected);
+          }
+        };
+        expect(() => validateNumber(number)).toThrow(expected);
+      });
+    });
+
+    describe('each with multiple divisions in tests', () => {
+      it.each([
+        { a: 1, b: 2, expected: 0.5 },
+        { a: 2, b: 1, expected: 2 },
+        { a: 5, b: 5, expected: 1 },
+        { a: 5, b: 0, expected: Infinity },
+        { a: Infinity, b: 0, expected: Infinity },
+        { a: 5, b: Infinity, expected: 0 },
+        { a: Infinity, b: Infinity, expected: NaN },
+      ])('should test division $a / $b = $expected', ({ a, b, expected }) => {
+        expect(a / b).toBe(expected);
+      });
+    });
+  });
+
+  describe.each([
+    { a: 1, b: 1, expected: 2 },
+    { a: 1, b: 2, expected: 3 },
+    { a: 2, b: 1, expected: 3 },
+  ])('describe object add($a, $b)', ({ a, b, expected }) => {
+    it(`returns ${expected}`, () => {
+      expect(a + b).toBe(expected);
+    });
+
+    it(`returned value not be greater than ${expected}`, () => {
+      expect(a + b).not.toBeGreaterThan(expected);
+    });
+
+    it(`returned value not be less than ${expected}`, () => {
+      expect(a + b).not.toBeLessThan(expected);
+    });
+  });
+
   describe('error handling', () => {
     it('should test throwing errors', () => {
       const throwError = () => {

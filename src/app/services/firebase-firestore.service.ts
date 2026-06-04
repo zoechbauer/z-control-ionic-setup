@@ -32,7 +32,7 @@ import {
   ContingentData,
 } from '../shared/firebase-firestore.interfaces';
 import { ToastService } from './toast.service';
-import { AllMonthsOption, ToastAnchor } from '../shared/enums';
+import { AllMonthsOption, FeatureType, ToastAnchor } from '../shared/enums';
 import { TranslateService } from '@ngx-translate/core';
 import { FirebaseFirestoreAuthWrapperService } from './firebase-firestore-auth-wrapper.service';
 import { DeviceUtils } from './device-utils.service';
@@ -438,12 +438,13 @@ export class FirebaseFirestoreService {
       await runInInjectionContext(this.injector, () =>
         (callable as any)({
           appId: FireStoreConstants.APP_ID,
+          featureType: FeatureType.Feature, 
         }),
       );
     } catch (error) {
       console.error('Error creating missing contingent data:', error);
       this.toastService.showToast(
-        'Error creating missing contingent data.',
+        this.translate.instant('FEATURE.TOAST.ERROR_CREATING_MISSING_CONTINGENT_DATA'),
         ToastAnchor.MainPage,
       );
     }
@@ -462,7 +463,7 @@ export class FirebaseFirestoreService {
    * @returns Promise<ContingentData> The contingent data object,
    * or an empty object if not found or on error.
    */
-  async readContingentData(selectedMonth: string): Promise<ContingentData> {
+  async readFeatureContingentData(selectedMonth: string): Promise<ContingentData> {
     try {
       if (selectedMonth === AllMonthsOption.SelectOptionValue) {
         return {}; // contingent data is not displayed for 'all months' option
@@ -475,10 +476,8 @@ export class FirebaseFirestoreService {
         return this.getFirestoreDocSnapshot(dataRef);
       });
       if ((dataSnap as any).exists()) {
-        const data = (dataSnap as any).data() as FirestoreContingentData;
-        const contingentData: ContingentData =
-          this.convertFirestoreToAppContingentData(data);
-        return contingentData;
+        const data = (dataSnap as any).data() as ContingentData;
+        return data;
       } else {
         return {};
       }
@@ -500,30 +499,6 @@ export class FirebaseFirestoreService {
     docRef: DocumentReference<DocumentData>,
   ): Promise<DocumentSnapshot<DocumentData>> {
     return getDoc(docRef);
-  }
-
-  /**
-   * Converts Firestore contingent data to application format.
-   * Maps Firestore field names to application field names and applies default values from environment configuration.
-   * @param firestoreData The Firestore contingent data to convert.
-   * @returns {ContingentData} The converted contingent data.
-   */
-  private convertFirestoreToAppContingentData(
-    firestoreData: FirestoreContingentData,
-  ): ContingentData {
-    return {
-      StopFeatureUsageForAllUsers:
-        firestoreData.StopTranslationForAllUsers ?? true,
-      maxFreeFeatureCharsPerMonth:
-        firestoreData.maxFreeTranslateCharsPerMonth ??
-        environment.app.maxFreeFeatureCharsPerMonth,
-      maxFreeFeatureCharsBufferPerMonth:
-        firestoreData.maxFreeTranslateCharsBufferPerMonth ??
-        environment.app.maxFreeFeatureCharsBufferPerMonth,
-      maxFreeFeatureCharsPerMonthForUser:
-        firestoreData.maxFreeTranslateCharsPerMonthForUser ??
-        environment.app.maxFreeFeatureCharsPerMonthForUser,
-    };
   }
 
   /**
@@ -649,7 +624,6 @@ export class FirebaseFirestoreService {
         result.push({
           userId: docSnap.id,
           consumedFeatureCharCount: data['charCount'] || 0,
-          targetLanguages: data['targetLanguages'] || [],
           lastFeatureUsageDate: this.getFirestoreDate(data['lastUpdated']),
         });
       });

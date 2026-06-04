@@ -31,7 +31,6 @@ export interface DisplayedUserStatistics {
   displayedPlatform: string;
   displayedModel: string;
   consumedFeatureCharCount: number;
-  targetLanguages: string[];
   lastFeatureUsageDate: Date | null;
 }
 export interface DisplayedUserStatisticsRow extends DisplayedUserStatistics {
@@ -48,7 +47,6 @@ export interface UserStatisticsSummary {
 export interface UserFeatureUsageStatistics {
   userId: string;
   consumedFeatureCharCount: number;
-  targetLanguages: string[];
   lastFeatureUsageDate?: Date;
 }
 

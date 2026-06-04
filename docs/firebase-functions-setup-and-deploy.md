@@ -4,6 +4,12 @@
 
 This guide documents a safe setup for multiple apps (for example setup app, translator app, image-to-text app) that share the same Firestore data model for contingent statistics, while keeping each app's data isolated.
 
+Current policy for this repository:
+
+- Translator clients are already upgraded.
+- Backend uses strict `appId` validation (no current legacy fallback).
+- Setup app repository is the single deployment owner for shared Firebase Functions.
+
 ## Core Design
 
 Use one request parameter from the frontend:
@@ -12,7 +18,7 @@ Use one request parameter from the frontend:
 
 Convert `appId` to Firestore root collection on the backend:
 
-- `setup -> ZC_ionic_setup`
+- `ionic_setup -> ZC_ionic_setup`
 - `translator -> MLT_translations_statistics`
 - `imageToText -> ZC_image_to_text`
 
@@ -78,7 +84,7 @@ Suggested helper:
 ```ts
 static readonly getCollectionByAppId = (appId: string): string => {
 	const map: Record<string, string> = {
-		setup: FireStoreConstants.COLLECTION_NAME,
+		ionic_setup: FireStoreConstants.COLLECTION_NAME,
 		translator: 'MLT_translations_statistics',
 		imageToText: 'ZC_image_to_text',
 	};
@@ -92,14 +98,14 @@ static readonly getCollectionByAppId = (appId: string): string => {
 
 ## Backward Compatibility Strategy
 
-To avoid crashes for users on older app versions:
+Use this only when a specific app still has legacy clients.
 
-- Deploy BE first with fallback behavior
-- If `appId` is missing for translator legacy clients, default to translator collection
+- Deploy BE first with temporary fallback behavior
+- Apply fallback only to the affected app
 - Release FE updates that send `appId`
-- After migration window, optionally enforce `appId` strictly
+- Remove fallback after migration window and return to strict `appId`
 
-This prevents breaking old clients that still call functions without `appId`.
+Current state in this setup: translator fallback is not required.
 
 ## Best Long-Term Setups
 
@@ -108,6 +114,7 @@ This prevents breaking old clients that still call functions without `appId`.
 - Use one dedicated backend repository as the source of truth for all shared callables.
 - Keep one appId-to-collection mapping in one place.
 - Deploy shared functions only from that backend repository.
+- In this repository family, use setup app repository as that deployment owner.
 - Best when multiple apps consume the same function logic and release cadence can be coordinated.
 
 Pros:
@@ -145,6 +152,10 @@ If this setup repository deploys to the same Firebase project as translator, rem
 - If translator still needs it, do not delete it from the shared deployed backend yet.
 - If you choose the deploy default of no deletion, existing live functions remain deployed.
 - Treat deletion prompts as high-risk in shared projects.
+
+Operational rule:
+
+- Even if other app repositories contain a `functions` folder, do not deploy shared functions from them.
 
 ## Using Different Codebases In The Same Firebase Project
 
@@ -248,6 +259,8 @@ firebase deploy --only functions:setup,functions:translator
 7. Deploy safely
 
 - `firebase deploy --only functions`
+- Run deploy from setup app repository only
+- Ensure deploy-capable credentials exist only in setup app CI/CD
 
 ## Commands
 
@@ -279,16 +292,23 @@ firebase deploy --only functions
 
 - Reading `collection` from `request` instead of `request.data`
 - Changing constructor signatures but not all call sites
-- Requiring `appId` immediately and breaking old app versions
 - Removing functions from source and deleting live functions by accident during deploy
 - Duplicating Firestore path logic in many files instead of one central mapping
+- Allowing multiple repos to deploy the same shared functions
 
 ## Recommended Release Order (No Downtime)
 
-1. Deploy BE with `appId` support plus legacy fallback
-2. Release FE with `appId` in payload
-3. Monitor errors and adoption
-4. Enforce strict `appId` later
+1. Implement backend change in setup app repository
+2. Deploy functions from setup app repository only
+3. Release FE with `appId` in payload
+4. Monitor logs/errors
+
+For legacy migrations only:
+
+1. Deploy BE with temporary app-specific fallback
+2. Release FE update
+3. Monitor adoption
+4. Remove fallback and keep strict `appId`
 
 ## Security Notes
 
@@ -303,3 +323,4 @@ firebase deploy --only functions
 - One shared Firestore structure for contingent stats
 - One compatibility window policy for breaking API changes
 - One release checklist used by all apps
+- One deployment owner repository for shared Firebase Functions

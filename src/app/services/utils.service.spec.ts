@@ -46,7 +46,7 @@ describe('UtilsService', () => {
 
   const createModalMock = (component: unknown): HTMLIonModalElement => {
     const modal = document.createElement(
-      'div'
+      'div',
     ) as unknown as HTMLIonModalElement;
     Object.defineProperty(modal, 'component', {
       value: component,
@@ -62,9 +62,7 @@ describe('UtilsService', () => {
   describe('Navigation methods', () => {
     it('should navigate to tab', () => {
       service.navigateToTab(Tab.MainFeature);
-      expect(routerSpy.navigate).toHaveBeenCalledWith([
-        '/tabs/main',
-      ]);
+      expect(routerSpy.navigate).toHaveBeenCalledWith(['/tabs/main']);
     });
 
     it('should navigate to tab with query params', () => {
@@ -122,7 +120,7 @@ describe('UtilsService', () => {
 
       expect(service.isPortrait).toBeTrue();
       expect(globalThis.matchMedia).toHaveBeenCalledWith(
-        '(orientation: portrait)'
+        '(orientation: portrait)',
       );
     });
 
@@ -133,7 +131,7 @@ describe('UtilsService', () => {
 
       expect(service.isPortrait).toBeFalse();
       expect(globalThis.matchMedia).toHaveBeenCalledWith(
-        '(orientation: portrait)'
+        '(orientation: portrait)',
       );
     });
 
@@ -144,7 +142,7 @@ describe('UtilsService', () => {
 
       expect(service.isDarkMode).toBeTrue();
       expect(globalThis.matchMedia).toHaveBeenCalledWith(
-        '(prefers-color-scheme: dark)'
+        '(prefers-color-scheme: dark)',
       );
     });
 
@@ -155,18 +153,18 @@ describe('UtilsService', () => {
 
       expect(service.isDarkMode).toBeFalse();
       expect(globalThis.matchMedia).toHaveBeenCalledWith(
-        '(prefers-color-scheme: dark)'
+        '(prefers-color-scheme: dark)',
       );
     });
 
     it('should throw when matchMedia is unavailable for isDarkMode', () => {
       spyOn(globalThis, 'matchMedia').and.returnValue(
-        undefined as unknown as MediaQueryList
+        undefined as unknown as MediaQueryList,
       );
 
       expect(() => service.isDarkMode).toThrow();
       expect(globalThis.matchMedia).toHaveBeenCalledWith(
-        '(prefers-color-scheme: dark)'
+        '(prefers-color-scheme: dark)',
       );
     });
   });
@@ -207,7 +205,7 @@ describe('UtilsService', () => {
       modalControllerSpy.create.and.resolveTo(modal);
       const classSpy = spyOn(
         service,
-        'setModalLandscapeClasses'
+        'setModalLandscapeClasses',
       ).and.callThrough();
       await service.openHelpModal();
       expect(modalControllerSpy.create).toHaveBeenCalledWith({
@@ -222,7 +220,7 @@ describe('UtilsService', () => {
       modalControllerSpy.create.and.resolveTo(modal);
       const classSpy = spyOn(
         service,
-        'setModalLandscapeClasses'
+        'setModalLandscapeClasses',
       ).and.callThrough();
       await service.openHelpModal();
       globalThis.dispatchEvent(new Event('orientationchange'));
@@ -277,7 +275,7 @@ describe('UtilsService', () => {
       service.setModalLandscapeClasses(modal);
       tick(11);
       expect(consoleErrorSpy).toHaveBeenCalledWith(
-        'Unknown modal component for setting landscape class'
+        'Unknown modal component for setting landscape class',
       );
     }));
   });
@@ -305,7 +303,7 @@ describe('UtilsService', () => {
       service.scrollTo('missing-id', event);
       expect(event.preventDefault).toHaveBeenCalled();
       expect(warnSpy).toHaveBeenCalledWith(
-        "Element with id 'missing-id' not found"
+        "Element with id 'missing-id' not found",
       );
     });
 
@@ -349,7 +347,7 @@ describe('UtilsService', () => {
       expect(result).toBe('');
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         'Invalid date provided for formatting:',
-        jasmine.any(Date)
+        jasmine.any(Date),
       );
     });
 
@@ -360,7 +358,7 @@ describe('UtilsService', () => {
       expect(result).toBe('');
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         'Invalid date provided for formatting:',
-        '2024-01'
+        '2024-01',
       );
     });
 
@@ -386,7 +384,7 @@ describe('UtilsService', () => {
       expect(result).toBe('');
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         'Invalid date provided for formatting:',
-        jasmine.any(Date)
+        jasmine.any(Date),
       );
     });
 
@@ -397,7 +395,7 @@ describe('UtilsService', () => {
       expect(result).toBe('');
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         'Invalid date provided for formatting:',
-        '2024-01'
+        '2024-01',
       );
     });
 
@@ -413,7 +411,7 @@ describe('UtilsService', () => {
   describe('DateTime formatting for Firestore Search string', () => {
     it('should format date to YYYY-MM string', () => {
       const result = service.formatDateTimeFirestoreSearchString(
-        new Date(2024, 0, 5, 9, 7)
+        new Date(2024, 0, 5, 9, 7),
       );
       expect(result).toBe('2024-01');
     });
@@ -421,37 +419,45 @@ describe('UtilsService', () => {
     it('should return empty string and log error if date is invalid', () => {
       const consoleErrorSpy = spyOn(console, 'error');
       const result = service.formatDateTimeFirestoreSearchString(
-        new Date('invalid date')
+        new Date('invalid date'),
       );
 
       expect(result).toBe('');
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         'Invalid date provided for formatting:',
-        jasmine.any(Date)
+        jasmine.any(Date),
       );
     });
 
     it('should return empty string and log error if date is incomplete in formatDateTimeISO', () => {
       const consoleErrorSpy = spyOn(console, 'error');
       const result = service.formatDateTimeFirestoreSearchString(
-        '2024-01' as unknown as Date
+        '2024-01' as unknown as Date,
       );
 
       expect(result).toBe('');
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         'Invalid date provided for formatting:',
-        '2024-01'
+        '2024-01',
       );
     });
 
     it('should return empty string but do not log error if date is null in formatDateTimeISO', () => {
       const consoleErrorSpy = spyOn(console, 'error');
       const result = service.formatDateTimeFirestoreSearchString(
-        null as unknown as Date
+        null as unknown as Date,
       );
 
       expect(result).toBe('');
       expect(consoleErrorSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('getCurrentMonth', () => {
+    it('returns current month in YYYY-MM format', () => {
+      const result = service.getCurrentMonth();
+      const expected = new Date().toISOString().slice(0, 7);
+      expect(result).toBe(expected);
     });
   });
 
@@ -473,7 +479,7 @@ describe('UtilsService', () => {
       expect(result[1]).toBe('2026-03');
       expect(result[2]).toBe('2026-04');
       expect(result[3]).toBe(
-        'SETTINGS.STATISTICS.FILTER.LABEL.FILTER_MONTH_DATA_ALL'
+        'SETTINGS.STATISTICS.FILTER.LABEL.FILTER_MONTH_DATA_ALL',
       );
     });
 
@@ -485,7 +491,7 @@ describe('UtilsService', () => {
       expect(result[0]).toBe('2026-02');
       expect(result[12]).toBe('2027-02');
       expect(result[13]).toBe(
-        'SETTINGS.STATISTICS.FILTER.LABEL.FILTER_MONTH_DATA_ALL'
+        'SETTINGS.STATISTICS.FILTER.LABEL.FILTER_MONTH_DATA_ALL',
       );
     });
 

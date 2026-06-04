@@ -23,7 +23,6 @@ function createUserStat(
   userId = 'U-1',
   consumedFeatureCharCount = 500,
   lastFeatureUsageDate: Date | null = new Date('2026-03-15T00:00:00Z'),
-  targetLanguages: string[] = ['en'],
 ): DisplayedUserStatisticsRow {
   return {
     userId,
@@ -46,7 +45,6 @@ function createUserStat(
     displayedPlatform: 'web-desktop',
     displayedModel: 'Model X',
     consumedFeatureCharCount: consumedFeatureCharCount,
-    targetLanguages,
     lastFeatureUsageDate: lastFeatureUsageDate,
     formattedLastActivityDate: '2026-03-15',
     isCurrentUser: false,
@@ -89,14 +87,14 @@ describe('GetStatisticsComponent', () => {
     );
     firestoreServiceSpy = jasmine.createSpyObj(
       'FirebaseFirestoreService',
-      ['readContingentData', 'getTotalCharCount'],
+      ['readFeatureContingentData', 'getTotalCharCount'],
       {
         programmerDeviceRefresh$: of(void 0),
         isProgrammerDevice: false,
         StopFeatureUsageForAllUsers: false,
       },
     );
-    firestoreServiceSpy.readContingentData.and.returnValue(
+    firestoreServiceSpy.readFeatureContingentData.and.returnValue(
       Promise.resolve({ StopFeatureUsageForAllUsers: false }),
     );
     localStorageServiceSpy = jasmine.createSpyObj(
@@ -370,8 +368,7 @@ describe('GetStatisticsComponent', () => {
         displayedModel: string,
         isNative: boolean,
         platform: string,
-        translatedCharCount: number,
-        targetLanguages: string[],
+        consumedCharCount: number,
         formattedLastActivityDate: string,
         isCurrentUser = false,
       ) {
@@ -398,9 +395,8 @@ describe('GetStatisticsComponent', () => {
           },
           displayedPlatform: platform,
           displayedModel,
-          consumedFeatureCharCount: translatedCharCount,
-          targetLanguages,
-          lastFeatureUsageDate: translatedCharCount > 0 ? lastUpdated : null,
+          consumedFeatureCharCount: consumedCharCount,
+          lastFeatureUsageDate: consumedCharCount > 0 ? lastUpdated : null,
           formattedLastActivityDate,
           isCurrentUser,
         });
@@ -415,7 +411,6 @@ describe('GetStatisticsComponent', () => {
           false,
           'web-desktop',
           1000,
-          ['en', 'nl'],
           '2026-03-15',
         );
         addStatisticsData(
@@ -425,7 +420,6 @@ describe('GetStatisticsComponent', () => {
           false,
           'web-mobile',
           2000,
-          ['en', 'nl', 'fr'],
           '2026-03-15',
         );
         addStatisticsData(
@@ -435,7 +429,6 @@ describe('GetStatisticsComponent', () => {
           false,
           'web-mobile',
           0,
-          [],
           '2026-03-10',
         );
         addStatisticsData(
@@ -445,7 +438,6 @@ describe('GetStatisticsComponent', () => {
           true,
           'native',
           3000,
-          ['en', 'nl', 'fr', 'es', 'it'],
           '2026-03-15',
         );
         addStatisticsData(
@@ -455,7 +447,6 @@ describe('GetStatisticsComponent', () => {
           true,
           'web-desktop',
           0,
-          [],
           '2026-03-10',
         );
         return statisticsData;
@@ -563,37 +554,7 @@ describe('GetStatisticsComponent', () => {
         expect(component.filteredUserStatsRows).toEqual([]);
       });
 
-      it('should filter rows which have at least 3 target languages with >> operator', () => {
-        component.onSearchTermChange('>>2');
-        component['filteredUserStatsRows'].sort((a, b) =>
-          a.userId.localeCompare(b.userId),
-        );
-        expect(component['filteredUserStatsRows'].map((r) => r.userId)).toEqual(
-          ['P-1', 'U-2'],
-        );
-      });
-
-      it('should filter rows which have less or equal to 3 target languages with << operator', () => {
-        component.onSearchTermChange('<<4');
-        component['filteredUserStatsRows'].sort((a, b) =>
-          a.userId.localeCompare(b.userId),
-        );
-        expect(component['filteredUserStatsRows'].map((r) => r.userId)).toEqual(
-          ['P-2', 'U-1', 'U-2', 'U-4'],
-        );
-      });
-
-      it('should filter rows which have not target languages with << operator', () => {
-        component.onSearchTermChange('<<1');
-        component['filteredUserStatsRows'].sort((a, b) =>
-          a.userId.localeCompare(b.userId),
-        );
-        expect(component['filteredUserStatsRows'].map((r) => r.userId)).toEqual(
-          ['P-2', 'U-4'],
-        );
-      });
-
-      it('should filter rows which have at least 2000 translated chars with > operator', () => {
+      it('should filter rows which have at least 2000 consumed feature chars with > operator', () => {
         component.onSearchTermChange('>1999');
         component['filteredUserStatsRows'].sort((a, b) =>
           a.userId.localeCompare(b.userId),
@@ -603,7 +564,7 @@ describe('GetStatisticsComponent', () => {
         );
       });
 
-      it('should filter rows which have less or equal to 1000 translated chars with < operator', () => {
+      it('should filter rows which have less or equal to 1000 consumed feature chars with < operator', () => {
         component.onSearchTermChange('<1001');
         component['filteredUserStatsRows'].sort((a, b) =>
           a.userId.localeCompare(b.userId),
@@ -613,7 +574,7 @@ describe('GetStatisticsComponent', () => {
         );
       });
 
-      it('should filter rows which have no translated chars with < operator', () => {
+      it('should filter rows which have no consumed feature chars with < operator', () => {
         component.onSearchTermChange('<1');
         component['filteredUserStatsRows'].sort((a, b) =>
           a.userId.localeCompare(b.userId),
@@ -867,8 +828,8 @@ describe('GetStatisticsComponent', () => {
             localStorageServiceSpy.getStatisticsDisplayMode.and.returnValue(
               Promise.resolve(DisplayMode.Programmer),
             );
-          const readContingentDataSpy =
-            firestoreServiceSpy.readContingentData.and.returnValue(
+          const readFeatureContingentDataSpy =
+            firestoreServiceSpy.readFeatureContingentData.and.returnValue(
               Promise.resolve({ StopFeatureUsageForAllUsers: false }),
             );
           component.isProgrammerDevice = false;
@@ -879,7 +840,7 @@ describe('GetStatisticsComponent', () => {
           expect(component.searchTerm).toBe('');
           expect(loadFirestoreUidSpy).toHaveBeenCalled();
           expect(getStatisticsDisplayModeSpy).toHaveBeenCalled();
-          expect(readContingentDataSpy).toHaveBeenCalled();
+          expect(readFeatureContingentDataSpy).toHaveBeenCalled();
           expect(isProgrammerDeviceSpy).toBeDefined();
           expect(component.currentUserUid).toBe('test-uid');
           expect(component.displayMode).toBe(DisplayMode.Programmer);
@@ -908,8 +869,8 @@ describe('GetStatisticsComponent', () => {
             firestoreUtilsServiceSpy.getUserStatisticsSummary.and.returnValue(
               [],
             );
-          const readContingentDataSpy =
-            firestoreServiceSpy.readContingentData.and.returnValue(
+          const readFeatureContingentDataSpy =
+            firestoreServiceSpy.readFeatureContingentData.and.returnValue(
               Promise.resolve({
                 StopFeatureUsageForAllUsers: false,
                 maxFreeFeatureCharsPerMonth: 500000,
@@ -926,7 +887,7 @@ describe('GetStatisticsComponent', () => {
 
           expect(getDisplayedUserStatisticsSpy).toHaveBeenCalled();
           expect(getUserStatisticsSummarySpy).toHaveBeenCalled();
-          expect(readContingentDataSpy).toHaveBeenCalled();
+          expect(readFeatureContingentDataSpy).toHaveBeenCalled();
 
           expect(component.isStopped).withContext('isStopped').toBeFalse();
           expect(component.totalLimit).withContext('totalLimit').toBe(500000);
@@ -1548,10 +1509,7 @@ describe('GetStatisticsComponent', () => {
         component.isLoading = false;
         component.statisticsData = {
           displayedUserStatistics: [
-            createUserStat('U-1', 1000, new Date('2026-03-15T00:00:00Z'), [
-              'en',
-              'de',
-            ]),
+            createUserStat('U-1', 1000, new Date('2026-03-15T00:00:00Z')),
           ],
           userFeatureStatistics: [],
           users: [],
@@ -1605,7 +1563,7 @@ describe('GetStatisticsComponent', () => {
         statisticData = {
           displayedUserStatistics: [
             {
-              ...createUserStat('U-1', 1000, featureDate, ['en', 'de']),
+              ...createUserStat('U-1', 1000, featureDate),
               userCreatedAt: createdDate,
             },
           ],

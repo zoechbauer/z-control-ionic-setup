@@ -21,6 +21,7 @@ import { ToastService } from '../services/toast.service';
 import { ToastAnchor } from '../shared/enums';
 import { FirebaseFirestoreUtilsService } from '../services/firebase-firestore-utils.service';
 import { FeatureService } from '../services/feature.service';
+import { SpinnerComponent } from '../ui/components/spinner/spinner.component';
 
 @Component({
   selector: 'app-feature-example',
@@ -40,6 +41,7 @@ import { FeatureService } from '../services/feature.service';
     CommonModule,
     FormsModule,
     TranslatePipe,
+    SpinnerComponent,
   ],
 })
 export class FeatureExampleComponent implements OnInit {

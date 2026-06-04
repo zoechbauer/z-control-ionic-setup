@@ -13,7 +13,13 @@ Primary goal:
 
 - Reuse one backend pattern for multiple apps
 - Keep contingent statistics structure consistent
-- Prevent crashes for old app versions during migration
+- Keep one clear owner for Firebase Functions deployments
+
+Current runtime status:
+
+- Translator app is already upgraded and deployed.
+- `appId` is required by backend callables (strict mode).
+- Setup app repository is the deployment owner for shared functions.
 
 ## Current Source Of Truth
 
@@ -72,19 +78,66 @@ For callables that read/write contingent or user-mapping data, payload must incl
 
 ## Backward Compatibility Policy
 
-Use a migration window so existing users do not crash.
+Migration is complete for current active apps.
 
-Recommended behavior for translator functions during migration:
+- `appId` is mandatory for all relevant callables.
+- Requests without valid `appId` should fail with `invalid-argument`.
+- No translator fallback is required in the current setup.
 
-- If `appId` is present: map normally
-- If `appId` is missing: default to `translator` collection (`MLT_translations_statistics`)
+If a future app introduces legacy clients, add a temporary fallback only for that app and remove it after the migration window.
 
-Reason:
+## Deployment Ownership Policy (Required)
 
-- Old translator app versions might not send `appId`
-- Strictly requiring `appId` immediately can break those clients
+Only one repository is allowed to deploy shared Firebase Functions:
 
-After most users updated, you can enforce strict `appId`.
+- Deployment owner: this setup app repository
+- Non-owner app repositories may include `firebase.json` / `functions` for reference or local testing
+- Non-owner app repositories must not deploy shared functions to production
+
+Rationale:
+
+- Prevent accidental overwrite or deletion of functions
+- Keep one source of truth for backend behavior
+- Reduce drift across copied function folders
+
+## Code Handling Model (Required)
+
+If a new function is added for the translator app, keep the backend implementation in the setup app repository.
+
+- Setup app repository is the canonical backend source of truth.
+- Translator app repository may stay FE-only for runtime and deployment purposes.
+- The translator app does not need a second deployed copy of the backend code.
+- If you need shared compile-time types or request shapes, keep them aligned intentionally across repos or extract them into a shared package.
+- During local integration testing, run the backend emulator from the setup app and point the translator FE at that backend while using `ionic serve`.
+
+In practice:
+
+- Edit BE logic in setup app
+- Test translator FE against setup backend/emulator
+- Deploy functions only from setup app
+- Deploy translator FE separately when the UI change is ready
+
+## GitHub Actions Policy Snippet
+
+Copy-paste guardrail for the setup app CI. It blocks shared-functions changes in any repo other than the setup repository.
+
+```yaml
+name: guard-shared-functions
+on:
+  pull_request:
+    paths:
+      - "functions/**"
+jobs:
+  block-non-owner-repos:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ensure this repo is the setup repo
+        run: |
+          if [ "${{ github.repository }}" != "your-org/z-control-ionic-setup" ]; then
+            echo "Shared Firebase Functions may only be changed in the setup repository."
+            exit 1
+          fi
+```
 
 ## Deployment Safety (Critical)
 
@@ -101,6 +154,8 @@ To avoid accidental cross-app breakage, prefer one of these:
 Single shared codebase in one project requires strict release discipline.
 
 ## Setup And Deploy Steps
+
+Run these steps from the setup app repository (deployment owner) only.
 
 1. Build and type-check functions.
 
@@ -128,18 +183,26 @@ firebase deploy --only functions
 
 ## No-Downtime Rollout Sequence
 
-1. Backend deploy with appId support plus translator fallback.
-2. Frontend release that sends `appId` for translator and setup app.
-3. Monitor logs/errors.
-4. Later remove fallback and enforce strict `appId`.
+1. Backend update in setup app repository.
+2. Deploy functions from setup app repository only.
+3. Frontend release(s) for affected app(s).
+4. Monitor logs/errors after rollout.
 
 ## Checklist Before Every Deploy
 
 - [ ] `request.data.appId` is used (not `request.appId`)
 - [ ] `getCollectionByAppId(...)` contains all active apps
 - [ ] Unknown appIds return `invalid-argument`
-- [ ] Old translator clients still supported (during migration window)
 - [ ] No accidental deletion of still-used functions
+- [ ] Deploy is executed from setup app repository only
+- [ ] CI/CD credentials for non-owner repos cannot deploy functions
+
+## CI/CD Guardrails (Recommended)
+
+- Use a dedicated service account for functions deploy in setup app CI only.
+- Do not store deploy-capable Firebase tokens/secrets in non-owner repositories.
+- Protect production deploy workflow with branch protection and required reviews.
+- Require build and test success before `firebase deploy --only functions`.
 
 ## Suggested Next App Onboarding (Example: image-to-text)
 
@@ -157,6 +220,9 @@ When adding a new app:
 3. Reuse same contingent/user-mapping callable contract.
 
 4. Release with same compatibility policy if legacy clients exist.
+
+5. Do not deploy shared functions from the new app repository.
+   Deploy backend changes from setup app repository after merge.
 
 ## Notes On Interfaces
 

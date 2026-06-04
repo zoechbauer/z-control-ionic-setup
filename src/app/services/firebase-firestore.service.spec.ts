@@ -9,14 +9,13 @@ import { FirebaseFirestoreService } from './firebase-firestore.service';
 import { UtilsService } from './utils.service';
 import {
   ContingentData,
-  FirestoreContingentData,
   ProgrammerDeviceUID,
   UserFeatureUsageStatistics,
   UserType,
 } from '../shared/firebase-firestore.interfaces';
 import { LocalStorageService } from './local-storage.service';
 import { ToastService } from './toast.service';
-import { ToastAnchor, AllMonthsOption } from '../shared/enums';
+import { ToastAnchor, AllMonthsOption, FeatureType } from '../shared/enums';
 import { environment } from 'src/environments/environment';
 import { createTranslateServiceMock } from '../testing/translate-service.mock';
 import { FirebaseFirestoreAuthWrapperService } from './firebase-firestore-auth-wrapper.service';
@@ -183,7 +182,7 @@ describe('FirebaseFirestoreService', () => {
     });
   });
 
-  describe('readContingentData', () => {
+  describe('readFeatureContingentData', () => {
     beforeEach(() => {
       spyOn(utilsServiceMock, 'getCurrentMonth').and.returnValue('2026-04');
     });
@@ -202,12 +201,8 @@ describe('FirebaseFirestoreService', () => {
         exists: () => true,
         data: () => flags,
       } as any);
-      spyOn<any>(
-        service,
-        'convertFirestoreToAppContingentData',
-      ).and.returnValue(flags);
 
-      const result = await service.readContingentData('2026-04');
+      const result = await service.readFeatureContingentData('2026-04');
 
       expect((service as any).getFirestoreDoc).toHaveBeenCalled();
       expect((service as any).getFirestoreDocSnapshot).toHaveBeenCalledWith(
@@ -217,7 +212,7 @@ describe('FirebaseFirestoreService', () => {
     });
 
     it('should return empty object when selected month is "all"', async () => {
-      const result = await service.readContingentData(
+      const result = await service.readFeatureContingentData(
         AllMonthsOption.SelectOptionValue,
       );
       expect(result).toEqual({});
@@ -231,20 +226,20 @@ describe('FirebaseFirestoreService', () => {
         data: () => undefined,
       } as any);
 
-      const result = await service.readContingentData('2026-04');
+      const result = await service.readFeatureContingentData('2026-04');
 
       expect(result).toEqual({});
     });
 
-    it('should return empty object when document exists but data is undefined', async () => {
+    it('should return empty object when document exists but data is {}', async () => {
       const fakeRef = { id: 'fake-ref' } as any;
       spyOn<any>(service, 'getFirestoreDoc').and.returnValue(fakeRef);
       spyOn<any>(service, 'getFirestoreDocSnapshot').and.resolveTo({
         exists: () => true,
-        data: () => undefined,
+        data: () => ({}),
       } as any);
 
-      const result = await service.readContingentData('2026-04');
+      const result = await service.readFeatureContingentData('2026-04');
 
       expect(result).toEqual({});
     });
@@ -257,67 +252,13 @@ describe('FirebaseFirestoreService', () => {
         new Error('firestore read failed'),
       );
 
-      const result = await service.readContingentData('2026-04');
+      const result = await service.readFeatureContingentData('2026-04');
 
       expect(result).toEqual({});
       expect(toastServiceMock.showToast).toHaveBeenCalledWith(
         'Error reading contingent data.',
         ToastAnchor.MainPage,
       );
-    });
-
-    describe('convertFirestoreToAppContingentData', () => {
-      it('should convert Firestore data to app contingent data', () => {
-        const firestoreContingentData: FirestoreContingentData = {
-          StopTranslationForAllUsers: true,
-          maxFreeTranslateCharsPerMonth: 1000,
-          maxFreeTranslateCharsBufferPerMonth: 100,
-          maxFreeTranslateCharsPerMonthForUser: 500,
-        };
-        const contingentData: ContingentData = {
-          StopFeatureUsageForAllUsers: true,
-          maxFreeFeatureCharsPerMonth: 1000,
-          maxFreeFeatureCharsBufferPerMonth: 100,
-          maxFreeFeatureCharsPerMonthForUser: 500,
-        };
-        const result = (service as any).convertFirestoreToAppContingentData(
-          firestoreContingentData,
-        );
-        expect(result).toEqual(contingentData);
-      });
-
-      it('should set StopFeatureUsageForAllUsers to true if StopTranslationForAllUsers is missing', () => {
-        const firestoreContingentData: FirestoreContingentData = {
-          maxFreeTranslateCharsPerMonth: 1000,
-          maxFreeTranslateCharsBufferPerMonth: 100,
-          maxFreeTranslateCharsPerMonthForUser: 500,
-        };
-        const result = (service as any).convertFirestoreToAppContingentData(
-          firestoreContingentData,
-        );
-        expect(result.StopFeatureUsageForAllUsers).toBeTrue();
-      });
-
-      it('should use environment values if Firestore data is missing', () => {
-        const firestoreContingentData: FirestoreContingentData = {};
-        const result = (service as any).convertFirestoreToAppContingentData(
-          firestoreContingentData,
-        );
-        expect(result.maxFreeFeatureCharsPerMonth).toEqual(
-          environment.app.maxFreeFeatureCharsPerMonth,
-        );
-        expect(result.maxFreeFeatureCharsBufferPerMonth).toEqual(
-          environment.app.maxFreeFeatureCharsBufferPerMonth,
-        );
-        expect(result.maxFreeFeatureCharsPerMonthForUser).toEqual(
-          environment.app.maxFreeFeatureCharsPerMonthForUser,
-        );
-      });
-
-      it('should set StopFeatureUsageForAllUsers to true if no data is provided', () => {
-        const result = (service as any).convertFirestoreToAppContingentData({});
-        expect(result.StopFeatureUsageForAllUsers).toBeTrue();
-      });
     });
   });
 
@@ -337,7 +278,7 @@ describe('FirebaseFirestoreService', () => {
       expect(httpsCallableSpy).toHaveBeenCalledWith(
         'createMissingContingentData',
       );
-      expect(callableSpy).toHaveBeenCalledWith({ appId });
+      expect(callableSpy).toHaveBeenCalledWith({ appId, featureType: FeatureType.Feature });
       expect(toastServiceMock.showToast).not.toHaveBeenCalled();
     });
 
@@ -357,9 +298,9 @@ describe('FirebaseFirestoreService', () => {
       expect(httpsCallableSpy).toHaveBeenCalledWith(
         'createMissingContingentData',
       );
-      expect(callableSpy).toHaveBeenCalledWith({ appId });
+      expect(callableSpy).toHaveBeenCalledWith({ appId, featureType: FeatureType.Feature });
       expect(toastServiceMock.showToast).toHaveBeenCalledWith(
-        'Error creating missing contingent data.',
+        'FEATURE.TOAST.ERROR_CREATING_MISSING_CONTINGENT_DATA',
         ToastAnchor.MainPage,
       );
     });
@@ -525,7 +466,6 @@ describe('FirebaseFirestoreService', () => {
             id: 'U-1',
             data: () => ({
               charCount: 100,
-              targetLanguages: ['en'],
               lastUpdated: {
                 toDate: () => new Date('2026-03-01T00:00:00.000Z'),
               },
@@ -535,7 +475,6 @@ describe('FirebaseFirestoreService', () => {
             id: 'U-2',
             data: () => ({
               charCount: 200,
-              targetLanguages: ['fr'],
               lastUpdated: {
                 toDate: () => new Date('2026-03-01T00:00:00.000Z'),
               },
@@ -556,13 +495,11 @@ describe('FirebaseFirestoreService', () => {
         {
           userId: 'U-1',
           consumedFeatureCharCount: 100,
-          targetLanguages: ['en'],
           lastFeatureUsageDate: new Date('2026-03-01T00:00:00.000Z'),
         },
         {
           userId: 'U-2',
           consumedFeatureCharCount: 200,
-          targetLanguages: ['fr'],
           lastFeatureUsageDate: new Date('2026-03-01T00:00:00.000Z'),
         },
       ]);
@@ -582,7 +519,7 @@ describe('FirebaseFirestoreService', () => {
           });
           cb({
             id: 'U-2',
-            data: () => ({}), // missing charCount and targetLanguages
+            data: () => ({}), // missing charCount
           });
         },
       } as any;
@@ -599,13 +536,11 @@ describe('FirebaseFirestoreService', () => {
         {
           userId: 'U-1',
           consumedFeatureCharCount: 100,
-          targetLanguages: [],
           lastFeatureUsageDate: new Date('2026-03-01T00:00:00.000Z'),
         },
         {
           userId: 'U-2',
           consumedFeatureCharCount: 0,
-          targetLanguages: [],
           lastFeatureUsageDate: undefined,
         },
       ]);
@@ -616,7 +551,6 @@ describe('FirebaseFirestoreService', () => {
         {
           userId: 'U-1',
           consumedFeatureCharCount: 100,
-          targetLanguages: ['en'],
           lastFeatureUsageDate: new Date('2026-03-01T00:00:00.000Z'),
         },
       ];
@@ -658,7 +592,6 @@ describe('FirebaseFirestoreService', () => {
         {
           userId: 'U-1',
           consumedFeatureCharCount: 100,
-          targetLanguages: ['en'],
           lastFeatureUsageDate: new Date('2026-03-01T00:00:00.000Z'),
         },
       ];
@@ -715,7 +648,6 @@ describe('FirebaseFirestoreService', () => {
         {
           userId: 'U-1',
           consumedFeatureCharCount: 100,
-          targetLanguages: ['en'],
           lastFeatureUsageDate: new Date('2026-03-01T00:00:00.000Z'),
         },
       ];
@@ -747,7 +679,6 @@ describe('FirebaseFirestoreService', () => {
         {
           userId: 'U-1',
           consumedFeatureCharCount: 100,
-          targetLanguages: ['en'],
           lastFeatureUsageDate: new Date('2026-03-01T00:00:00.000Z'),
         },
       ];
@@ -755,7 +686,6 @@ describe('FirebaseFirestoreService', () => {
         {
           userId: 'U-2',
           consumedFeatureCharCount: 200,
-          targetLanguages: ['fr'],
           lastFeatureUsageDate: new Date('2026-02-01T00:00:00.000Z'),
         },
       ];
@@ -1304,7 +1234,6 @@ describe('FirebaseFirestoreService', () => {
         {
           userId: 'uid2',
           consumedFeatureCharCount: 10,
-          targetLanguages: ['de'],
           lastFeatureUsageDate: new Date('2026-03-10T00:00:00.000Z'),
         },
       ]);
@@ -1323,7 +1252,6 @@ describe('FirebaseFirestoreService', () => {
         {
           userId: 'uid2',
           consumedFeatureCharCount: 0,
-          targetLanguages: ['de'],
           lastFeatureUsageDate: new Date('2026-03-10T00:00:00.000Z'),
         },
       ]);
@@ -1624,20 +1552,20 @@ describe('FirebaseFirestoreService', () => {
           jasmine.anything(),
         );
         expect(toastServiceMock.showToast).toHaveBeenCalledWith(
-          'Error creating missing contingent data.',
+          'FEATURE.TOAST.ERROR_CREATING_MISSING_CONTINGENT_DATA',
           ToastAnchor.MainPage,
         );
       });
     });
 
     describe('getFirestoreDocSnapshot and getFirestoreDoc', () => {
-      it('should execute getFirestoreDocSnapshot path directly in readContingentData and handle failure', async () => {
+      it('should execute getFirestoreDocSnapshot path directly in readFeatureContingentData and handle failure', async () => {
         spyOn(console, 'error');
         spyOn<any>(service, 'getFirestoreDoc').and.returnValue({
           id: 'mock-ref',
         } as any);
 
-        const result = await service.readContingentData('2026-03');
+        const result = await service.readFeatureContingentData('2026-03');
 
         expect(result).toEqual({});
         expect(console.error).toHaveBeenCalledWith(
@@ -1646,11 +1574,11 @@ describe('FirebaseFirestoreService', () => {
         );
       });
 
-      it('should execute getFirestoreDoc path directly in readContingentData and handle failure', async () => {
+      it('should execute getFirestoreDoc path directly in readFeatureContingentData and handle failure', async () => {
         spyOn(console, 'error');
         // Do NOT spy on getFirestoreDoc — let lines 479-481 execute (doc() will throw with empty firestoreMock)
 
-        const result = await service.readContingentData('2026-03');
+        const result = await service.readFeatureContingentData('2026-03');
 
         expect(result).toEqual({});
         expect(console.error).toHaveBeenCalledWith(

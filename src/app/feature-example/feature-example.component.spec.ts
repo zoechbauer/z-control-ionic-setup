@@ -68,7 +68,6 @@ describe('FeatureExampleComponent', () => {
           useValue: {
             selectedLanguage$: of('de'),
             selectedLanguageName$: of('Deutsch (de)'),
-            targetLanguages$: of(['en', 'fr']),
           },
         },
         {

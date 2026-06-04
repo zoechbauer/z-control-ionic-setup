@@ -1,5 +1,9 @@
 import { FirebaseFirestoreService } from './firebase-firestore.service.js';
-import { FirestoreContingentData } from './shared/firebase-firestore.interfaces.js';
+import {
+  ContingentData,
+  FeatureContingentData,
+  FirestoreContingentData,
+} from './shared/firebase-firestore.interfaces.js';
 
 export class FirebaseFirestoreUtilsService {
   private readonly firestoreService: FirebaseFirestoreService;
@@ -12,11 +16,11 @@ export class FirebaseFirestoreUtilsService {
    * Checks whether translation contingent limits are exceeded for a user.
    */
   async isContingentExceeded(
-    flags: FirestoreContingentData,
-    userId: string
+    flags: ContingentData,
+    userId: string,
   ): Promise<boolean> {
     // 1. If translation is globally stopped for all users
-    if (flags.StopTranslationForAllUsers) {
+    if (flags.StopForAllUsers) {
       return true;
     }
     // 2. If the total contingent for all users is exceeded
@@ -31,10 +35,10 @@ export class FirebaseFirestoreUtilsService {
   }
 
   private async isContingentForUserExceeded(
-    flags: FirestoreContingentData,
-    userId: string
+    flags: ContingentData,
+    userId: string,
   ): Promise<boolean> {
-    const limit = flags.maxFreeTranslateCharsPerMonthForUser;
+    const limit = flags.maxFreeCharsPerMonthForUser;
     if (limit === undefined) {
       return true;
     }
@@ -43,10 +47,10 @@ export class FirebaseFirestoreUtilsService {
   }
 
   private async isTotalContingentExceeded(
-    flags: FirestoreContingentData
+    flags: ContingentData,
   ): Promise<boolean> {
-    const limit = flags.maxFreeTranslateCharsPerMonth;
-    const buffer = flags.maxFreeTranslateCharsBufferPerMonth;
+    const limit = flags.maxFreeCharsPerMonth;
+    const buffer = flags.maxFreeCharsBufferPerMonth;
     if (limit === undefined || buffer === undefined) {
       return true;
     }
@@ -57,23 +61,100 @@ export class FirebaseFirestoreUtilsService {
   /**
    * Validates the contingent for the user and throws if exceeded or not found.
    */
-  static async validateContingentOrThrow(collection: string, userId: string): Promise<void> {
+  static async validateContingentOrThrow(
+    collection: string,
+    userId: string,
+  ): Promise<void> {
     const firestoreService = new FirebaseFirestoreService(collection, userId);
     let flags = await firestoreService.readContingentData();
+
     if (!flags) {
       // could occur on change to next month
-      console.log(`Contingent data not found in collection ${collection} for user ${userId} -> created`);
+      console.log(
+        `Contingent data not found in collection ${collection} for user ${userId} -> created`,
+      );
       await firestoreService.createMissingContingentData();
       flags = await firestoreService.readContingentData();
     }
+
     const utilsService = new FirebaseFirestoreUtilsService(firestoreService);
-    if (await utilsService.isContingentExceeded(flags, userId)) {
+    const flagsUnified: ContingentData =
+      FirebaseFirestoreUtilsService.normalizeContingentData(flags);
+    if (await utilsService.isContingentExceeded(flagsUnified, userId)) {
       console.error('Contingent exceeded for user:', userId);
       throw new (await import('firebase-functions/v2/https')).HttpsError(
         'resource-exhausted',
-        'Translation contingent exceeded.'
+        'Translation contingent exceeded.',
       );
     }
+  }
+
+  /**
+   * Validates the feature contingent for the user and throws if exceeded or not found.
+   */
+  static async validateFeatureContingentOrThrow(
+    collection: string,
+    userId: string,
+  ): Promise<void> {
+    const firestoreService = new FirebaseFirestoreService(collection, userId);
+    let flags = await firestoreService.readFeatureContingentData();
+
+    if (!flags) {
+      // could occur on change to next month
+      console.log(
+        `Contingent data not found in collection ${collection} for user ${userId} -> created`,
+      );
+      await firestoreService.createMissingFeatureContingentData();
+      flags = await firestoreService.readFeatureContingentData();
+    }
+
+    const utilsService = new FirebaseFirestoreUtilsService(firestoreService);
+    const flagsUnified: ContingentData =
+      FirebaseFirestoreUtilsService.normalizeContingentData(flags);
+    if (await utilsService.isContingentExceeded(flagsUnified, userId)) {
+      console.error('Contingent exceeded for user:', userId);
+      throw new (await import('firebase-functions/v2/https')).HttpsError(
+        'resource-exhausted',
+        'Feature contingent exceeded.',
+      );
+    }
+  }
+
+  /**
+   * Normalizes contingent data to a unified format.
+   * @param flags The contingent data to normalize.
+   * @returns The normalized contingent data.
+   */
+  private static normalizeContingentData(
+    flags: FeatureContingentData | FirestoreContingentData,
+  ): ContingentData {
+    const isFeatureFlags =
+      'maxFreeFeatureCharsPerMonth' in flags ||
+      'maxFreeFeatureCharsBufferPerMonth' in flags ||
+      'maxFreeFeatureCharsPerMonthForUser' in flags ||
+      'StopFeatureUsageForAllUsers' in flags;
+
+    if (isFeatureFlags) {
+      const featureFlags = flags as FeatureContingentData;
+      return {
+        StopForAllUsers: featureFlags.StopFeatureUsageForAllUsers ?? false,
+        maxFreeCharsPerMonth: featureFlags.maxFreeFeatureCharsPerMonth,
+        maxFreeCharsBufferPerMonth:
+          featureFlags.maxFreeFeatureCharsBufferPerMonth,
+        maxFreeCharsPerMonthForUser:
+          featureFlags.maxFreeFeatureCharsPerMonthForUser,
+      };
+    }
+
+    const translationFlags = flags as FirestoreContingentData;
+    return {
+      StopForAllUsers: translationFlags.StopTranslationForAllUsers ?? false,
+      maxFreeCharsPerMonth: translationFlags.maxFreeTranslateCharsPerMonth,
+      maxFreeCharsBufferPerMonth:
+        translationFlags.maxFreeTranslateCharsBufferPerMonth,
+      maxFreeCharsPerMonthForUser:
+        translationFlags.maxFreeTranslateCharsPerMonthForUser,
+    };
   }
 
   /**

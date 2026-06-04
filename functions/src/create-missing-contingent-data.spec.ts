@@ -19,12 +19,16 @@ vi.mock('./firebase-firestore.service.js', () => ({
 
 import { createMissingContingentData } from './create-missing-contingent-data.js';
 import { FirebaseFirestoreService } from './firebase-firestore.service.js';
+import { FeatureType } from './shared/app.constants.js';
 
 describe('createMissingContingentData', () => {
-  const appId = 'translator';
-  const makeRequest = (uid?: string, appId?: string) => ({
+  const appId = 'ionic_setup';
+  const makeRequest = (uid?: string, appId?: string, featureType?: string) => ({
     auth: uid ? { uid } : undefined,
-    data: appId ? { appId } : undefined,
+    data: {
+      ...(appId ? { appId } : {}),
+      ...(featureType ? { featureType } : {}),
+    },
   });
 
   beforeEach(() => {
@@ -53,6 +57,33 @@ describe('createMissingContingentData', () => {
     await expect(call).rejects.toMatchObject(expected);
   });
 
+  it('should throw invalid-argument HttpsError if wrong feature type is provided', async () => {
+    const request = makeRequest('user1', appId, 'wrongFeatureType'); // { auth: { uid: 'user1' }, data: undefined }
+    const call = (createMissingContingentData as any)(request);
+    const expected = {
+      code: 'invalid-argument',
+      message: 'featureType must be either undefined for MLT or "feature".',
+    };
+
+    await expect(call).rejects.toMatchObject(expected);
+  });
+
+    it.each([
+      {featureType: undefined },
+      {featureType: FeatureType.Feature },
+      {featureType: FeatureType.MLT },
+    ])
+    (`should not throw invalid-argument HttpsError if correct feature type [$featureType] is provided`, async ({ featureType }) => {
+    const request = makeRequest('user1', appId, featureType);
+    const call = (createMissingContingentData as any)(request);
+    const expected = {
+      code: 'invalid-argument',
+      message: 'featureType must be either undefined for MLT or "feature".',
+    };
+
+    await expect(call).not.rejects.toMatchObject(expected);
+  });
+
   it('should throw internal HttpsError if wrong appId is provided', async () => {
     const request = makeRequest('user1', 'wrongAppId'); // { auth: { uid: 'user1' }, data
     const call = (createMissingContingentData as any)(request);
@@ -65,13 +96,13 @@ describe('createMissingContingentData', () => {
 
   it('should return { success: true } when firestoreService creates missing contingent data successfully', async () => {
     vi.mocked(FirebaseFirestoreService).mockImplementation(function (
-      this: any
+      this: any,
     ) {
       this.createMissingContingentData = vi.fn().mockResolvedValue(undefined);
     } as any);
 
     const result = await (createMissingContingentData as any)(
-      makeRequest('user1', appId)
+      makeRequest('user1', appId),
     );
     expect(result).toEqual({ success: true });
   });
@@ -79,12 +110,14 @@ describe('createMissingContingentData', () => {
   it('should throw internal HttpsError if firestoreService.createMissingContingentData throws an error', async () => {
     const error = new Error('Some error');
     vi.mocked(FirebaseFirestoreService).mockImplementation(function (
-      this: any
+      this: any,
     ) {
       this.createMissingContingentData = vi.fn().mockRejectedValue(error);
     } as any);
 
-    const call = (createMissingContingentData as any)(makeRequest('user1', appId));
+    const call = (createMissingContingentData as any)(
+      makeRequest('user1', appId),
+    );
     const expected = {
       code: 'internal',
       message: 'Some error',
@@ -92,15 +125,17 @@ describe('createMissingContingentData', () => {
 
     await expect(call).rejects.toMatchObject(expected);
   });
-  
+
   it('should throw internal HttpsError with default message if thrown error has no message', async () => {
     vi.mocked(FirebaseFirestoreService).mockImplementation(function (
-      this: any
+      this: any,
     ) {
       this.createMissingContingentData = vi.fn().mockRejectedValue({});
     } as any);
 
-    const call = (createMissingContingentData as any)(makeRequest('user1', appId));
+    const call = (createMissingContingentData as any)(
+      makeRequest('user1', appId),
+    );
     const expected = {
       code: 'internal',
       message: 'Error creating missing contingent data.',

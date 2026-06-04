@@ -60,3 +60,8 @@ export enum UserType {
   Programmer = 'P',
   User = 'U',
 }
+
+export enum FeatureType {
+  MLT = 'translator',
+  Feature = 'feature',
+}

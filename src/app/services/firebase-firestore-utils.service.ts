@@ -123,15 +123,6 @@ export class FirebaseFirestoreUtilsService {
                 (sum, info) => sum + (info.consumedFeatureCharCount || 0),
                 0,
               ),
-              targetLanguages: Array.from(
-                new Set(
-                  userFeatureUsageInfos.reduce<string[]>(
-                    (allLanguages, info) =>
-                      allLanguages.concat(info.targetLanguages || []),
-                    [],
-                  ),
-                ),
-              ),
               lastFeatureUsageDate: userFeatureUsageInfos.reduce<
                 Date | undefined
               >((latest, info) => {
@@ -169,7 +160,6 @@ export class FirebaseFirestoreUtilsService {
         displayedModel: DeviceUtils.getModel(userInfo),
         consumedFeatureCharCount:
           aggregatedFeatureUsageInfo?.consumedFeatureCharCount ?? 0,
-        targetLanguages: aggregatedFeatureUsageInfo?.targetLanguages ?? [],
         lastFeatureUsageDate:
           aggregatedFeatureUsageInfo?.lastFeatureUsageDate ?? null,
       };
@@ -230,13 +220,6 @@ export class FirebaseFirestoreUtilsService {
     // device model summary rows
     rows = this.createStatisticsSummaryModelRows(
       StatisticsSummaryCategory.Model,
-      statisticsData,
-    );
-    statsSummary.push(...rows);
-
-    // target languages summary rows
-    rows = this.createStatisticsSummaryLanguagesRows(
-      StatisticsSummaryCategory.Languages,
       statisticsData,
     );
     statsSummary.push(...rows);
@@ -316,29 +299,6 @@ export class FirebaseFirestoreUtilsService {
   }
 
   /**
-   * Creates summary rows grouped by target languages.
-   *
-   * @param category Summary category label for the generated rows.
-   * @param statisticsData Source user statistics.
-   * @returns Summary rows for each target language count.
-   */
-  private createStatisticsSummaryLanguagesRows(
-    category: StatisticsSummaryCategory,
-    statisticsData: DisplayedUserStatistics[],
-  ): UserStatisticsSummary[] {
-    const maxLanguageCount = Math.max(
-      1,
-      ...statisticsData.map((userStat) => userStat.targetLanguages.length),
-    );
-
-    const types = Array.from({ length: maxLanguageCount }, (_, index) =>
-      String(index + 1),
-    );
-
-    return this.buildStatisticsSummaryRows(category, types, statisticsData);
-  }
-
-  /**
    * Builds summary rows for the specified types.
    *
    * @param category Summary category label for the generated rows.
@@ -369,7 +329,7 @@ export class FirebaseFirestoreUtilsService {
   /**
    * Counts users with at least one feature usage for the given type.
    *
-   * Supports user type, platform, language-count buckets, and normalized model names.
+   * Supports user type, platform, and normalized model names.
    *
    * @param statisticsData Source user statistics.
    * @param type Type discriminator used for matching.
@@ -380,12 +340,6 @@ export class FirebaseFirestoreUtilsService {
     type: StatisticsSummaryName | string,
   ): number {
     return statisticsData.filter((userStat) => {
-      if (this.isLanguageCountType(type)) {
-        return (
-          userStat.targetLanguages.length === Number(type) &&
-          userStat.consumedFeatureCharCount > 0
-        );
-      }
       switch (type) {
         case StatisticsSummaryName.Programmer:
         case StatisticsSummaryName.User:
@@ -409,14 +363,10 @@ export class FirebaseFirestoreUtilsService {
     }).length;
   }
 
-  private isLanguageCountType(type: string): boolean {
-    return /^\d+$/.test(type);
-  }
-
   /**
    * Counts users with no feature usage for the given type.
    *
-   * Supports user type, platform, language-count buckets, and normalized model names.
+   * Supports user type, platform, and normalized model names.
    *
    * @param statisticsData Source user statistics.
    * @param type Type discriminator used for matching.
@@ -427,12 +377,6 @@ export class FirebaseFirestoreUtilsService {
     type: StatisticsSummaryName | string,
   ): number {
     return statisticsData.filter((userStat) => {
-      if (this.isLanguageCountType(type)) {
-        return (
-          userStat.targetLanguages.length === Number(type) &&
-          userStat.consumedFeatureCharCount === 0
-        );
-      }
       switch (type) {
         case StatisticsSummaryName.Programmer:
         case StatisticsSummaryName.User:
@@ -509,7 +453,7 @@ export class FirebaseFirestoreUtilsService {
   > {
     // Read all control flags from Firestore
     const contingentData: ContingentData =
-      await this.firestoreService.readContingentData(
+      await this.firestoreService.readFeatureContingentData(
         this.utilsService.getCurrentMonth(),
       );
     const displayedContingentData: DisplayedUserContingentData[] = [];
@@ -563,7 +507,7 @@ export class FirebaseFirestoreUtilsService {
   async isContingentExceeded(): Promise<boolean> {
     // Read all control flags from Firestore
     const flags: ContingentData =
-      await this.firestoreService.readContingentData(
+      await this.firestoreService.readFeatureContingentData(
         this.utilsService.getCurrentMonth(),
       );
 

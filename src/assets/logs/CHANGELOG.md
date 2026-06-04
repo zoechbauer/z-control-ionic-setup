@@ -2,6 +2,21 @@
 
 Welcome to the latest updates for the **z-control IONIC Setup** app.
 
+## [0.5] - 2026-06-03
+
+### ✨ New Features
+
+- Added a loading spinner on the feature page to improve feedback during async requests.
+- Removed `targetLanguages` from feature quota/statistics flows because it is no longer required.
+- Expanded project documentation with clearer setup guidance, backend ownership rules, and integration workflow notes.
+- Migrated cloud functions from the z-control Translator app into this setup app as the shared backend owner.
+
+### 🔧 Internal
+
+- Added `addConsumedFeatureChars` usage for `secure-feature` to align backend quota tracking with the new feature model.
+- Improved emulator host detection to better handle local emulator and production environments.
+- Updated frontend/backend tests and docs to reflect the latest backend structure and deployment ownership policy.
+
 ## [0.4] – 2026-06-01
 
 ### 🐛 Fixes

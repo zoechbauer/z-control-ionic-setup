@@ -42,7 +42,6 @@ describe('UserDetailComponent', () => {
       displayedPlatform: 'web-desktop',
       displayedModel: 'Model 1',
       translationCount: 1234,
-      targetLanguages: ['fr', 'en'],
       lastTranslationDate: new Date('2026-03-09T00:00:00Z'),
     };
   }

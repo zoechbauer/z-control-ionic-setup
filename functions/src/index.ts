@@ -1,4 +1,5 @@
 export { secureFeature } from './secure-feature.js';
+export { secureTranslate } from './secure-translate.js';
 export { createMissingContingentData } from './create-missing-contingent-data.js';
 export { updateProgrammerDeviceUIDs } from './update-programmer-deviceUIDs.js';
 export { getProgrammerDeviceUIDs } from './get-programmer-deviceUIDs.js';

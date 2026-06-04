@@ -1,7 +1,9 @@
 import admin from 'firebase-admin';
 import { FireStoreConstants, UserType } from './shared/app.constants.js';
 import {
+  CharCountAndTargetLangsResult,
   DeviceInfo,
+  FeatureContingentData,
   FirestoreContingentData,
   ProgrammerDeviceUID,
 } from './shared/firebase-firestore.interfaces.js';
@@ -20,9 +22,9 @@ export class FirebaseFirestoreService {
   }
 
   /**
-   * Reads the contingent data document containing global translation limits and control flags.
+   * Reads the contingent data document containing global feature limits and control flags.
    *
-   * @returns Promise resolving to the contingent data object with translation quotas and control flags.
+   * @returns Promise resolving to the contingent data object with feature quotas and control flags.
    * @throws Error if the document read operation fails.
    */
   async readContingentData(): Promise<FirestoreContingentData> {
@@ -35,12 +37,48 @@ export class FirebaseFirestoreService {
   }
 
   /**
-   * Retrieves the character count for the current user.
+   * Reads the contingent data document containing global feature limits and control flags.
    *
-   * Returns the user's cumulative translated character count. If the user document doesn't exist or lacks character count data, returns 0.
+   * @returns Promise resolving to the contingent data object with feature quotas and control flags.
+   * @throws Error if the document read operation fails.
+   */
+  async readFeatureContingentData(): Promise<FeatureContingentData> {
+    const doc = await this.db
+      .doc(
+        `${FireStoreConstants.getMetaContingentDataDocumentPath(this.collection)}`,
+      )
+      .get();
+    return doc.data() as FeatureContingentData;
+  }
+  
+  /**
+   * Retrieves the character count and target languages for the current user.
+   *
+   * Returns the user's cumulative translated character count and their selected target languages
+   * for translations. If the user document doesn't exist or lacks character count data, returns 0.
+   *
+   * @returns Promise resolving to an object with charCount and targetLanguages array.
+   * @throws Error if the document read operation fails.
+   */
+  async getCharCountAndTargetLangsForUser(): Promise<CharCountAndTargetLangsResult> {
+    const doc = await this.db
+      .doc(`${FireStoreConstants.getUsersCollectionPath(this.collection)}/${this.userId}`)
+      .get();
+    return doc.exists && doc.data()?.charCount
+      ? {
+          charCount: doc.data()!.charCount,
+          targetLanguages: doc.data()?.targetLanguages || [],
+        }
+      : { charCount: 0, targetLanguages: [] };
+  }
+
+  /**
+   * Retrieves the character count for the current user.
+   * 
+   * Returns the user's cumulative consumed feature character count. 
+   * If the user document doesn't exist or lacks character count data, returns 0.
    *
    * @returns Promise resolving to the character count as a number.
-
    * @throws Error if the document read operation fails.
    */
   async getCharCountForUser(): Promise<number> {
@@ -53,10 +91,10 @@ export class FirebaseFirestoreService {
   }
 
   /**
-   * Retrieves the total translated character count across all users for the current month.
+   * Retrieves the total consumed feature character count across all users for the current month.
    *
-   * Reads the meta document that tracks cumulative translation usage. Used for monitoring
-   * global translation quotas and enforcing rate limits.
+   * Reads the meta document that tracks cumulative feature usage. Used for monitoring
+   * global feature quotas and enforcing rate limits.
    *
    * @returns Promise resolving to the total character count as a number, or 0 if not found.
    * @throws Error if the document read operation fails.
@@ -76,10 +114,41 @@ export class FirebaseFirestoreService {
   }
 
   /**
-   * If the contingent data document is missing, it creates it with default values.
+   * If the MLT contingent data document is missing, it creates it with default values.
    * Existing values are never overwritten.
    */
   async createMissingContingentData(): Promise<void> {
+    const contingentData: FirestoreContingentData = {
+      StopTranslationForAllUsers: false,
+      maxFreeTranslateCharsPerMonthForUser: 10000,
+      maxFreeTranslateCharsPerMonth: 500000,
+      maxFreeTranslateCharsBufferPerMonth: 5000,
+    };
+
+    await this.createMissingContingentDataExec(contingentData);
+  }
+
+  /**
+   * If the feature contingent data document is missing, it creates it with default values.
+   * Existing values are never overwritten.
+   */
+  async createMissingFeatureContingentData(): Promise<void> {
+    const contingentData: FeatureContingentData = {
+      StopFeatureUsageForAllUsers: false,
+      maxFreeFeatureCharsPerMonthForUser: 10000,
+      maxFreeFeatureCharsPerMonth: 500000,
+      maxFreeFeatureCharsBufferPerMonth: 5000,
+    };
+
+    await this.createMissingContingentDataExec(contingentData);
+  }
+
+  /**
+   * Creates the contingent data document with default values if it doesn't exist.
+   */
+  private async createMissingContingentDataExec(
+    contingentData: FirestoreContingentData | FeatureContingentData,
+  ): Promise<void> {
     try {
       const docRef = this.db.doc(
         `${FireStoreConstants.getMetaContingentDataDocumentPath(this.collection)}`,
@@ -88,10 +157,7 @@ export class FirebaseFirestoreService {
       if (!doc.exists) {
         await docRef.set(
           {
-            StopTranslationForAllUsers: false,
-            maxFreeTranslateCharsPerMonthForUser: 10000,
-            maxFreeTranslateCharsPerMonth: 500000,
-            maxFreeTranslateCharsBufferPerMonth: 5000,
+            ...contingentData,
             lastUpdated: new Date(),
           },
           { merge: true },
@@ -426,15 +492,12 @@ export class FirebaseFirestoreService {
   }
 
   /**
-   * Increments the translated character count for the current user.
+   * Increments the translated character count for the current user, used by secureTranslate feature.
    * Also updates the lastUpdated timestamp for both the user and the total statistics document and the selected languages.
    *
    * - Updates the user's document with the incremented character count and timestamp.
    * - Updates the total statistics document with the incremented character count and timestamp.
    * - Count = text length x number of target languages.
-   *
-   * @param count Number of characters to add to the user's and total translated character counts.
-   * @param selectedLanguages Array of selected target languages for the translation.
    *
    * @param count Number of characters to add to both user and total character counts.
    * @param selectedLanguages Array of target language codes selected for the translation.
@@ -448,7 +511,37 @@ export class FirebaseFirestoreService {
     if (!this.userId) return;
 
     try {
-      await this.updateUserCharCount(count, selectedLanguages);
+      await this.updateUserCharCountAndTargetLanguages(
+        count,
+        selectedLanguages,
+      );
+    } catch (error) {
+      console.error('Error writing user char count document:', error);
+    }
+
+    try {
+      await this.updateTotalCharCount(count);
+    } catch (error) {
+      console.error('Error writing total char count document:', error);
+    }
+  }
+
+  /**
+   * Increments the consumed feature usage character count for the current user, used by secureFeature.
+   * Also updates the lastUpdated timestamp for both the user and the total statistics document.
+   *
+   * - Updates the user's document with the incremented character count and timestamp.
+   * - Updates the total statistics document with the incremented character count and timestamp.
+   *
+   * @param count Number of characters to add to the user's and total feature usage character counts.
+   * @returns Promise that resolves when both user and total counts are updated.
+   * @throws Error is caught and logged for update operation failures.
+   */
+  async addConsumedFeatureChars(count: number): Promise<void> {
+    if (!this.userId) return;
+
+    try {
+      await this.updateUserCharCount(count);
     } catch (error) {
       console.error('Error writing user char count document:', error);
     }
@@ -464,7 +557,7 @@ export class FirebaseFirestoreService {
    * Updates the character count and target languages for the current user.
    * Internal helper for addTranslatedChars that updates the user's usage statistics.
    */
-  private async updateUserCharCount(
+  private async updateUserCharCountAndTargetLanguages(
     count: number,
     selectedLanguages: string[],
   ): Promise<void> {
@@ -482,8 +575,25 @@ export class FirebaseFirestoreService {
   }
 
   /**
-   * Updates the total translated character count across all users for the current month.
-   * Internal helper for addTranslatedChars that updates global usage statistics.
+   * Updates the character count for the current user.
+   * Internal helper for addConsumedFeatureChars that updates the user's usage statistics.
+   */
+  private async updateUserCharCount(count: number): Promise<void> {
+    const docRef = this.db.doc(
+      `${FireStoreConstants.getUsersCollectionPath(this.collection)}/${this.userId}`,
+    );
+    await docRef.set(
+      {
+        charCount: admin.firestore.FieldValue.increment(count),
+        lastUpdated: new Date(),
+      },
+      { merge: true },
+    );
+  }
+
+  /**
+   * Updates the total feature/translation character count across all users for the current month.
+   * Internal helper for addTranslatedChars and addConsumedFeatureChars that updates global usage statistics.
    */
   private async updateTotalCharCount(count: number): Promise<void> {
     const totalRef = this.db.doc(

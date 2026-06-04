@@ -49,7 +49,7 @@ describe('FirebaseFirestoreUtilsService', () => {
     firestoreServiceMock = jasmine.createSpyObj(
       'FirebaseFirestoreService',
       [
-        'readContingentData',
+        'readFeatureContingentData',
         'getCharCountForUser',
         'getTotalCharCount',
         'getAllUserFeatureUsageStatistics',
@@ -100,7 +100,7 @@ describe('FirebaseFirestoreUtilsService', () => {
 
   describe('isContingentExceeded', () => {
     it('should return true if StopFeatureUsageForAllUsers is true', async () => {
-      firestoreServiceMock.readContingentData.and.resolveTo({
+      firestoreServiceMock.readFeatureContingentData.and.resolveTo({
         StopFeatureUsageForAllUsers: true,
       });
       const result = await service.isContingentExceeded();
@@ -108,7 +108,7 @@ describe('FirebaseFirestoreUtilsService', () => {
     });
 
     it('should return true if total contingent is exceeded', async () => {
-      firestoreServiceMock.readContingentData.and.resolveTo({});
+      firestoreServiceMock.readFeatureContingentData.and.resolveTo({});
       firestoreServiceMock.getTotalCharCount.and.resolveTo(
         environment.app.maxFreeFeatureCharsPerMonth -
           environment.app.maxFreeFeatureCharsBufferPerMonth +
@@ -120,7 +120,7 @@ describe('FirebaseFirestoreUtilsService', () => {
     });
 
     it('should return true if user contingent is exceeded', async () => {
-      firestoreServiceMock.readContingentData.and.resolveTo({});
+      firestoreServiceMock.readFeatureContingentData.and.resolveTo({});
       firestoreServiceMock.getTotalCharCount.and.resolveTo(0);
       firestoreServiceMock.getCharCountForUser.and.resolveTo(
         environment.app.maxFreeFeatureCharsPerMonthForUser + 1,
@@ -130,7 +130,7 @@ describe('FirebaseFirestoreUtilsService', () => {
     });
 
     it('should return false if contingent is not exceeded and feature usage is not stopped', async () => {
-      firestoreServiceMock.readContingentData.and.resolveTo({});
+      firestoreServiceMock.readFeatureContingentData.and.resolveTo({});
       firestoreServiceMock.getTotalCharCount.and.resolveTo(0);
       firestoreServiceMock.getCharCountForUser.and.resolveTo(0);
       const result = await service.isContingentExceeded();
@@ -144,7 +144,7 @@ describe('FirebaseFirestoreUtilsService', () => {
         maxFreeFeatureCharsBufferPerMonth: 0,
         maxFreeFeatureCharsPerMonthForUser: 10,
       };
-      firestoreServiceMock.readContingentData.and.resolveTo(flags);
+      firestoreServiceMock.readFeatureContingentData.and.resolveTo(flags);
       firestoreServiceMock.getTotalCharCount.and.resolveTo(101);
       firestoreServiceMock.getCharCountForUser.and.resolveTo(11);
       // Should return true for total contingent exceeded first
@@ -171,7 +171,7 @@ describe('FirebaseFirestoreUtilsService', () => {
     });
 
     it('should return contingent data with user char count', async () => {
-      firestoreServiceMock.readContingentData.and.resolveTo(contingentData);
+      firestoreServiceMock.readFeatureContingentData.and.resolveTo(contingentData);
       firestoreServiceMock.getCharCountForUser.and.resolveTo(1000);
 
       const result = await service.getDisplayedUserContingentData();
@@ -190,7 +190,7 @@ describe('FirebaseFirestoreUtilsService', () => {
     });
 
     it('should return contingent data with char count of all users', async () => {
-      firestoreServiceMock.readContingentData.and.resolveTo(contingentData);
+      firestoreServiceMock.readFeatureContingentData.and.resolveTo(contingentData);
       firestoreServiceMock.getCharCountForUser.and.resolveTo(1000);
       firestoreServiceMock.getTotalCharCount.and.resolveTo(20000);
 
@@ -212,7 +212,7 @@ describe('FirebaseFirestoreUtilsService', () => {
     });
 
     it('should use environment data if contingent data fields are missing', async () => {
-      firestoreServiceMock.readContingentData.and.resolveTo({});
+      firestoreServiceMock.readFeatureContingentData.and.resolveTo({});
       firestoreServiceMock.getCharCountForUser.and.resolveTo(500);
       firestoreServiceMock.getTotalCharCount.and.resolveTo(5000);
 
@@ -340,51 +340,43 @@ describe('FirebaseFirestoreUtilsService', () => {
         {
           userId: 'U-1',
           consumedFeatureCharCount: 1500,
-          targetLanguages: ['en'],
           lastFeatureUsageDate: new Date('2026-02-20'),
         },
         {
           userId: 'U-2',
           consumedFeatureCharCount: 1000,
-          targetLanguages: ['en'],
           lastFeatureUsageDate: new Date('2026-02-18'),
         },
 
         {
           userId: 'U-1',
           consumedFeatureCharCount: 1500,
-          targetLanguages: ['en', 'nl'],
           lastFeatureUsageDate: new Date('2026-03-20'),
         },
         {
           userId: 'U-2',
           consumedFeatureCharCount: 1200,
-          targetLanguages: ['en', 'fr'],
           lastFeatureUsageDate: new Date('2026-03-18'),
         },
         {
           userId: 'U-3',
           consumedFeatureCharCount: 2500,
-          targetLanguages: ['en', 'de'],
           lastFeatureUsageDate: new Date('2026-03-25'),
         },
 
         {
           userId: 'U-1',
           consumedFeatureCharCount: 1500,
-          targetLanguages: ['en', 'nl', 'fr'],
           lastFeatureUsageDate: new Date('2026-04-20'),
         },
         {
           userId: 'U-2',
           consumedFeatureCharCount: 1300,
-          targetLanguages: ['en', 'fr', 'es'],
           lastFeatureUsageDate: new Date('2026-04-18'),
         },
         {
           userId: 'P-1',
           consumedFeatureCharCount: 3000,
-          targetLanguages: ['en', 'nl', 'fr', 'es', 'it'],
           lastFeatureUsageDate: new Date('2026-04-22'),
         },
       ];
@@ -495,7 +487,6 @@ describe('FirebaseFirestoreUtilsService', () => {
         );
         expect(user).toBeDefined();
         expect(user?.consumedFeatureCharCount).toBe(0);
-        expect(user?.targetLanguages).toEqual([]);
         expect(user?.lastFeatureUsageDate).toBeNull();
       });
     });
@@ -557,19 +548,16 @@ describe('FirebaseFirestoreUtilsService', () => {
           {
             userId: 'U-1',
             consumedFeatureCharCount: 1000,
-            targetLanguages: ['en', 'nl'],
             lastFeatureUsageDate: new Date('2026-03-10'),
           },
           {
             userId: 'U-2',
             consumedFeatureCharCount: 2000,
-            targetLanguages: ['en'],
             lastFeatureUsageDate: new Date('2026-03-11'),
           },
           {
             userId: 'P-1',
             consumedFeatureCharCount: 3000,
-            targetLanguages: ['en', 'nl', 'fr', 'es', 'it'],
             lastFeatureUsageDate: new Date('2026-03-12'),
           },
         ];
@@ -606,7 +594,6 @@ describe('FirebaseFirestoreUtilsService', () => {
           jasmine.objectContaining({
             userId: 'U-1',
             consumedFeatureCharCount: 1000,
-            targetLanguages: ['en', 'nl'],
             lastFeatureUsageDate: new Date('2026-03-10'),
           }),
         );
@@ -614,7 +601,6 @@ describe('FirebaseFirestoreUtilsService', () => {
           jasmine.objectContaining({
             userId: 'U-2',
             consumedFeatureCharCount: 2000,
-            targetLanguages: ['en'],
             lastFeatureUsageDate: new Date('2026-03-11'),
           }),
         );
@@ -622,7 +608,6 @@ describe('FirebaseFirestoreUtilsService', () => {
           jasmine.objectContaining({
             userId: 'P-1',
             consumedFeatureCharCount: 3000,
-            targetLanguages: ['en', 'nl', 'fr', 'es', 'it'],
             lastFeatureUsageDate: new Date('2026-03-12'),
           }),
         );
@@ -646,7 +631,6 @@ describe('FirebaseFirestoreUtilsService', () => {
             userName: 'User 1',
             userType: 'U',
             isNative: false,
-            targetLanguages: ['en', 'nl'],
           }),
         );
         expect(user2Stats).toEqual(
@@ -655,7 +639,6 @@ describe('FirebaseFirestoreUtilsService', () => {
             userName: 'User 2',
             userType: 'U',
             isNative: true,
-            targetLanguages: ['en'],
           }),
         );
         expect(progDev1Stats).toEqual(
@@ -664,7 +647,6 @@ describe('FirebaseFirestoreUtilsService', () => {
             userName: 'Programmer Device 1',
             userType: 'P',
             isNative: true,
-            targetLanguages: ['en', 'nl', 'fr', 'es', 'it'],
           }),
         );
       });
@@ -857,7 +839,6 @@ describe('FirebaseFirestoreUtilsService', () => {
         const extraUserStat: UserFeatureUsageStatistics = {
           userId: 'U-999',
           consumedFeatureCharCount: 500,
-          targetLanguages: ['en'],
           lastFeatureUsageDate: new Date('2026-03-15'),
         };
         const userStatsWithExtra = [...userStats, extraUserStat];
@@ -892,7 +873,6 @@ describe('FirebaseFirestoreUtilsService', () => {
       platform: string,
       consumedFeatureCharCount: number,
       lastFeatureUsageDate: Date | null,
-      targetLanguages: string[],
     ) {
       const createdAt = new Date('2026-03-10');
       const lastUpdated = new Date('2026-03-15');
@@ -918,13 +898,12 @@ describe('FirebaseFirestoreUtilsService', () => {
         displayedPlatform: platform,
         displayedModel,
         consumedFeatureCharCount: consumedFeatureCharCount,
-        targetLanguages,
         lastFeatureUsageDate:
           consumedFeatureCharCount > 0 ? lastFeatureUsageDate : null,
       });
     }
 
-    function createStatiticsData(): DisplayedUserStatistics[] {
+    function createStatisticsData(): DisplayedUserStatistics[] {
       statisticsData = [];
       addStatisticsData(
         'U-1',
@@ -934,7 +913,6 @@ describe('FirebaseFirestoreUtilsService', () => {
         'web-desktop',
         1000,
         new Date('2026-03-15'),
-        ['en', 'nl'],
       );
       addStatisticsData(
         'U-2',
@@ -944,7 +922,6 @@ describe('FirebaseFirestoreUtilsService', () => {
         'web-mobile',
         2000,
         new Date('2026-03-13'),
-        ['en', 'nl', 'fr'],
       );
       addStatisticsData(
         'U-4',
@@ -954,7 +931,6 @@ describe('FirebaseFirestoreUtilsService', () => {
         'web-mobile',
         0,
         null,
-        [],
       );
       addStatisticsData(
         'P-1',
@@ -964,7 +940,6 @@ describe('FirebaseFirestoreUtilsService', () => {
         'native',
         3000,
         new Date('2026-03-17'),
-        ['en', 'nl', 'fr', 'es', 'it'],
       );
       addStatisticsData(
         'P-1',
@@ -974,7 +949,6 @@ describe('FirebaseFirestoreUtilsService', () => {
         'native',
         1000,
         new Date('2026-03-15'),
-        ['en', 'nl', 'fr', 'es', 'it', 'uk'],
       );
       addStatisticsData(
         'P-2',
@@ -984,13 +958,12 @@ describe('FirebaseFirestoreUtilsService', () => {
         'web-desktop',
         0,
         null,
-        [],
       );
       return statisticsData;
     }
 
     beforeEach(() => {
-      statisticsData = createStatiticsData();
+      statisticsData = createStatisticsData();
     });
 
     it('should return summary records for user type', () => {
@@ -1124,80 +1097,6 @@ describe('FirebaseFirestoreUtilsService', () => {
         );
     });
 
-    it('should return summary records for languages', () => {
-      // Act
-      const result = service.getUserStatisticsSummary(statisticsData);
-
-      // Filter for languages summary rows
-      const targetLangRows = result.filter(
-        (s) => s.category === StatisticsSummaryCategory.Languages,
-      );
-      expect(targetLangRows.length).toBe(6, 'targetLangRows.length');
-
-      // Assert
-      const targetLang1Row = targetLangRows.find((r) => r.name === '1');
-      const targetLang2Row = targetLangRows.find((r) => r.name === '2');
-      const targetLang3Row = targetLangRows.find((r) => r.name === '3');
-      const targetLang4Row = targetLangRows.find((r) => r.name === '4');
-      const targetLang5Row = targetLangRows.find((r) => r.name === '5');
-      const targetLang6Row = targetLangRows.find((r) => r.name === '6');
-
-      expect(targetLang1Row)
-        .withContext('target language 1')
-        .toEqual(
-          jasmine.objectContaining({
-            name: '1',
-            countFeatureUsage: 0,
-            countRegistrations: 0,
-          }),
-        );
-      expect(targetLang2Row)
-        .withContext('target language 2')
-        .toEqual(
-          jasmine.objectContaining({
-            name: '2',
-            countFeatureUsage: 1,
-            countRegistrations: 0,
-          }),
-        );
-      expect(targetLang3Row)
-        .withContext('target language 3')
-        .toEqual(
-          jasmine.objectContaining({
-            name: '3',
-            countFeatureUsage: 1,
-            countRegistrations: 0,
-          }),
-        );
-      expect(targetLang4Row)
-        .withContext('target language 4')
-        .toEqual(
-          jasmine.objectContaining({
-            name: '4',
-            countFeatureUsage: 0,
-            countRegistrations: 0,
-          }),
-        );
-      expect(targetLang5Row)
-        .withContext('target language 5')
-        .toEqual(
-          jasmine.objectContaining({
-            name: '5',
-            countFeatureUsage: 1,
-            countRegistrations: 0,
-          }),
-        );
-      expect(targetLang6Row)
-        .withContext('target language 6')
-        .toEqual(
-          jasmine.objectContaining({
-            name: '6',
-            countFeatureUsage: 1,
-            countRegistrations: 0,
-          }),
-        );
-    });
-
     it('should order the summary records correctly', () => {
       const result = service.getUserStatisticsSummary(statisticsData);
 
@@ -1213,13 +1112,6 @@ describe('FirebaseFirestoreUtilsService', () => {
         'Model 1',
         'Model 3',
         'Model 4',
-        // Languages
-        '1',
-        '2',
-        '3',
-        '4',
-        '5',
-        '6',
       ];
 
       const actualOrder = result.map((s) => s.name);

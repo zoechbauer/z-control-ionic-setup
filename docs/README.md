@@ -35,7 +35,6 @@ Guides for setting up, running, and improving Angular unit tests with Karma and 
 - **unit-testing-quick-reference.md**  
   A compact command reference for running and troubleshooting Angular unit tests with Karma and Jasmine.
 
-
 ## B. Installation
 
 - **mobile-installation-guide.md.md**  
@@ -55,11 +54,13 @@ Guides for setting up, running, and improving Angular unit tests with Karma and 
 - **clean-android-build-step-by-step.md**  
   Detailed guide for performing a clean Android build, including cleaning artifacts, syncing assets, and rebuilding in Android Studio.
 
-
 ## D. Google Firebase API
 
 - **firebase-config-enviroment-files.md**  
   Instructions for managing Firebase configuration using environment files to keep credentials out of source control. Includes local setup, usage, and security notes.
+
+- **fe-be-regression-checklist.md**  
+  Release checklist for validating frontend/backend integration between setup and translator flows, including emulator startup, callable success, Firestore updates, appId contract checks, and deployment safety.
 
 - **firebase-functions-esm-build-guide.md**  
   Step-by-step guide for building Firebase Functions with ESM, native fetch, and strict type isolation in a monorepo. Includes troubleshooting for TypeScript and module issues.

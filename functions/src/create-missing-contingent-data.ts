@@ -1,7 +1,7 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { FirebaseFirestoreService } from './firebase-firestore.service.js';
 import { getErrorMsg } from './utils.js';
-import { FireStoreConstants } from './shared/app.constants.js';
+import { FeatureType, FireStoreConstants } from './shared/app.constants.js';
 
 /**
  * Callable function to ensure the contingent data document exists for the current month.
@@ -17,13 +17,22 @@ export const createMissingContingentData = onCall(async (request) => {
   if (typeof appId !== 'string' || appId.trim() === '') {
     throw new HttpsError('invalid-argument', 'appId must be provided.');
   }
+
+  const featureType = request.data?.featureType;
+  if (featureType !== undefined && featureType !== FeatureType.MLT && featureType !== FeatureType.Feature) {
+    throw new HttpsError('invalid-argument', 'featureType must be either undefined for MLT or "feature".');
+  }
   
   try {
     const collection = FireStoreConstants.getCollectionByAppId(appId);
     const userId = auth.uid;
     
     const firestoreService = new FirebaseFirestoreService(collection, userId);
-    await firestoreService.createMissingContingentData();
+    if (featureType === FeatureType.Feature) {
+      await firestoreService.createMissingFeatureContingentData();
+    } else {
+      await firestoreService.createMissingContingentData();
+    }
     return { success: true };
   } catch (error) {
     let errorMessage = 'Error creating missing contingent data.';

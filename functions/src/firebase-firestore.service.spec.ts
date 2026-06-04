@@ -2,6 +2,8 @@ import { beforeEach, describe, it, expect, vi } from 'vitest';
 import { FireStoreConstants, UserType } from './shared/app.constants.js';
 import {
   DeviceInfo,
+  FeatureContingentData,
+  FirestoreContingentData,
   ProgrammerDeviceUID,
 } from './shared/firebase-firestore.interfaces.js';
 
@@ -61,7 +63,7 @@ describe('FirebaseFirestoreService', () => {
 
   describe('readContingentData', () => {
     it('should return contingent data from current month for the user', async () => {
-      const mockDocData = {
+      const mockDocData: FirestoreContingentData = {
         StopTranslationForAllUsers: false,
         maxFreeTranslateCharsPerMonth: 500_000,
         maxFreeTranslateCharsBufferPerMonth: 5_000,
@@ -80,7 +82,7 @@ describe('FirebaseFirestoreService', () => {
 
       expect(data, 'data').toEqual(mockDocData);
       expect(mockDoc, 'mockDoc current month').toHaveBeenCalledWith(
-        FireStoreConstants.getMetaContingentDataDocumentPath(collection)
+        FireStoreConstants.getMetaContingentDataDocumentPath(collection),
       );
       expect(mockGet).toHaveBeenCalled();
     });
@@ -95,11 +97,57 @@ describe('FirebaseFirestoreService', () => {
       service.db = { doc: mockDoc };
 
       await expect(service.readContingentData()).rejects.toThrow(
-        'Failed to read contingent data'
+        'Failed to read contingent data',
       );
 
       expect(mockDoc, 'mockDoc contingentData').toHaveBeenCalledWith(
-        FireStoreConstants.getMetaContingentDataDocumentPath(collection)
+        FireStoreConstants.getMetaContingentDataDocumentPath(collection),
+      );
+      expect(mockGet).toHaveBeenCalled();
+    });
+  });
+  
+  describe('readFeatureContingentData', () => {
+    it('should return feature contingent data from current month for the user', async () => {
+      const mockDocData: FeatureContingentData = {
+        StopFeatureUsageForAllUsers: false,
+        maxFreeFeatureCharsPerMonth: 500_000,
+        maxFreeFeatureCharsBufferPerMonth: 5_000,
+        maxFreeFeatureCharsPerMonthForUser: 10_000,
+      };
+
+      // Mock the Firestore db chain injected in the constructor
+      const mockGet = vi.fn().mockResolvedValue({ data: () => mockDocData });
+      const mockDoc = vi.fn().mockReturnValue({ get: mockGet });
+
+      // Override vi.doMock before re-import, or inject directly on the instance:
+      const service = new FirebaseFirestoreService(collection, 'testUserId');
+      service.db = { doc: mockDoc };
+
+      const data = await service.readFeatureContingentData(); // calls REAL method
+
+      expect(data, 'data').toEqual(mockDocData);
+      expect(mockDoc, 'mockDoc current month').toHaveBeenCalledWith(
+        FireStoreConstants.getMetaContingentDataDocumentPath(collection),
+      );
+      expect(mockGet).toHaveBeenCalled();
+    });
+
+    it('should throw an error if readFeatureContingentData fails', async () => {
+      const mockGet = vi
+        .fn()
+        .mockRejectedValue(new Error('Failed to read contingent data'));
+      const mockDoc = vi.fn().mockReturnValue({ get: mockGet });
+
+      const service = new FirebaseFirestoreService(collection, 'testUserId');
+      service.db = { doc: mockDoc };
+
+      await expect(service.readFeatureContingentData()).rejects.toThrow(
+        'Failed to read contingent data',
+      );
+
+      expect(mockDoc, 'mockDoc contingentData').toHaveBeenCalledWith(
+        FireStoreConstants.getMetaContingentDataDocumentPath(collection),
       );
       expect(mockGet).toHaveBeenCalled();
     });
@@ -108,7 +156,7 @@ describe('FirebaseFirestoreService', () => {
   describe('getCharCountForUser', () => {
     it('should return char count for the user', async () => {
       const mockDocData = {
-        charCount: 1234
+        charCount: 1234,
       };
       const mockGet = vi.fn().mockResolvedValue({
         exists: true,
@@ -123,7 +171,7 @@ describe('FirebaseFirestoreService', () => {
 
       expect(charCount).toEqual(mockDocData.charCount);
       expect(mockDoc).toHaveBeenCalledWith(
-        expect.stringContaining('testUserId')
+        expect.stringContaining('testUserId'),
       );
       expect(mockGet).toHaveBeenCalled();
     });
@@ -145,7 +193,81 @@ describe('FirebaseFirestoreService', () => {
 
       expect(charCount).toEqual(mockDocData.charCount);
       expect(mockDoc).toHaveBeenCalledWith(
-        expect.stringContaining('testUserId')
+        expect.stringContaining('testUserId'),
+      );
+      expect(mockGet).toHaveBeenCalled();
+    });
+  });
+
+  describe('getCharCountAndTargetLangsForUser', () => {
+    it('should return char count and target languages for the user', async () => {
+      const mockDocData = {
+        charCount: 1234,
+        targetLanguages: ['en', 'nl'],
+      };
+      const mockGet = vi.fn().mockResolvedValue({
+        exists: true,
+        data: () => mockDocData,
+      });
+      const mockDoc = vi.fn().mockReturnValue({ get: mockGet });
+
+      const service = new FirebaseFirestoreService(collection, 'testUserId');
+      service.db = { doc: mockDoc };
+
+      const charCount = await service.getCharCountAndTargetLangsForUser();
+
+      expect(charCount).toEqual(mockDocData);
+      expect(mockDoc).toHaveBeenCalledWith(
+        expect.stringContaining('testUserId'),
+      );
+      expect(mockGet).toHaveBeenCalled();
+    });
+
+    it('should return empty array for targetLanguages values for the user if target languages do not exist', async () => {
+      const mockDocData = {
+        charCount: 1234,
+      };
+      const mockGet = vi.fn().mockResolvedValue({
+        exists: true,
+        data: () => mockDocData,
+      });
+      const mockDoc = vi.fn().mockReturnValue({ get: mockGet });
+
+      const service = new FirebaseFirestoreService(collection, 'testUserId');
+      service.db = { doc: mockDoc };
+      const expectedResult = {
+        charCount: 1234,
+        targetLanguages: [],
+      };
+
+      const charCount = await service.getCharCountAndTargetLangsForUser();
+
+      expect(charCount).toEqual(expectedResult);
+      expect(mockDoc).toHaveBeenCalledWith(
+        expect.stringContaining('testUserId'),
+      );
+      expect(mockGet).toHaveBeenCalled();
+    });
+
+    it('should return default values for the user if doc does not exist', async () => {
+      const mockDocData = {
+        charCount: 0,
+        targetLanguages: [],
+      };
+      const mockGet = vi.fn().mockResolvedValue({
+        exists: false,
+        data: () => mockDocData,
+      });
+      const mockDoc = vi.fn().mockReturnValue({ get: mockGet });
+
+      const service = new FirebaseFirestoreService(collection, 'testUserId');
+      service.db = { doc: mockDoc };
+
+      const charCount = await service.getCharCountAndTargetLangsForUser();
+
+      expect(charCount).toEqual(mockDocData);
+      expect(mockDoc).toHaveBeenCalledWith(
+        expect.stringContaining('testUserId'),
       );
       expect(mockGet).toHaveBeenCalled();
     });
@@ -167,7 +289,7 @@ describe('FirebaseFirestoreService', () => {
 
       expect(totalCharCount).toEqual(mockDocData.charCount);
       expect(mockDoc).toHaveBeenCalledWith(
-        FireStoreConstants.getMetaTotalCharsDocumentPath(collection)
+        FireStoreConstants.getMetaTotalCharsDocumentPath(collection),
       );
       expect(mockGet).toHaveBeenCalled();
     });
@@ -185,7 +307,7 @@ describe('FirebaseFirestoreService', () => {
 
       expect(totalCharCount).toEqual(0);
       expect(mockDoc).toHaveBeenCalledWith(
-        FireStoreConstants.getMetaTotalCharsDocumentPath(collection)
+        FireStoreConstants.getMetaTotalCharsDocumentPath(collection),
       );
       expect(mockGet).toHaveBeenCalled();
     });
@@ -201,84 +323,126 @@ describe('FirebaseFirestoreService', () => {
       service.db = { doc: mockDoc };
 
       await expect(service.getTotalCharCount()).rejects.toThrow(
-        'Failed to get total char count'
+        'Failed to get total char count',
       );
       expect(mockConsoleError).toHaveBeenCalledWith(
         'Error getting total char count:',
-        expect.any(Error)
+        expect.any(Error),
       );
       expect(mockDoc).toHaveBeenCalledWith(
-        FireStoreConstants.getMetaTotalCharsDocumentPath(collection)
+        FireStoreConstants.getMetaTotalCharsDocumentPath(collection),
       );
       expect(mockGet).toHaveBeenCalled();
     });
   });
 
-  describe('createMissingContingentData', () => {
-    it('should create document and log if it does not exist', async () => {
-      const mockSet = vi.fn().mockResolvedValue(undefined);
-      const mockGet = vi.fn().mockResolvedValue({ exists: false });
-      const mockDocRef = { get: mockGet, set: mockSet };
-      const mockDoc = vi.fn().mockReturnValue(mockDocRef);
-      const mockConsoleLog = vi.spyOn(console, 'log');
-
+  describe('create missing contingent data', () => {
+    it('should call createMissingContingentDataExec with FeatureContingentData object', async () => {
+      const contingentData: FeatureContingentData = {
+        StopFeatureUsageForAllUsers: false,
+        maxFreeFeatureCharsPerMonthForUser: 10000,
+        maxFreeFeatureCharsPerMonth: 500000,
+        maxFreeFeatureCharsBufferPerMonth: 5000,
+      };
       const service = new FirebaseFirestoreService(collection, 'testUserId');
-      service.db = { doc: mockDoc };
-
-      await service.createMissingContingentData();
-
-      expect(mockDoc).toHaveBeenCalledWith(
-        FireStoreConstants.getMetaContingentDataDocumentPath(collection)
-      );
-      expect(mockGet).toHaveBeenCalled();
-      expect(mockSet).toHaveBeenCalledWith(
-        expect.objectContaining({ StopTranslationForAllUsers: false }),
-        { merge: true }
-      );
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        'Created control flags document with default values.'
-      );
-    });
-
-    it('should skip creating document if it already exists', async () => {
-      const mockSet = vi.fn();
-      const mockGet = vi.fn().mockResolvedValue({ exists: true });
-      const mockDocRef = { get: mockGet, set: mockSet };
-      const mockDoc = vi.fn().mockReturnValue(mockDocRef);
-
-      const service = new FirebaseFirestoreService(collection, 'testUserId');
-      service.db = { doc: mockDoc };
-
-      await service.createMissingContingentData();
-
-      expect(mockDoc).toHaveBeenCalledWith(
-        FireStoreConstants.getMetaContingentDataDocumentPath(collection)
-      );
-      expect(mockGet).toHaveBeenCalledWith();
-      expect(mockSet).not.toHaveBeenCalled();
-    });
-
-    it('should log and throw an error if get fails', async () => {
-      const mockGet = vi
+      const mockCreateMissingContingentDataExec = vi
         .fn()
-        .mockRejectedValue(new Error('Failed to check document existence'));
-      const mockDoc = vi.fn().mockReturnValue({ get: mockGet });
-      const mockConsoleError = vi.spyOn(console, 'error');
+        .mockResolvedValue(undefined);
+      (service as any).createMissingContingentDataExec =
+        mockCreateMissingContingentDataExec;
 
+      await service.createMissingFeatureContingentData();
+      expect(mockCreateMissingContingentDataExec).toHaveBeenCalledWith(
+        contingentData,
+      );
+    });
+
+    it('should call createMissingContingentDataExec with FirestoreContingentData object', async () => {
+      const contingentData: FirestoreContingentData = {
+        StopTranslationForAllUsers: false,
+        maxFreeTranslateCharsPerMonthForUser: 10000,
+        maxFreeTranslateCharsPerMonth: 500000,
+        maxFreeTranslateCharsBufferPerMonth: 5000,
+      };
       const service = new FirebaseFirestoreService(collection, 'testUserId');
-      service.db = { doc: mockDoc };
+      const mockCreateMissingContingentDataExec = vi
+        .fn()
+        .mockResolvedValue(undefined);
+      (service as any).createMissingContingentDataExec =
+        mockCreateMissingContingentDataExec;
 
-      await expect(service.createMissingContingentData()).rejects.toThrow(
-        'Failed to check document existence'
+      await service.createMissingContingentData();
+      expect(mockCreateMissingContingentDataExec).toHaveBeenCalledWith(
+        contingentData,
       );
-      expect(mockConsoleError).toHaveBeenCalledWith(
-        'Error creating missing contingent data:',
-        expect.any(Error)
-      );
-      expect(mockDoc).toHaveBeenCalledWith(
-        FireStoreConstants.getMetaContingentDataDocumentPath(collection)
-      );
-      expect(mockGet).toHaveBeenCalled();
+    });
+
+    describe('CreateMissingContingentDataEx', () => {
+      it('should create document and log if it does not exist', async () => {
+        const mockSet = vi.fn().mockResolvedValue(undefined);
+        const mockGet = vi.fn().mockResolvedValue({ exists: false });
+        const mockDocRef = { get: mockGet, set: mockSet };
+        const mockDoc = vi.fn().mockReturnValue(mockDocRef);
+        const mockConsoleLog = vi.spyOn(console, 'log');
+
+        const service = new FirebaseFirestoreService(collection, 'testUserId');
+        service.db = { doc: mockDoc };
+
+        await service.createMissingContingentData();
+
+        expect(mockDoc).toHaveBeenCalledWith(
+          FireStoreConstants.getMetaContingentDataDocumentPath(collection),
+        );
+        expect(mockGet).toHaveBeenCalled();
+        expect(mockSet).toHaveBeenCalledWith(
+          expect.objectContaining({ StopTranslationForAllUsers: false }),
+          { merge: true },
+        );
+        expect(mockConsoleLog).toHaveBeenCalledWith(
+          'Created control flags document with default values.',
+        );
+      });
+
+      it('should skip creating document if it already exists', async () => {
+        const mockSet = vi.fn();
+        const mockGet = vi.fn().mockResolvedValue({ exists: true });
+        const mockDocRef = { get: mockGet, set: mockSet };
+        const mockDoc = vi.fn().mockReturnValue(mockDocRef);
+
+        const service = new FirebaseFirestoreService(collection, 'testUserId');
+        service.db = { doc: mockDoc };
+
+        await service.createMissingContingentData();
+
+        expect(mockDoc).toHaveBeenCalledWith(
+          FireStoreConstants.getMetaContingentDataDocumentPath(collection),
+        );
+        expect(mockGet).toHaveBeenCalledWith();
+        expect(mockSet).not.toHaveBeenCalled();
+      });
+
+      it('should log and throw an error if get fails', async () => {
+        const mockGet = vi
+          .fn()
+          .mockRejectedValue(new Error('Failed to check document existence'));
+        const mockDoc = vi.fn().mockReturnValue({ get: mockGet });
+        const mockConsoleError = vi.spyOn(console, 'error');
+
+        const service = new FirebaseFirestoreService(collection, 'testUserId');
+        service.db = { doc: mockDoc };
+
+        await expect(service.createMissingContingentData()).rejects.toThrow(
+          'Failed to check document existence',
+        );
+        expect(mockConsoleError).toHaveBeenCalledWith(
+          'Error creating missing contingent data:',
+          expect.any(Error),
+        );
+        expect(mockDoc).toHaveBeenCalledWith(
+          FireStoreConstants.getMetaContingentDataDocumentPath(collection),
+        );
+        expect(mockGet).toHaveBeenCalled();
+      });
     });
   });
 
@@ -297,7 +461,7 @@ describe('FirebaseFirestoreService', () => {
       const service = new FirebaseFirestoreService(collection, 'testUserId');
       const invalidInput: any = 'not-an-array';
       await expect(
-        service.updateProgrammerDeviceUIDs(invalidInput)
+        service.updateProgrammerDeviceUIDs(invalidInput),
       ).rejects.toThrow('programmerDeviceUIDs must be an array');
     });
 
@@ -312,7 +476,7 @@ describe('FirebaseFirestoreService', () => {
 
       expect(mockUpdateUserMappingUsers).toHaveBeenCalledWith(
         { userId: 'user1', name: 'Device 1' },
-        programmerDevices
+        programmerDevices,
       );
       expect(mockCreateUserMappingProgrammerDevices).toHaveBeenCalledWith({
         userId: 'user1',
@@ -337,7 +501,7 @@ describe('FirebaseFirestoreService', () => {
       // valid devices
       expect(mockUpdateUserMappingUsers).toHaveBeenCalledWith(
         { userId: 'user1', name: 'Device 1' },
-        programmerDevices
+        programmerDevices,
       );
       expect(mockCreateUserMappingProgrammerDevices).toHaveBeenCalledWith({
         userId: 'user1',
@@ -347,11 +511,11 @@ describe('FirebaseFirestoreService', () => {
       // invalid devices
       expect(mockUpdateUserMappingUsers).not.toHaveBeenCalledWith(
         { name: 'Device 2' },
-        programmerDevices
+        programmerDevices,
       );
       expect(mockUpdateUserMappingUsers).not.toHaveBeenCalledWith(
         { userId: 'user2' },
-        programmerDevices
+        programmerDevices,
       );
 
       expect(mockCreateUserMappingProgrammerDevices).not.toHaveBeenCalledWith({
@@ -363,11 +527,11 @@ describe('FirebaseFirestoreService', () => {
 
       expect(consoleWarnSpy).toHaveBeenCalledWith(
         'Skipping device without userId or name:',
-        { name: 'Device 2' }
+        { name: 'Device 2' },
       );
       expect(consoleWarnSpy).toHaveBeenCalledWith(
         'Skipping device without userId or name:',
-        { userId: 'user2' }
+        { userId: 'user2' },
       );
     });
 
@@ -387,7 +551,7 @@ describe('FirebaseFirestoreService', () => {
       expect(mockConsoleError).toHaveBeenCalledWith(
         'Error updating user mapping for programmer device:',
         { userId: 'user1', name: 'Device 1' },
-        error
+        error,
       );
     });
   });
@@ -433,13 +597,13 @@ describe('FirebaseFirestoreService', () => {
       };
       await (service as any).updateUserMappingUsers(
         programmerDevice,
-        allDevices
+        allDevices,
       );
 
       expect(mockDoc).toHaveBeenCalledWith(
         `${FireStoreConstants.getUserMappingUsersCollectionPath(collection)}/${
           programmerDevice.userId
-        }`
+        }`,
       );
       expect(mockSet).toHaveBeenCalledWith(
         {
@@ -448,7 +612,7 @@ describe('FirebaseFirestoreService', () => {
           device: 'Device 3',
           lastUpdated: expect.any(Date),
         },
-        { merge: true }
+        { merge: true },
       );
     });
 
@@ -471,13 +635,13 @@ describe('FirebaseFirestoreService', () => {
       };
       await (service as any).updateUserMappingUsers(
         programmerDevice,
-        allDevices
+        allDevices,
       );
 
       expect(mockDoc).toHaveBeenCalledWith(
         `${FireStoreConstants.getUserMappingUsersCollectionPath(collection)}/${
           programmerDevice.userId
-        }`
+        }`,
       );
       expect(mockSet).not.toHaveBeenCalled();
       expect(mockConsoleLog).not.toHaveBeenCalled();
@@ -504,13 +668,13 @@ describe('FirebaseFirestoreService', () => {
       };
       await (service as any).updateUserMappingUsers(
         programmerDevice,
-        allDevices
+        allDevices,
       );
 
       expect(mockDoc).toHaveBeenCalledWith(
         `${FireStoreConstants.getUserMappingUsersCollectionPath(collection)}/${
           programmerDevice.userId
-        }`
+        }`,
       );
       expect(mockSet).toHaveBeenCalledWith(
         {
@@ -520,10 +684,10 @@ describe('FirebaseFirestoreService', () => {
           device: programmerDevice.name,
           createdAt: expect.any(Date),
         },
-        { merge: true }
+        { merge: true },
       );
       expect(mockConsoleLog).toHaveBeenCalledWith(
-        `User mapping document for user ${programmerDevice.userId} does not exist. Creating new document...`
+        `User mapping document for user ${programmerDevice.userId} does not exist. Creating new document...`,
       );
     });
   });
@@ -546,13 +710,13 @@ describe('FirebaseFirestoreService', () => {
         name: 'Device 3',
       };
       await (service as any).createUserMappingProgrammerDevices(
-        programmerDevice
+        programmerDevice,
       );
 
       expect(mockDoc).toHaveBeenCalledWith(
         `${FireStoreConstants.getUserMappingProgrammerDevicesCollectionPath(collection)}/${
           programmerDevice.userId
-        }`
+        }`,
       );
       expect(mockSet).toHaveBeenCalledWith(
         {
@@ -560,10 +724,10 @@ describe('FirebaseFirestoreService', () => {
           device: programmerDevice.name,
           createdAt: expect.any(Date),
         },
-        { merge: true }
+        { merge: true },
       );
       expect(mockConsoleLog).toHaveBeenCalledWith(
-        `Created programmer device mapping for userId: ${programmerDevice.userId}`
+        `Created programmer device mapping for userId: ${programmerDevice.userId}`,
       );
     });
 
@@ -584,13 +748,13 @@ describe('FirebaseFirestoreService', () => {
         name: 'Device 3',
       };
       await (service as any).createUserMappingProgrammerDevices(
-        programmerDevice
+        programmerDevice,
       );
 
       expect(mockDoc).toHaveBeenCalledWith(
         `${FireStoreConstants.getUserMappingProgrammerDevicesCollectionPath(collection)}/${
           programmerDevice.userId
-        }`
+        }`,
       );
       expect(mockSet).not.toHaveBeenCalled();
       expect(mockConsoleLog).not.toHaveBeenCalled();
@@ -615,7 +779,9 @@ describe('FirebaseFirestoreService', () => {
       const result = await service.getProgrammerDeviceUIDs();
 
       expect(mockCollection).toHaveBeenCalledWith(
-        FireStoreConstants.getUserMappingProgrammerDevicesCollectionPath(collection)
+        FireStoreConstants.getUserMappingProgrammerDevicesCollectionPath(
+          collection,
+        ),
       );
       expect(result).toEqual(mockCollectionData);
     });
@@ -634,11 +800,13 @@ describe('FirebaseFirestoreService', () => {
       const result = await service.getProgrammerDeviceUIDs();
 
       expect(mockCollection).toHaveBeenCalledWith(
-        FireStoreConstants.getUserMappingProgrammerDevicesCollectionPath(collection)
+        FireStoreConstants.getUserMappingProgrammerDevicesCollectionPath(
+          collection,
+        ),
       );
       expect(result).toEqual([]);
       expect(mockConsoleLog).toHaveBeenCalledWith(
-        'No programmer devices found in Firestore.'
+        'No programmer devices found in Firestore.',
       );
     });
 
@@ -653,11 +821,11 @@ describe('FirebaseFirestoreService', () => {
       service.db = { collection: mockCollection };
 
       await expect(service.getProgrammerDeviceUIDs()).rejects.toThrow(
-        'Failed to get programmer devices'
+        'Failed to get programmer devices',
       );
       expect(mockConsoleError).toHaveBeenCalledWith(
         'Error retrieving programmer devices from Firestore:',
-        expect.any(Error)
+        expect.any(Error),
       );
     });
   });
@@ -686,7 +854,9 @@ describe('FirebaseFirestoreService', () => {
       const result = await service.isProgrammerDevice();
 
       expect(mockCollection).toHaveBeenCalledWith(
-        FireStoreConstants.getUserMappingProgrammerDevicesCollectionPath(collection)
+        FireStoreConstants.getUserMappingProgrammerDevicesCollectionPath(
+          collection,
+        ),
       );
       expect(result).toBe(true);
     });
@@ -705,7 +875,9 @@ describe('FirebaseFirestoreService', () => {
       const result = await service.isProgrammerDevice();
 
       expect(mockCollection).toHaveBeenCalledWith(
-        FireStoreConstants.getUserMappingProgrammerDevicesCollectionPath(collection)
+        FireStoreConstants.getUserMappingProgrammerDevicesCollectionPath(
+          collection,
+        ),
       );
       expect(result).toBe(false);
     });
@@ -724,11 +896,13 @@ describe('FirebaseFirestoreService', () => {
       const result = await service.isProgrammerDevice();
 
       expect(mockCollection).toHaveBeenCalledWith(
-        FireStoreConstants.getUserMappingProgrammerDevicesCollectionPath(collection)
+        FireStoreConstants.getUserMappingProgrammerDevicesCollectionPath(
+          collection,
+        ),
       );
       expect(result).toBe(false);
       expect(mockConsoleLog).toHaveBeenCalledWith(
-        'No programmer devices found in Firestore.'
+        'No programmer devices found in Firestore.',
       );
     });
 
@@ -744,15 +918,17 @@ describe('FirebaseFirestoreService', () => {
       service.userId = 'user1';
 
       await expect(service.isProgrammerDevice()).rejects.toThrow(
-        'Failed to get programmer devices'
+        'Failed to get programmer devices',
       );
 
       expect(mockCollection).toHaveBeenCalledWith(
-        FireStoreConstants.getUserMappingProgrammerDevicesCollectionPath(collection)
+        FireStoreConstants.getUserMappingProgrammerDevicesCollectionPath(
+          collection,
+        ),
       );
       expect(mockConsoleError).toHaveBeenCalledWith(
         'Error checking if device is a programmer device from Firestore:',
-        expect.any(Error)
+        expect.any(Error),
       );
     });
   });
@@ -798,7 +974,7 @@ describe('FirebaseFirestoreService', () => {
       await service.addUser(userId, programmerDeviceUIDs, deviceInfo, isNative);
 
       expect(mockDoc).toHaveBeenCalledWith(
-        `${FireStoreConstants.getUserMappingUsersCollectionPath(collection)}/${userId}`
+        `${FireStoreConstants.getUserMappingUsersCollectionPath(collection)}/${userId}`,
       );
       expect(mockGet).toHaveBeenCalled();
       expect(mockSet).toHaveBeenCalledExactlyOnceWith(
@@ -811,11 +987,11 @@ describe('FirebaseFirestoreService', () => {
           userId,
           createdAt: expect.any(Date),
         },
-        { merge: true }
+        { merge: true },
       );
       expect(mockGetUserName).toHaveBeenCalledExactlyOnceWith(
         userId,
-        programmerDeviceUIDs
+        programmerDeviceUIDs,
       );
       expect(mockConsoleLog).not.toHaveBeenCalled();
     });
@@ -838,7 +1014,7 @@ describe('FirebaseFirestoreService', () => {
       await service.addUser(userId, programmerDeviceUIDs, deviceInfo);
 
       expect(mockDoc).toHaveBeenCalledWith(
-        `${FireStoreConstants.getUserMappingUsersCollectionPath(collection)}/${userId}`
+        `${FireStoreConstants.getUserMappingUsersCollectionPath(collection)}/${userId}`,
       );
       expect(mockGet).toHaveBeenCalled();
       expect(mockSet).toHaveBeenCalledExactlyOnceWith(
@@ -851,11 +1027,11 @@ describe('FirebaseFirestoreService', () => {
           userId,
           createdAt: expect.any(Date),
         },
-        { merge: true }
+        { merge: true },
       );
       expect(mockGetUserName).toHaveBeenCalledExactlyOnceWith(
         userId,
-        programmerDeviceUIDs
+        programmerDeviceUIDs,
       );
       expect(mockConsoleLog).not.toHaveBeenCalled();
     });
@@ -878,7 +1054,7 @@ describe('FirebaseFirestoreService', () => {
       await service.addUser(userId, programmerDeviceUIDs, deviceInfo, isNative);
 
       expect(mockDoc).toHaveBeenCalledWith(
-        `${FireStoreConstants.getUserMappingUsersCollectionPath(collection)}/${userId}`
+        `${FireStoreConstants.getUserMappingUsersCollectionPath(collection)}/${userId}`,
       );
       expect(mockGet).toHaveBeenCalled();
       expect(mockSet).toHaveBeenCalledExactlyOnceWith(
@@ -891,11 +1067,11 @@ describe('FirebaseFirestoreService', () => {
           userId,
           createdAt: expect.any(Date),
         },
-        { merge: true }
+        { merge: true },
       );
       expect(mockGetUserName).toHaveBeenCalledExactlyOnceWith(
         userId,
-        programmerDeviceUIDs
+        programmerDeviceUIDs,
       );
       expect(mockConsoleLog).not.toHaveBeenCalled();
     });
@@ -904,11 +1080,11 @@ describe('FirebaseFirestoreService', () => {
       const service = new FirebaseFirestoreService(collection, 'testUserId');
 
       await expect(
-        service.addUser('', programmerDeviceUIDs, deviceInfo, isNative)
+        service.addUser('', programmerDeviceUIDs, deviceInfo, isNative),
       ).rejects.toThrow('userId must be provided');
 
       await expect(service.addUser()).rejects.toThrow(
-        'userId must be provided'
+        'userId must be provided',
       );
     });
 
@@ -936,7 +1112,7 @@ describe('FirebaseFirestoreService', () => {
       await service.addUser(userId, programmerDeviceUIDs, deviceInfo);
 
       expect(mockDoc).toHaveBeenCalledWith(
-        `${FireStoreConstants.getUserMappingUsersCollectionPath(collection)}/${userId}`
+        `${FireStoreConstants.getUserMappingUsersCollectionPath(collection)}/${userId}`,
       );
       expect(mockGet).toHaveBeenCalled();
       expect(mockSet).toHaveBeenCalledExactlyOnceWith(
@@ -945,11 +1121,11 @@ describe('FirebaseFirestoreService', () => {
           isNative,
           lastUpdated: expect.any(Date),
         },
-        { merge: true }
+        { merge: true },
       );
       expect(mockConsoleLog).toHaveBeenCalledWith(
         'Updated user mapping document with device info for user:',
-        userId
+        userId,
       );
     });
 
@@ -982,7 +1158,7 @@ describe('FirebaseFirestoreService', () => {
       await service.addUser(userId, programmerDeviceUIDs, deviceInfo);
 
       expect(mockDoc).toHaveBeenCalledWith(
-        `${FireStoreConstants.getUserMappingUsersCollectionPath(collection)}/${userId}`
+        `${FireStoreConstants.getUserMappingUsersCollectionPath(collection)}/${userId}`,
       );
       expect(mockGet).toHaveBeenCalled();
       expect(mockSet).toHaveBeenCalledExactlyOnceWith(
@@ -991,11 +1167,11 @@ describe('FirebaseFirestoreService', () => {
           isNative,
           lastUpdated: expect.any(Date),
         },
-        { merge: true }
+        { merge: true },
       );
       expect(mockConsoleLog).toHaveBeenCalledWith(
         'Updated user mapping document with device info for user:',
-        userId
+        userId,
       );
     });
 
@@ -1024,7 +1200,7 @@ describe('FirebaseFirestoreService', () => {
       await service.addUser(userId, programmerDeviceUIDs, deviceInfo);
 
       expect(mockDoc).toHaveBeenCalledWith(
-        `${FireStoreConstants.getUserMappingUsersCollectionPath(collection)}/${userId}`
+        `${FireStoreConstants.getUserMappingUsersCollectionPath(collection)}/${userId}`,
       );
       expect(mockGet).toHaveBeenCalled();
       expect(mockSet).not.toHaveBeenCalled();
@@ -1048,7 +1224,7 @@ describe('FirebaseFirestoreService', () => {
       expect(mockConsoleError).toHaveBeenCalledWith(
         'Error upserting user:',
         userId,
-        expect.any(Error)
+        expect.any(Error),
       );
     });
 
@@ -1081,7 +1257,7 @@ describe('FirebaseFirestoreService', () => {
       expect(mockConsoleError).toHaveBeenCalledWith(
         'Error upserting user:',
         userId,
-        expect.any(Error)
+        expect.any(Error),
       );
     });
   });
@@ -1102,7 +1278,7 @@ describe('FirebaseFirestoreService', () => {
 
       const result = await (service as any).getUserName(
         'user3',
-        programmerDevices
+        programmerDevices,
       );
 
       expect(mockCountUser).toHaveBeenCalledWith(UserType.User);
@@ -1116,7 +1292,7 @@ describe('FirebaseFirestoreService', () => {
 
       const result = await (service as any).getUserName(
         'user1',
-        programmerDevices
+        programmerDevices,
       );
 
       expect(mockCountUser).toHaveBeenCalledWith(UserType.Programmer);
@@ -1136,7 +1312,7 @@ describe('FirebaseFirestoreService', () => {
       const result = await (service as any).countUser(UserType.Programmer);
 
       expect(mockCollection).toHaveBeenCalledWith(
-        FireStoreConstants.getUserMappingUsersCollectionPath(collection)
+        FireStoreConstants.getUserMappingUsersCollectionPath(collection),
       );
       expect(mockWhere).toHaveBeenCalledWith('type', '==', UserType.Programmer);
       expect(result).toBe(3);
@@ -1153,7 +1329,7 @@ describe('FirebaseFirestoreService', () => {
       const result = await (service as any).countUser(UserType.User);
 
       expect(mockCollection).toHaveBeenCalledWith(
-        FireStoreConstants.getUserMappingUsersCollectionPath(collection)
+        FireStoreConstants.getUserMappingUsersCollectionPath(collection),
       );
       expect(mockWhere).toHaveBeenCalledWith('type', '==', UserType.User);
       expect(result).toBe(0);
@@ -1171,12 +1347,12 @@ describe('FirebaseFirestoreService', () => {
       service.db = { collection: mockCollection };
 
       await expect((service as any).countUser(UserType.User)).rejects.toThrow(
-        'Error counting users for type: ' + UserType.User
+        'Error counting users for type: ' + UserType.User,
       );
       expect(mockConsoleError).toHaveBeenCalledWith(
         'Error getting user number for type:',
         UserType.User,
-        expect.any(Error)
+        expect.any(Error),
       );
     });
   });
@@ -1185,17 +1361,20 @@ describe('FirebaseFirestoreService', () => {
     const count = 5;
     const selectedLanguages = ['en', 'fr'];
 
-    let mockUpdateUserCharCount: any;
+    let updateUserCharCountAndTargetLanguages: any;
     let mockUpdateTotalCharCount: any;
     let service: any;
 
     beforeEach(() => {
-      mockUpdateUserCharCount = vi.fn().mockResolvedValue(undefined);
+      updateUserCharCountAndTargetLanguages = vi
+        .fn()
+        .mockResolvedValue(undefined);
       mockUpdateTotalCharCount = vi.fn().mockResolvedValue(undefined);
 
       service = new FirebaseFirestoreService(collection, 'testUserId');
 
-      (service as any).updateUserCharCount = mockUpdateUserCharCount;
+      (service as any).updateUserCharCountAndTargetLanguages =
+        updateUserCharCountAndTargetLanguages;
       (service as any).updateTotalCharCount = mockUpdateTotalCharCount;
     });
 
@@ -1203,9 +1382,9 @@ describe('FirebaseFirestoreService', () => {
       (service as any).userId = 'user1';
       await service.addTranslatedChars(count, selectedLanguages);
 
-      expect(mockUpdateUserCharCount).toHaveBeenCalledWith(
+      expect(updateUserCharCountAndTargetLanguages).toHaveBeenCalledWith(
         count,
-        selectedLanguages
+        selectedLanguages,
       );
       expect(mockUpdateTotalCharCount).toHaveBeenCalledWith(count);
     });
@@ -1214,20 +1393,20 @@ describe('FirebaseFirestoreService', () => {
       (service as any).userId = null;
       await service.addTranslatedChars(count, selectedLanguages);
 
-      expect(mockUpdateUserCharCount).not.toHaveBeenCalled();
+      expect(updateUserCharCountAndTargetLanguages).not.toHaveBeenCalled();
       expect(mockUpdateTotalCharCount).not.toHaveBeenCalled();
     });
 
     it('should log error if updateUserCharCount fails', async () => {
       (service as any).userId = 'user1';
       const error = new Error('Failed to update user char count');
-      mockUpdateUserCharCount.mockRejectedValue(error);
+      updateUserCharCountAndTargetLanguages.mockRejectedValue(error);
       const mockConsoleError = vi.spyOn(console, 'error');
 
       await service.addTranslatedChars(count, selectedLanguages);
       expect(mockConsoleError).toHaveBeenCalledWith(
         'Error writing user char count document:',
-        error
+        error,
       );
       expect(mockUpdateTotalCharCount).toHaveBeenCalledWith(count);
     });
@@ -1241,16 +1420,78 @@ describe('FirebaseFirestoreService', () => {
       await service.addTranslatedChars(count, selectedLanguages);
       expect(mockConsoleError).toHaveBeenCalledWith(
         'Error writing total char count document:',
-        error
+        error,
       );
-      expect(mockUpdateUserCharCount).toHaveBeenCalledWith(
+      expect(updateUserCharCountAndTargetLanguages).toHaveBeenCalledWith(
         count,
-        selectedLanguages
+        selectedLanguages,
       );
     });
   });
 
-  describe('updateUserCharCount', () => {
+  describe('addConsumedFeatureChars', () => {
+    const count = 5;
+
+    let updateUserCharCount: any;
+    let mockUpdateTotalCharCount: any;
+    let service: any;
+
+    beforeEach(() => {
+      updateUserCharCount = vi.fn().mockResolvedValue(undefined);
+      mockUpdateTotalCharCount = vi.fn().mockResolvedValue(undefined);
+
+      service = new FirebaseFirestoreService(collection, 'testUserId');
+
+      (service as any).updateUserCharCount = updateUserCharCount;
+      (service as any).updateTotalCharCount = mockUpdateTotalCharCount;
+    });
+
+    it('should update user and total char counts', async () => {
+      (service as any).userId = 'user1';
+      await service.addConsumedFeatureChars(count);
+
+      expect(updateUserCharCount).toHaveBeenCalledWith(count);
+      expect(mockUpdateTotalCharCount).toHaveBeenCalledWith(count);
+    });
+
+    it('should exit function if userId is not set', async () => {
+      (service as any).userId = null;
+      await service.addConsumedFeatureChars(count);
+
+      expect(updateUserCharCount).not.toHaveBeenCalled();
+      expect(mockUpdateTotalCharCount).not.toHaveBeenCalled();
+    });
+
+    it('should log error if updateUserCharCount fails', async () => {
+      (service as any).userId = 'user1';
+      const error = new Error('Failed to update user char count');
+      updateUserCharCount.mockRejectedValue(error);
+      const mockConsoleError = vi.spyOn(console, 'error');
+
+      await service.addConsumedFeatureChars(count);
+      expect(mockConsoleError).toHaveBeenCalledWith(
+        'Error writing user char count document:',
+        error,
+      );
+      expect(mockUpdateTotalCharCount).toHaveBeenCalledWith(count);
+    });
+
+    it('should log error if updateTotalCharCount fails', async () => {
+      (service as any).userId = 'user1';
+      const error = new Error('Failed to update total char count');
+      mockUpdateTotalCharCount.mockRejectedValue(error);
+      const mockConsoleError = vi.spyOn(console, 'error');
+
+      await service.addConsumedFeatureChars(count);
+      expect(mockConsoleError).toHaveBeenCalledWith(
+        'Error writing total char count document:',
+        error,
+      );
+      expect(updateUserCharCount).toHaveBeenCalledWith(count);
+    });
+  });
+
+  describe('updateUserCharCountAndTargetLanguages', () => {
     it('should update user char count and target languages', async () => {
       const mockSet = vi.fn().mockResolvedValue(undefined);
       const mockDoc = vi.fn().mockReturnValue({ set: mockSet });
@@ -1262,10 +1503,13 @@ describe('FirebaseFirestoreService', () => {
       const count = 25;
       const selectedLanguages = ['en', 'fr'];
 
-      await (service as any).updateUserCharCount(count, selectedLanguages);
+      await (service as any).updateUserCharCountAndTargetLanguages(
+        count,
+        selectedLanguages,
+      );
 
       expect(mockDoc).toHaveBeenCalledWith(
-        `${FireStoreConstants.getUsersCollectionPath(collection)}/${service.userId}`
+        `${FireStoreConstants.getUsersCollectionPath(collection)}/${service.userId}`,
       );
       expect(mockIncrement).toHaveBeenCalledWith(count);
       expect(mockSet).toHaveBeenCalledWith(
@@ -1274,7 +1518,34 @@ describe('FirebaseFirestoreService', () => {
           targetLanguages: selectedLanguages,
           lastUpdated: expect.any(Date),
         },
-        { merge: true }
+        { merge: true },
+      );
+    });
+  });
+
+  describe('updateUserCharCount', () => {
+    it('should update user char count', async () => {
+      const mockSet = vi.fn().mockResolvedValue(undefined);
+      const mockDoc = vi.fn().mockReturnValue({ set: mockSet });
+
+      const service = new FirebaseFirestoreService(collection, 'testUserId');
+      service.db = { doc: mockDoc };
+      service.userId = 'user1';
+
+      const count = 25;
+
+      await (service as any).updateUserCharCount(count);
+
+      expect(mockDoc).toHaveBeenCalledWith(
+        `${FireStoreConstants.getUsersCollectionPath(collection)}/${service.userId}`,
+      );
+      expect(mockIncrement).toHaveBeenCalledWith(count);
+      expect(mockSet).toHaveBeenCalledWith(
+        {
+          charCount: { __incrementBy: count },
+          lastUpdated: expect.any(Date),
+        },
+        { merge: true },
       );
     });
   });
@@ -1292,7 +1563,7 @@ describe('FirebaseFirestoreService', () => {
       await (service as any).updateTotalCharCount(count);
 
       expect(mockDoc).toHaveBeenCalledWith(
-        FireStoreConstants.getMetaTotalCharsDocumentPath(collection)
+        FireStoreConstants.getMetaTotalCharsDocumentPath(collection),
       );
       expect(mockIncrement).toHaveBeenCalledWith(count);
       expect(mockSet).toHaveBeenCalledWith(
@@ -1300,7 +1571,7 @@ describe('FirebaseFirestoreService', () => {
           charCount: { __incrementBy: count },
           lastUpdated: expect.any(Date),
         },
-        { merge: true }
+        { merge: true },
       );
     });
   });

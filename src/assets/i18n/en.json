@@ -3,7 +3,12 @@
   "APP": {
     "NAME": "z-control IONIC Setup",
     "LOADING_DATA": "Loading data...",
-    "UNDER_CONSTRUCTION": "This feature is under construction."
+    "UNDER_CONSTRUCTION": "This feature is under construction.",
+    "MAIN": {
+      "TOAST": {
+        "ERROR_CALLING_FEATURE": "Error calling the main feature. Please try again later or use another word."
+      }
+    }
   },
   "------ header page": "-------",
   "HEADER": {
@@ -59,7 +64,8 @@
     "TOAST": {
       "QUOTA_REDUCED": "The monthly quota has been reduced.",
       "CONTINGENT_EXCEEDED": "Feature quota exceeded. Please try again next month.",
-      "ERROR_CALLING_FEATURE": "Error calling the main feature. Please try again later."
+      "ERROR_CALLING_FEATURE": "Error calling the main feature. Please try again later or use another word.",
+      "ERROR_CREATING_MISSING_CONTINGENT_DATA": "Error creating missing contingent data."
     }
   },
 
@@ -151,7 +157,7 @@
         "CHECKSUM_ALL_USERS": "Used by all users",
         "CHARS": "Characters",
         "GRID_INFO_NOTE": "Sorted in descending order by the date of the last feature usage",
-        "GRID_SEARCH_INFO": "Text=User & Platform, <|>=used chars, <<|>>=lang",
+        "GRID_SEARCH_INFO": "Text for User & Platform; Used Characters: >|<",
         "USER_STATISTICS_OVERVIEW": "User Statistics Overview",
         "JSON_DATA": "Raw Data (JSON) - Debug Only"
       },

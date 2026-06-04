@@ -10,6 +10,19 @@ Created as a starter template for building modern, user-friendly Ionic apps with
 
 Download now for free and use it to create your own Ionic apps!
 
+## Multi-App Backend Role
+
+This repository is used in two roles:
+
+- Ionic setup app starter template for new z-control apps
+- Canonical backend source for shared Firebase Functions across z-control apps
+
+Practical rule:
+
+- Implement and maintain shared backend function code in this repository
+- Deploy shared Firebase Functions from this repository only
+- Other app repositories may contain frontend-only changes and should not deploy shared functions
+
 ## Download & Online Access
 
 - **Web App:**  
@@ -34,9 +47,43 @@ Download now for free and use it to create your own Ionic apps!
 ## 📁 Project Structure
 
 ```
-TODO - add project structure overview here, or link to a separate file with detailed structure explanation
+z-control-ionic-setup/
+├── src/                         # Angular/Ionic frontend source
+│   ├── app/                     # Pages, components, services, shared code
+│   ├── assets/                  # Static assets, logs, language files
+│   ├── environments/            # Environment configuration
+│   └── theme/                   # Global theme variables
+├── functions/                   # Firebase Functions (shared backend source)
+│   ├── src/                     # Callable handlers, services, shared backend constants/interfaces
+│   └── lib/                     # Compiled backend output
+├── docs/                        # Project and architecture documentation
+│   └── unit-tests/              # Testing tutorials and quick references
+├── tools/                       # Utility scripts and templates
+├── resources/                   # App icons, splash screens, platform resources
+├── www/                         # Built web output (hosting target)
+├── angular.json                 # Angular workspace config
+├── capacitor.config.ts          # Capacitor app config
+├── firebase.json                # Firebase hosting/functions config
+└── package.json                 # Frontend scripts and dependencies
 
 ```
+
+## Development Workflow
+
+Use this workflow when you build a new feature for another z-control app (for example translator) that needs backend changes.
+
+1. Implement backend changes in this setup repository (`functions/src`).
+2. Start Firebase emulators from this setup repository.
+3. Run the target frontend app (for example translator) with `ionic serve`.
+4. Test FE and BE integration against the setup backend/emulator.
+5. Deploy shared Firebase Functions from this setup repository only.
+6. Deploy the target frontend app after integration tests pass.
+
+Why this works:
+
+- Shared backend stays in one source of truth.
+- Function deployments remain safe and predictable.
+- Frontend repos can evolve independently without backend deployment ownership.
 
 ## Getting Started
 
@@ -85,9 +132,43 @@ cd android
 
 ## Documentation
 
-[How to use this setup app](docs/z-control-ionic-setup-usage.md)
+### Start Here
 
-[GitHub Copilot support guide](docs/github-copilot-support.md)
+- [How to use this setup app](docs/z-control-ionic-setup-usage.md)
+- [Docs index](docs/README.md)
+- [Coding guidelines](docs/coding-guidelines.md)
+- [GitHub Copilot support guide](docs/github-copilot-support.md)
+
+### Firebase And Backend Architecture
+
+- [Firebase Functions setup and deploy](docs/firebase-functions-setup-and-deploy.md)
+- [Multi-app Firebase Functions deploy playbook](docs/firebase-functions-multi-app-deploy-playbook.md)
+- [Firebase codebase, runtime, and appId security](docs/firebase-codebase-runtime-and-appid-security.md)
+- [Firebase config environment files](docs/firebase-config-enviroment-files.md)
+- [Firebase Functions ESM build guide](docs/firebase-functions-esm-build-guide.md)
+
+### Feature-Specific And Local Testing Guides
+
+- [Local testing guide secureTranslate](docs/local-testing-guide-secureTranslate.md)
+- [Anonymous login](docs/anonymous-login.md)
+- [Standalone config](docs/standalone-config.md)
+- [Why use runInInjectionContext](docs/why-use-runInInjectionContext.md)
+
+### Testing Documentation
+
+- [Unit tests folder](docs/unit-tests)
+- [FE/BE regression checklist](docs/fe-be-regression-checklist.md)
+- [Unit testing quick reference](docs/unit-tests/unit-testing-quick-reference.md)
+- [Unit testing learning roadmap](docs/unit-tests/unit-testing-learning-roadmap.md)
+- [Test types FE/BE](docs/unit-tests/test-types-fe-be.md)
+- [Karma test runner scrolling fix](docs/unit-tests/karma-test-runner-scrolling-fix.md)
+- [Jasmine vs Vitest](docs/unit-tests/jasmine-vs-vitest.md)
+- [Functions Vitest setup](docs/unit-tests/functions-vitest-setup.md)
+
+### Operations And Maintenance
+
+- [Android installation troubleshooting](docs/solving-installation-problems-android.md)
+- [Environment and programmer devices TODO list](docs/todo-list-environment-programmer-devices.md)
 
 ## Tools
 

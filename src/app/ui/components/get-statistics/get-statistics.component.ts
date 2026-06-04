@@ -195,7 +195,7 @@ export class GetStatisticsComponent implements OnInit, OnDestroy {
       this.currentUserUid = await this.localStorageService.loadFirestoreUid();
 
       // Read control flags
-      this.contingentData = await this.firestoreService.readContingentData(
+      this.contingentData = await this.firestoreService.readFeatureContingentData(
         this.filterSelectedMonth,
       );
       this.isStopped = !!this.contingentData.StopFeatureUsageForAllUsers;
@@ -230,7 +230,7 @@ export class GetStatisticsComponent implements OnInit, OnDestroy {
           this.statisticsData?.displayedUserStatistics ?? [],
         );
 
-      // Calculate the sum of all users' translated characters
+      // Calculate the sum of all users' consumed feature characters
       this.allUsersCharCount =
         this.statisticsData?.displayedUserStatistics.reduce(
           (sum, userStat) => sum + userStat.consumedFeatureCharCount,
@@ -257,15 +257,12 @@ export class GetStatisticsComponent implements OnInit, OnDestroy {
    *
    * Supported filter modes:
    * - Text search (default): matches `userName` or `displayedPlatform` (case-insensitive).
-   * - Translated character count:
-   *   - `>123` => rows with `translatedCharCount > 123`
-   *   - `<10`  => rows with `translatedCharCount < 10`
-   * - Target language count:
-   *   - `>>5` => rows with `targetLanguages.length > 5`
-   *   - `<<1` => rows with `targetLanguages.length < 1`
+   * - Consumed Feature character count:
+   *   - `>123` => rows with `consumedFeatureCharCount > 123`
+   *   - `<10`  => rows with `consumedFeatureCharCount < 10`
    *
    * Notes:
-   * - Optional spaces after operators are supported (for example `> 123`, `>> 5`).
+   * - Optional spaces after operators are supported (for example `> 123`).
    * - If the search term is empty, all rows are returned unchanged.
    */
   private applyUserStatsFilter(): void {
@@ -277,20 +274,7 @@ export class GetStatisticsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Target language count filters: >>5 or <<1
-    const targetMatch = /^(>>|<<)\s*(\d+)$/.exec(term);
-    if (targetMatch) {
-      const operator = targetMatch[1];
-      const value = Number(targetMatch[2]);
-
-      this.filteredUserStatsRows = rows.filter((u) => {
-        const count = u.targetLanguages?.length ?? 0;
-        return operator === '>>' ? count > value : count < value;
-      });
-      return;
-    }
-
-    // Translated character count filters: >123 or <10
+    // Consumed Feature character count filters: >123 or <10
     const charMatch = /^([<>])\s*(\d+)$/.exec(term);
     if (charMatch) {
       const operator = charMatch[1];

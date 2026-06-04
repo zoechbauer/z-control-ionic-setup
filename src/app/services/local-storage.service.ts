@@ -28,7 +28,7 @@ export class LocalStorageService {
    * Emits the currently selected base language code (e.g. 'en', 'de').
    */
   selectedLanguageSubject = new BehaviorSubject<string>(
-    this.getMobileDefaultLanguage()
+    this.getMobileDefaultLanguage(),
   );
   /**
    * Observable for the currently selected base language code.
@@ -38,14 +38,14 @@ export class LocalStorageService {
    * Emits the name of the currently selected base language (e.g. 'English', 'Deutsch').
    */
   selectedLanguageNameSubject = new BehaviorSubject<string>(
-    this.getMobileDefaultLanguage()
+    this.getMobileDefaultLanguage(),
   );
 
   /**
    * Emits the current display mode for statistics (User or Programmer).
    */
   statisticsDisplayModeSubject = new BehaviorSubject<DisplayMode>(
-    DisplayMode.User
+    DisplayMode.User,
   );
   /**
    * Observable for the current display mode for statistics.
@@ -63,7 +63,7 @@ export class LocalStorageService {
 
   constructor(
     private readonly storage: Storage,
-    private readonly utilsService: UtilsService
+    private readonly utilsService: UtilsService,
   ) {}
 
   private async initStorage() {
@@ -71,15 +71,15 @@ export class LocalStorageService {
   }
 
   /**
-   * Initializes the storage and loads selected language, target languages, and text-to-speech values.
+   * Initializes the storage service and loads necessary data.
    * @param translate The TranslateService instance
    */
   async initializeServicesAsync(
-    translate: import('@ngx-translate/core').TranslateService
+    translate: import('@ngx-translate/core').TranslateService,
   ): Promise<void> {
     try {
       await this.initStorage();
-      const lang = await this.loadSelectedOrDefaultLanguage();
+      await this.loadSelectedOrDefaultLanguage();
       await this.loadFirestoreUid();
     } catch (error) {
       console.error('App initialization failed:', error);
@@ -91,7 +91,7 @@ export class LocalStorageService {
    * Fallback: sets default language to 'en' in TranslateService
    */
   private async initializeWithDefaults(
-    translate: import('@ngx-translate/core').TranslateService
+    translate: import('@ngx-translate/core').TranslateService,
   ): Promise<void> {
     try {
       translate.setDefaultLang('en');
@@ -108,7 +108,7 @@ export class LocalStorageService {
    */
   async loadSelectedOrDefaultLanguage(): Promise<string> {
     const selectedLanguage = await this.storage.get(
-      LocalStorage.SelectedLanguage
+      LocalStorage.SelectedLanguage,
     );
 
     if (selectedLanguage) {
@@ -138,6 +138,10 @@ export class LocalStorageService {
     }
   }
 
+  /**
+   * Determines the default language for the mobile device.
+   * @returns The default language code ('de' or 'en')
+   */
   private getMobileDefaultLanguage(): string {
     const lang = navigator.language.split('-')[0]; // e.g. "de-DE" -> "de"
     return /(de|en)/gi.test(lang) ? lang : 'en';
@@ -168,6 +172,10 @@ export class LocalStorageService {
     }
   }
 
+  /**
+   * Loads the statistics display mode from storage and updates the observable.
+   * @returns The stored display mode or User mode as default
+   */
   async getStatisticsDisplayMode(): Promise<DisplayMode> {
     let displayMode: DisplayMode;
     const rawValue = await this.storage.get(LocalStorage.StatisticsDisplayMode);
@@ -217,11 +225,11 @@ export class LocalStorageService {
    */
   async getStatisticsSelectedMonth(
     allMonthsOptionFormat: AllMonthsOption,
-    isProgrammerDevice = false
+    isProgrammerDevice = false,
   ): Promise<string> {
     let selectedMonth: string;
     const rawValue: string = await this.storage.get(
-      LocalStorage.StatisticsSelectedMonth
+      LocalStorage.StatisticsSelectedMonth,
     );
     const currentMonth = this.utilsService.getCurrentMonth();
 
@@ -269,7 +277,7 @@ export class LocalStorageService {
           : AllMonthsOption.localStorageValue;
       await this.storage.set(
         LocalStorage.StatisticsSelectedMonth,
-        convertedSelectedMonth
+        convertedSelectedMonth,
       );
       this.statisticsSelectedMonthSubject.next(convertedSelectedMonth);
     } catch (error) {

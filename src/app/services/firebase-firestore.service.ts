@@ -24,7 +24,6 @@ import { FireStoreConstants } from '../shared/app.constants';
 import { UtilsService } from './utils.service';
 import { LocalStorageService } from './local-storage.service';
 import {
-  FirestoreContingentData,
   UserFeatureUsageStatistics,
   UserType,
   ProgrammerDeviceUID,
@@ -64,13 +63,17 @@ export class FirebaseFirestoreService {
     this.injector = inject(Injector);
   }
 
+  /**
+   * Returns whether the current device is a programmer device.
+   */
   get isProgrammerDevice(): boolean {
     return this.cachedIsProgrammerDevice;
   }
 
+
   /**
-   * Initializes the Firestore service.
-   * Currently, it authenticates the user and sets up user mapping and control flags.
+   * Initializes the Firebase Firestore service by authenticating the user, 
+   * determining if it's a programmer device, and refreshing relevant data.
    */
   async init() {
     await this.authenticateUser();
@@ -265,6 +268,12 @@ export class FirebaseFirestoreService {
     }
   }
 
+  /**
+   * Checks if a user has any feature usage in a given month.
+   * @param userId The UID of the user to check.
+   * @param month The month to check for feature usage.
+   * @returns True if the user has feature usage in the specified month, false otherwise.
+   */
   private userHasFeatureUsageInMonth(userId: string, month: string): boolean {
     const featureUsageForMonth = this.cachedFeatureUsage.get(month);
     if (featureUsageForMonth) {
@@ -278,7 +287,7 @@ export class FirebaseFirestoreService {
 
   /**
    * Adds a user to the user mapping collection if not already present.
-   * Assigns a name in the form "U-<n>" for users or "P-<n>" for programmers.
+   * Assigns a name in the form "U-<n>" for users or "P-<n>" for programmers, e.g. U-1, P-1, etc.
    *
    * @param userId The UID of the user to add.
    */
@@ -338,6 +347,10 @@ export class FirebaseFirestoreService {
     }
   }
 
+  /**
+   * Checks if the current device is a programmer device.
+   * @returns True if the current device is a programmer device, false otherwise.
+   */
   public async getIsProgrammerDevice(): Promise<boolean> {
     try {
       const callable = runInInjectionContext(this.injector, () =>
@@ -502,7 +515,9 @@ export class FirebaseFirestoreService {
   }
 
   /**
-   * Retrieves the current character count for the authenticated user from Firestore.
+   * Retrieves the current number of feature usage characters for the authenticated user from Firestore.
+   * If the document does not exist (e.g., at the start of a new month), the function returns 0.
+   * 
    * @returns Promise resolving to the user's current character count.
    */
   async getCharCountForUser(): Promise<number> {
@@ -563,6 +578,7 @@ export class FirebaseFirestoreService {
   /**
    * Retrieves feature usage statistics for all users for the selected month or all months from Firestore.
    *  @param selectedMonth The month for which to retrieve user feature usage statistics or all for all user feature usage statistics.
+   * 
    *  @returns An array of UserFeatureUsageStatistics objects.
    */
   async getAllUserFeatureUsageStatistics(
@@ -598,6 +614,7 @@ export class FirebaseFirestoreService {
 
   /**
    * Retrieves feature usage statistics for all users for the selected month.
+   * 
    *  @param selectedMonth The month for which to retrieve user feature usage statistics.
    *  @returns An array of UserFeatureUsageStatistics objects.
    */

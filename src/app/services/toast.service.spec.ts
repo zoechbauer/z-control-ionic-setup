@@ -118,7 +118,7 @@ describe('ToastService', () => {
       // Arrange
       const message = 'Test Message';
       translateServiceSpy.instant.and.returnValue(message);
-      spyOn(service, 'showToastMessage').and.returnValue(Promise.reject('Toast creation failed'));
+      spyOn<any>(service, 'showToastMessage').and.returnValue(Promise.reject('Toast creation failed'));
       const consoleErrorSpy = spyOn(console, 'error');
       // Act
       await service.showToast(message);
@@ -162,7 +162,7 @@ describe('ToastService', () => {
       // Arrange
       const message = 'Test Message';
       translateServiceSpy.instant.and.returnValue(message);
-      spyOn(service, 'showToastMessage').and.returnValue(Promise.reject('Toast creation failed'));
+      spyOn<any>(service, 'showToastMessage').and.returnValue(Promise.reject('Toast creation failed'));
       const consoleErrorSpy = spyOn(console, 'error');
       // Act
       await service.showDisabledToast(message);

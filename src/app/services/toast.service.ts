@@ -17,6 +17,7 @@ export class ToastService {
 
   /**
    * Shows a toast with a translated message, typically used for disabled actions.
+   * 
    * @param toastMsg The translation key or message to display
    * @param anchorId Optional anchor ID for positioning the toast
    */
@@ -30,6 +31,7 @@ export class ToastService {
 
   /**
    * Displays a toast message below the header using a translated message string.
+   * 
    * @param translatedToastMessage The message to display (already translated).
    * @param anchorId Optional anchor ID, default is ToastAnchor.SETTINGS_PAGE.
    */
@@ -39,7 +41,7 @@ export class ToastService {
     });
   }
 
-  async showToastMessage(
+  private async showToastMessage(
     translatedToastMessage: string,
     anchorId?: ToastAnchor
   ) {

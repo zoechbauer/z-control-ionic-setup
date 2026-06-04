@@ -2,6 +2,17 @@
 
 Welcome to the latest updates for the **z-control IONIC Setup** app.
 
+## [0.6] - 2026-06-04
+
+### 🚀 Improvements
+
+- Added a visible notice that the help page is still a draft and should be updated when this setup app is used to create a new app.
+
+### 🔧 Internal
+
+- Added missing function documentation in frontend and backend services to improve readability and maintainability.
+- Applied minor formatting, code, and comment refinements for better consistency across the codebase.
+
 ## [0.5] - 2026-06-03
 
 ### ✨ New Features
@@ -72,4 +83,4 @@ Welcome to the latest updates for the **z-control IONIC Setup** app.
 ### 🛡 Security
 
 - Your data stays on your device and is not shared with third parties.
-- Only text you explicitly choose to translate is sent securely to Google Translate.
+- Only the used features send data to the backend for processing.

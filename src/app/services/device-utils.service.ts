@@ -86,6 +86,12 @@ export class DeviceUtils {
     return match?.[1]?.trim() ?? null;
   }
 
+  /**
+   * Detects the Apple device type based on user agent and platform.
+   * @param userAgent The user agent string
+   * @param platform The platform string
+   * @returns The Apple device type (iPhone, iPad, Mac) or null if not an Apple device
+   */
   static detectAppleDevice(
     userAgent = navigator.userAgent,
     platform = navigator.platform
@@ -107,6 +113,12 @@ export class DeviceUtils {
     return null;
   }
 
+  /**
+   * Determines if the device is an iPhone based on user agent and platform.
+   * @param userAgent The user agent string
+   * @param platform The platform string
+   * @returns True if the device is an iPhone, false otherwise
+   */
   static isIPhone(userAgent = '', platform = ''): boolean {
     const ua = userAgent.toLowerCase();
     const pf = platform.toLowerCase();
@@ -114,6 +126,12 @@ export class DeviceUtils {
     return /iphone/.test(ua) || /iphone/.test(pf);
   }
 
+  /**
+   * Determines if the device is an iPad based on user agent and platform.
+   * @param userAgent The user agent string
+   * @param platform The platform string
+   * @returns True if the device is an iPad, false otherwise
+   */
   static isIPad(userAgent = '', platform = ''): boolean {
     const ua = userAgent.toLowerCase();
     const pf = platform.toLowerCase();
@@ -137,12 +155,22 @@ export class DeviceUtils {
     return false;
   }
 
+  /**
+   * Determines if the device is an Android phone based on user agent.
+   * @param userAgent The user agent string
+   * @returns True if the device is an Android phone, false otherwise
+   */
   static isAndroidPhone(userAgent = ''): boolean {
     const ua = userAgent.toLowerCase();
 
     return /android.*mobile|windows phone|iemobile/.test(ua);
   }
 
+  /**
+   * Determines if the device is an Android tablet based on user agent.
+   * @param userAgent The user agent string
+   * @returns True if the device is an Android tablet, false otherwise
+   */
   static isAndroidTablet(userAgent = ''): boolean {
     const ua = userAgent.toLowerCase();
 

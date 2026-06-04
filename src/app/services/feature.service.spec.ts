@@ -18,8 +18,6 @@ describe('FeatureService', () => {
       'use',
       'setDefaultLang',
     ]);
-    translateServiceSpy.instant.and.returnValue('SIMULATED_TRANSLATION');
-
     const toastServiceSpy = jasmine.createSpyObj('ToastService', ['showToast']);
     const functionsStub = {} as Functions;
 

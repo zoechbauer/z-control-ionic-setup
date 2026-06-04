@@ -22,9 +22,9 @@ export class FirebaseFirestoreService {
   }
 
   /**
-   * Reads the contingent data document containing global feature limits and control flags.
+   * Reads the MLT contingent data document containing global feature limits and control flags.
    *
-   * @returns Promise resolving to the contingent data object with feature quotas and control flags.
+   * @returns Promise resolving to the contingent data object with MLT quotas and control flags.
    * @throws Error if the document read operation fails.
    */
   async readContingentData(): Promise<FirestoreContingentData> {
@@ -37,9 +37,9 @@ export class FirebaseFirestoreService {
   }
 
   /**
-   * Reads the contingent data document containing global feature limits and control flags.
+   * Reads the feature contingent data document containing global feature limits and control flags.
    *
-   * @returns Promise resolving to the contingent data object with feature quotas and control flags.
+   * @returns Promise resolving to the feature contingent data object with feature quotas and control flags.
    * @throws Error if the document read operation fails.
    */
   async readFeatureContingentData(): Promise<FeatureContingentData> {
@@ -52,7 +52,7 @@ export class FirebaseFirestoreService {
   }
   
   /**
-   * Retrieves the character count and target languages for the current user.
+   * Retrieves the MLT character count and target languages for the current user.
    *
    * Returns the user's cumulative translated character count and their selected target languages
    * for translations. If the user document doesn't exist or lacks character count data, returns 0.
@@ -73,7 +73,7 @@ export class FirebaseFirestoreService {
   }
 
   /**
-   * Retrieves the character count for the current user.
+   * Retrieves the feature character count for the current user.
    * 
    * Returns the user's cumulative consumed feature character count. 
    * If the user document doesn't exist or lacks character count data, returns 0.
@@ -91,10 +91,10 @@ export class FirebaseFirestoreService {
   }
 
   /**
-   * Retrieves the total consumed feature character count across all users for the current month.
+   * Retrieves the total consumed feature/MLT character count across all users for the current month.
    *
-   * Reads the meta document that tracks cumulative feature usage. Used for monitoring
-   * global feature quotas and enforcing rate limits.
+   * Reads the meta document that tracks cumulative feature/MLT usage. Used for monitoring
+   * global quotas and enforcing rate limits.
    *
    * @returns Promise resolving to the total character count as a number, or 0 if not found.
    * @throws Error if the document read operation fails.
@@ -176,8 +176,8 @@ export class FirebaseFirestoreService {
    * **Initial Setup Workflow:**
    * This function is called once from the client (via Cloud Function) to populate the
    * `programmerDevices` collection with UIDs from .env.local. After initial setup,
-   * programmer UIDs should be maintained manually in Firestore, allowing UID changes
-   * without code deployment.
+   * programmer UIDs can be maintained manually in Firestore or change .env.local 
+   * and call again to sync new UIDs without redeploying.
    *
    * **Behavior:**
    * For each device in the provided array:
@@ -205,7 +205,8 @@ export class FirebaseFirestoreService {
    * await service.updateProgrammerDeviceUIDs([
    *   { userId: 'abc123', name: 'Hans-Laptop' }
    * ]);
-   * // After this, update UIDs directly in Firestore programmerDevices collection
+   * // After this, update UIDs directly in Firestore programmerDevices collection or 
+   * // change .env.local and call again to sync new UIDs without redeploying.
    */
   async updateProgrammerDeviceUIDs(
     programmerDeviceUIDs: ProgrammerDeviceUID[],
@@ -229,10 +230,12 @@ export class FirebaseFirestoreService {
     }
   }
 
-  /**
-   * Updates or creates a user mapping document for a single programmer device.
-   * Internal helper for updateProgrammerDeviceUIDs.
-   */
+/**
+ * Updates or creates a user mapping document for a single programmer device.
+ * Internal helper for updateProgrammerDeviceUIDs.
+ * @param device - Programmer device object containing userId and device name.
+ * @param allDevices - Array of all programmer device objects.
+ */
   private async updateUserMappingUsers(
     device: ProgrammerDeviceUID,
     allDevices: ProgrammerDeviceUID[],
@@ -356,6 +359,10 @@ export class FirebaseFirestoreService {
     }
   }
 
+  /**
+   * Checks if the current device is a programmer device.
+   * @returns Promise resolving to true if the device is a programmer device, false otherwise.
+   */
   async isProgrammerDevice(): Promise<boolean> {
     try {
       const collectionRef = this.db.collection(

@@ -12,9 +12,12 @@ export class FirebaseFirestoreUtilsService {
     this.firestoreService = firestoreService;
   }
 
-  /**
-   * Checks whether translation contingent limits are exceeded for a user.
-   */
+/**
+ * Checks whether translation contingent limits are exceeded for a user.
+ * @param flags The contingent data flags
+ * @param userId The user ID to check
+ * @returns A promise that resolves to true if the contingent is exceeded, false otherwise
+ */
   async isContingentExceeded(
     flags: ContingentData,
     userId: string,
@@ -34,6 +37,12 @@ export class FirebaseFirestoreUtilsService {
     return false;
   }
 
+  /**
+   * Checks whether the contingent for a specific user is exceeded.
+   * @param flags The contingent data flags
+   * @param userId The user ID to check
+   * @returns A promise that resolves to true if the contingent is exceeded, false otherwise
+   */
   private async isContingentForUserExceeded(
     flags: ContingentData,
     userId: string,
@@ -46,6 +55,11 @@ export class FirebaseFirestoreUtilsService {
     return charCount >= limit;
   }
 
+  /**
+   * Checks whether the total contingent for all users is exceeded.
+   * @param flags The contingent data flags
+   * @returns A promise that resolves to true if the total contingent is exceeded, false otherwise
+   */
   private async isTotalContingentExceeded(
     flags: ContingentData,
   ): Promise<boolean> {
@@ -60,6 +74,9 @@ export class FirebaseFirestoreUtilsService {
 
   /**
    * Validates the contingent for the user and throws if exceeded or not found.
+   * @param collection The Firestore collection name
+   * @param userId The user ID to validate
+   * @returns A promise that resolves if the contingent is valid, or throws an error if exceeded
    */
   static async validateContingentOrThrow(
     collection: string,
@@ -89,9 +106,12 @@ export class FirebaseFirestoreUtilsService {
     }
   }
 
-  /**
-   * Validates the feature contingent for the user and throws if exceeded or not found.
-   */
+/**
+ * Validates the feature contingent for the user and throws if exceeded or not found.
+ * @param collection The Firestore collection name
+ * @param userId The user ID to validate
+ * @returns A promise that resolves if the feature contingent is valid, or throws an error if exceeded
+ */
   static async validateFeatureContingentOrThrow(
     collection: string,
     userId: string,
@@ -157,10 +177,12 @@ export class FirebaseFirestoreUtilsService {
     };
   }
 
-  /**
-   * Deep equality comparison that ignores property order.
-   * Recursively sorts object keys alphabetically using localeCompare before stringifying.
-   */
+/**
+ * Performs a deep equality check between two objects.
+ * @param obj1 The first object to compare
+ * @param obj2 The second object to compare
+ * @returns True if the objects are deeply equal, false otherwise
+ */
   static isDeepEqual(obj1: any, obj2: any): boolean {
     if (obj1 === obj2) return true;
     if (obj1 == null || obj2 == null) return false;

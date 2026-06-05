@@ -167,8 +167,15 @@ cd android
 
 ### Operations And Maintenance
 
+- [How to Install the z-control IONIC Setup App Locally on Your Mobile](docs/mobile-installation-guide.md.md)
 - [Android installation troubleshooting](docs/solving-installation-problems-android.md)
+- [Instructions to Ensure a Clean Build for Android](docs/clean-android-build-step-by-step.md)
 - [Environment and programmer devices TODO list](docs/todo-list-environment-programmer-devices.md)
+
+### Google Play Store Publication
+- [Google Play Store Publication Guide](docs/upload-to-google-playstore/docs/Google-Play-Store-Publication-Guide.md)
+- [Update Notification Guide](docs/upload-to-google-playstore/docs/Update-Notification-Guide.md)
+- [Ionic Capacitor Splash Screens Guide](docs/upload-to-google-playstore/docs/ionic-capacitor-splash-screens-guide.md)
 
 ## Tools
 

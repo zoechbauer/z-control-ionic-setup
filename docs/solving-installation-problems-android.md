@@ -4,13 +4,14 @@
 
 When running the Ionic app in **Production mode** (Android/iOS actual device or `--prod` build), clicking an `ion-accordion` results in a crash or a console error:
 
-```
+```typescript
 ERROR TypeError: i.requestAccordionToggle is not a function
     at yt.value.toggleExpanded (main.js:1:195718)
     at HTMLDivElement.onClick (main.js:1:196395)
 ```
 
 **Symptoms:**
+
 - Works perfectly in the Web Browser (`ionic serve`).
 - Works on mobile only when using Live Reload (`-l`).
 - Fails on mobile in standard builds or via Android Studio.
@@ -75,12 +76,11 @@ Make sure all Capacitor plugins are on the same major version.
 
 Ensure your `android/` folder settings match a working skeleton:
 
-| File                      | Key Setting                                 |
-|---------------------------|---------------------------------------------|
-| `android/build.gradle`    | `com.android.tools.build:gradle:8.10.1`     |
-| `gradle-wrapper.properties`| `distributionUrl=.../gradle-8.11.1-all.zip`|
-| `angular.json`            | Use the correct `optimization` settings     |
-
+| File                       | Key Setting                                 |
+|----------------------------|---------------------------------------------|
+| `android/build.gradle`     | `com.android.tools.build:gradle:8.10.1`     |
+| `gradle-wrapper.properties`| `distributionUrl=.../gradle-8.11.1-all.zip` |
+| `angular.json`             | Use the correct `optimization` settings     |
 
 ### 5. Check Angular Optimization (angular.json)
 
@@ -90,12 +90,15 @@ If the error persists, the Angular Build Optimizer might be stripping out necess
 2. Navigate to `architect` -> `build` -> `configurations` -> `production`.
 
 - #### Angular.json Property Warnings
-   - The `@angular-devkit/build-angular:application` builder (esbuild) does not support old flags.
-   - **Fix:** Remove `buildOptimizer`, `aot`, and `progress` from `angular.json`. Use the `optimization` object instead.
+
+  - The `@angular-devkit/build-angular:application` builder (esbuild) does not support old flags.
+  - **Fix:** Remove `buildOptimizer`, `aot`, and `progress` from `angular.json`. Use the `optimization` object instead.
 
 - #### Disable Script Optimization
-   - Tell the builder not to optimize scripts:
-   - In `angular.json` -> `production` -> `optimization`, set `"scripts": false`.
+
+  - Tell the builder not to optimize scripts:
+  - In `angular.json` -> `production` -> `optimization`, set `"scripts": false`.
+
 ---
 
 ### 6. Clean Rebuild Procedure
@@ -103,10 +106,12 @@ If the error persists, the Angular Build Optimizer might be stripping out necess
 To ensure no cached "broken" bundles remain, run this sequence after applying the fixes:
 
 1. **Delete old build files:**
+
    ```bash
    rm -rf www/
    rm -rf android/app/src/main/assets/public
    ```
+
 2. **Rebuild the app and sync to Android:**
    ```bash
    ionic build --prod
@@ -128,9 +133,3 @@ To ensure no cached "broken" bundles remain, run this sequence after applying th
 - Make sure your `@ionic/angular`, `@capacitor/core`, and all plugins are compatible and on the same major version.
 - Check the device logs in Android Studio for additional error details.
 - Try running with live reload (`ionic cap run android --external -l`) to see if the problem is only in production builds.
-
----
-
-## Notes
-
-- This document is for tracking and resolving Android build issues in this project. Add any new problems and solutions here as you encounter them.

@@ -2,6 +2,19 @@
 
 Welcome to the latest updates for the **z-control IONIC Setup** app.
 
+## [0.7] - 2026-06-05
+
+### ✨ New Features
+
+- Added Capacitor integration to the setup app, including installation and configuration of the Splash Screen plugin.
+- Added documentation for integrating Capacitor plugins into the setup app, covering installation, configuration, and usage within the z-control Ionic Setup project.
+- Added documentation for publishing the setup app to Google Play Store, including build preparation, application signing, and release workflow.
+- Resolved Android installation and build issues documented in `mobile-problem-fixed.md`:
+  - Updated Android Gradle Plugin to version 8.10.1 for Capacitor 8 compatibility.
+  - Standardized the Java runtime to version 17 to resolve the `invalid source release: 21` build error.
+  - Expanded troubleshooting documentation with detailed resolution steps.
+- Successfully deployed and tested the application on a physical Android device, confirming that installation and runtime issues have been resolved.
+
 ## [0.6] - 2026-06-04
 
 ### 🚀 Improvements

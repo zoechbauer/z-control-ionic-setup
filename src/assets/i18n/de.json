@@ -54,11 +54,10 @@
         "CLEAR": "Löschen"
       },
       "LABEL": {
-        "INPUT": "Wort suchen:",
         "RELATED_WORDS": "Verwandte Wörter:"
       },
       "PLACEHOLDER": {
-        "INPUT": "Geben Sie Text ein..."
+        "INPUT": "Geben Sie ein Wort ein..."
       }
     },
     "TOAST": {

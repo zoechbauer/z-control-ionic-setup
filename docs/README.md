@@ -42,9 +42,6 @@ Guides for setting up, running, and improving Angular unit tests with Karma and 
 
 ## C. Troubleshooting
 
-- **fix-invalid-source-release-21-problem.md**  
-  Solution for the "invalid source release: 21" error during Android builds, with steps to force Java 17 compatibility in Gradle.
-
 - **mobile-problem-fixed.md**  
   Documents resolved issues, such as the accordion toggle error and Gradle/Kotlin compatibility fixes for stable mobile deployment.
 
@@ -72,6 +69,8 @@ Guides for setting up, running, and improving Angular unit tests with Karma and 
 
 - **upload-to-google-playstore/docs/Google-Play-Store-Publication-Guide.md**  
   Complete step-by-step guide for publishing to Google Play Store, covering 24 steps across 6 phases from app creation through post-launch management. Includes build instructions, testing workflows, submission checklists, and troubleshooting.
+
+  <i>Note: This document contains information from the **z-control Translator app** publication process that is used as a reference for the setup app. The setup app is used for creating new apps that will be deployed on Google Play and will follow a similar publication workflow, but with its own specific details and assets.</i>
 
 - **upload-to-google-playstore/docs/Update-Notification-Guide.md**  
   Guide to app update notifications covering closed testing and production releases. Explains how to monitor test updates, how users get notified of new versions, automatic vs. manual updates, and optional in-app update strategies.

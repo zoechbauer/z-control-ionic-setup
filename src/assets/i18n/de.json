@@ -40,15 +40,15 @@
   "------ main page": "-------",
   "MAIN": {
     "CARD": {
-      "TITLE": "Hauptfunktion"
+      "TITLE": "Beispiel der Hauptfunktion"
     }
   },
   "FEATURE": {
     "CARD": {
       "TITLE": "Verwandte Wörter suchen",
       "SUBTITLE": "Geben Sie ein Wort ein und finden Sie verwandte Wörter",
-      "INFO-1": "wird verwendet, um ein Beispiel für die Hauptfunktion zu zeigen. Die Datamuse-API wird in einer einfachen Wortsuche verwendet.",
-      "INFO-2": "Die Funktion ist nicht der Hauptfokus dieser App, dient jedoch als Beispiel dafür, wie ein Feature im z-control Ionic Setup implementiert werden kann.",
+      "INFO-1": "bietet viele Funktionen.",
+      "INFO-2": "Wir zeigen hier nur die Suche nach verwandten Wörtern, damit Sie die Kontingent-Verwaltung in diesem Setup testen können.",
       "BUTTON": {
         "SEARCH": "Suchen",
         "CLEAR": "Löschen"
@@ -166,12 +166,14 @@
           "FILTER_MONTH_DATA": "Monatsdaten filtern",
           "FILTER_MONTH_DATA_ALL": "Alle Monate",
           "FILTER_DATA": "Daten filtern",
-          "DISPLAY_MODE_USER": "Benutzer-Ansicht",
-          "DISPLAY_MODE_PROGRAMMER": "Programmierer-Ansicht"
+          "DISPLAY_MODE_USER": "Benutzer",
+          "DISPLAY_MODE_PROGRAMMER": "Programmierer"
         },
-        "TITLE": {
-          "FILTER_MONTH_DATA": "Daten des Monats filtern oder alle Daten anzeigen",
-          "FILTER_DATA": "Daten mit ausgewähltem Monat neu laden"
+        "TOOLTIP": {
+          "FILTER_MONTH_DATA": "Daten des ausgewählten Monats anzeigen oder alle Daten anzeigen",
+          "FILTER_DATA": "Daten mit ausgewähltem Monat und Anzeigemodus neu laden",
+          "DISPLAY_MODE_USER": "Statistik als Benutzer anzeigen",
+          "DISPLAY_MODE_PROGRAMMER": "Statistik als Programmierer anzeigen"
         }
       },
       "GRID": {

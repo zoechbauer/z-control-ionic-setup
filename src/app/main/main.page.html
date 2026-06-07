@@ -2,19 +2,12 @@
   <app-header [currentTab]="Tab.MainFeature"></app-header>
 </div>
 
-<ion-content
-  #content
-  [class.landscape]="!utilsService.isPortrait"
->
-  <ion-card class="main-feature-card">
-    <ion-card-header>
-      <ion-card-title>{{ "MAIN.CARD.TITLE" | translate }}</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <app-feature-example></app-feature-example>
-    </ion-card-content>
-  </ion-card>
-  
+<h6 class="ion-text-center">{{'APP.NAME' | translate}}</h6>
+<ion-content #content [class.landscape]="!utilsService.isPortrait">
+
+  <!-- TODO - replace with actual feature -->
+  <app-feature-example></app-feature-example>
+
   <ion-accordion-group
     (ionValueChange)="onAccordionGroupChange($event, content)"
   >

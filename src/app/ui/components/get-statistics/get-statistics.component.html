@@ -19,7 +19,7 @@
         [(ngModel)]="filterSelectedMonth"
         interface="popover"
         title="{{
-          'SETTINGS.STATISTICS.FILTER.TITLE.FILTER_MONTH_DATA' | translate
+          'SETTINGS.STATISTICS.FILTER.TOOLTIP.FILTER_MONTH_DATA' | translate
         }}"
       >
         <ion-select-option
@@ -32,13 +32,24 @@
       </ion-select>
       <!-- Select display mode: user-mode or programmer-mode -->
       <ion-radio-group [(ngModel)]="selectedDisplayMode" class="display-mode">
-        <ion-radio [value]="DisplayMode.Programmer">
+        <ion-radio
+          [value]="DisplayMode.Programmer"
+          title="{{
+            'SETTINGS.STATISTICS.FILTER.TOOLTIP.DISPLAY_MODE_PROGRAMMER'
+              | translate
+          }}"
+        >
           {{
             "SETTINGS.STATISTICS.FILTER.LABEL.DISPLAY_MODE_PROGRAMMER"
               | translate
           }}
         </ion-radio>
-        <ion-radio [value]="DisplayMode.User">
+        <ion-radio
+          [value]="DisplayMode.User"
+          title="{{
+            'SETTINGS.STATISTICS.FILTER.TOOLTIP.DISPLAY_MODE_USER' | translate
+          }}"
+        >
           {{ "SETTINGS.STATISTICS.FILTER.LABEL.DISPLAY_MODE_USER" | translate }}
         </ion-radio>
       </ion-radio-group>
@@ -47,7 +58,7 @@
         size="block"
         (click)="onFilterData()"
         (keydown.enter)="onFilterData()"
-        title="{{ 'SETTINGS.STATISTICS.FILTER.TITLE.FILTER_DATA' | translate }}"
+        title="{{ 'SETTINGS.STATISTICS.FILTER.TOOLTIP.FILTER_DATA' | translate }}"
       >
         {{ "SETTINGS.STATISTICS.FILTER.LABEL.FILTER_DATA" | translate }}
       </ion-button>
@@ -324,9 +335,9 @@
     </ul>
     <p>
       This data allows us to manage each user’s monthly usage quota. Once a user
-      reaches their monthly limit, no further feature requests are processed
-      for the remainder of the month. At the beginning of the next month, the
-      quota resets automatically and the user can resume normal feature usage.
+      reaches their monthly limit, no further feature requests are processed for
+      the remainder of the month. At the beginning of the next month, the quota
+      resets automatically and the user can resume normal feature usage.
       z-control allows the application to retrieve device information to
       determine the platform (native app, web desktop, or web mobile) from which
       feature requests are sent.
@@ -355,8 +366,9 @@
       Diese Daten helfen uns, das monatliche Nutzungskontingent pro Benutzer zu
       verwalten. Sobald ein Benutzer sein monatliches Kontingent erreicht hat,
       werden für den restlichen Monat keine weiteren Featureanfragen
-      verarbeitet. Zu Beginn des nächsten Monats wird das Kontingent
-      automatisch zurückgesetzt und der Benutzer kann wieder regulär Featureanfragen stellen.
+      verarbeitet. Zu Beginn des nächsten Monats wird das Kontingent automatisch
+      zurückgesetzt und der Benutzer kann wieder regulär Featureanfragen
+      stellen.
     </p>
     <p class="small-text">
       <i>z-control</i> ermöglicht es der Anwendung, Geräteinformationen

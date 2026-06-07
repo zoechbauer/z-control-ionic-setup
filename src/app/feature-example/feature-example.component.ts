@@ -68,6 +68,9 @@ export class FeatureExampleComponent implements OnInit {
     });
   }
 
+  /**
+   * TODO: use this function to check if the user has exceeded their contingent for calling the feature.
+   */
   private async updateIsContingentExceeded() {
     this.isContingentExceeded =
       await this.firestoreUtilsService.isContingentExceeded();
@@ -79,6 +82,12 @@ export class FeatureExampleComponent implements OnInit {
     this.clearBtnDisabled = !hasText;
   }
 
+  /**
+   * Searches for features based on the user input.
+   *
+   * TODO: Use and rename this function to call your cloud function that 
+   * processes the feature input and returns the results.
+   */
   async search() {
     this.isLoading = true;
     await this.updateIsContingentExceeded();

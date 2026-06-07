@@ -40,15 +40,15 @@
   "------ main page": "-------",
   "MAIN": {
     "CARD": {
-      "TITLE": "Main Feature"
+      "TITLE": "Main Feature Example"
     }
   },
   "FEATURE": {
     "CARD": {
       "TITLE": "Search related words",
       "SUBTITLE": "Enter a word and find related words",
-      "INFO-1": "is used to show a main feature example. The Datamuse API is used in a simple word search.",
-      "INFO-2": "The feature is not the main focus of this app, but it serves as an example of how a feature can be implemented in the z-control Ionic Setup.",
+      "INFO-1": "offers many features.",
+      "INFO-2": "We only show the search for related words here so you can test the quota management in this setup.",
       "BUTTON": {
         "SEARCH": "Search",
         "CLEAR": "Clear"
@@ -166,12 +166,14 @@
           "FILTER_MONTH_DATA": "Filter Month Data",
           "FILTER_MONTH_DATA_ALL": "All Months",
           "FILTER_DATA": "Filter Data",
-          "DISPLAY_MODE_USER": "User View",
-          "DISPLAY_MODE_PROGRAMMER": "Programmer View"
+          "DISPLAY_MODE_USER": "User",
+          "DISPLAY_MODE_PROGRAMMER": "Programmer"
         },
-        "TITLE": {
-          "FILTER_MONTH_DATA": "Filter current month data or show all data",
-          "FILTER_DATA": "Reload data with selected month"
+        "TOOLTIP": {
+          "FILTER_MONTH_DATA": "Show data for the selected month or all data",
+          "FILTER_DATA": "Reload data with the selected month and display mode",
+          "DISPLAY_MODE_USER": "Show statistics as a user",
+          "DISPLAY_MODE_PROGRAMMER": "Show statistics as a programmer"
         }
       },
       "GRID": {

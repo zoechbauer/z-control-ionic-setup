@@ -34,6 +34,7 @@
     "@capacitor/keyboard": "8.0.3",
     "@capacitor/splash-screen": "^8.0.1",
     "@capacitor/status-bar": "8.0.2",
+    "@capgo/capacitor-navigation-bar": "^8.1.8",
     "@ionic/angular": "^8.0.0",
     "@ionic/storage": "^4.0.0",
     "@ionic/storage-angular": "^4.0.0",

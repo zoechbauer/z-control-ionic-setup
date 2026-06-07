@@ -24,7 +24,7 @@ All recent updates and improvements to our **z-control IONIC Setup** app.
 
 - …
 
-### 📦 Installations
+### 📦 Deployment
 
 - …
 

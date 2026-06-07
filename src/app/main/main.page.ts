@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
   IonContent,
@@ -7,10 +6,6 @@ import {
   IonLabel,
   IonAccordion,
   IonAccordionGroup,
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardContent,
 } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
@@ -34,11 +29,6 @@ import { FeatureExampleComponent } from '../feature-example/feature-example.comp
     IonContent,
     IonItem,
     IonLabel,
-    IonCard,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardContent,
-    CommonModule,
     FormsModule,
     TranslatePipe,
     HeaderComponent,

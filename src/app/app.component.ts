@@ -1,10 +1,14 @@
 import { Component, OnInit, Renderer2 } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 import { TranslateService } from '@ngx-translate/core';
+import { Capacitor } from '@capacitor/core';
 
-import { environment } from 'src/environments/environment';
+import { environment } from '../environments/environment';
 import { LocalStorageService } from './services/local-storage.service';
 import { FirebaseFirestoreService } from './services/firebase-firestore.service';
+import { SystemBarsService } from './services/system-bars.service';
+import { SafeAreaInsetsService } from './services/safe-area-insets.service';
+import { CapacitorPlatformService } from './services/capacitor-platform.service';
 
 @Component({
   selector: 'app-root',
@@ -13,7 +17,7 @@ import { FirebaseFirestoreService } from './services/firebase-firestore.service'
   imports: [IonApp, IonRouterOutlet],
 })
 export class AppComponent implements OnInit {
-  isNativeApp = false;
+  isNativeApp = Capacitor.isNativePlatform();
   showTabsBar = environment.app.showTabsBar;
 
   constructor(
@@ -21,6 +25,9 @@ export class AppComponent implements OnInit {
     private readonly renderer: Renderer2,
     private readonly firestoreService: FirebaseFirestoreService,
     private readonly localStorageService: LocalStorageService,
+    private readonly safeAreaInsets: SafeAreaInsetsService,
+    private readonly systemBars: SystemBarsService,
+    private readonly capacitorPlatformService: CapacitorPlatformService,
   ) {}
 
   ngOnInit() {
@@ -30,6 +37,15 @@ export class AppComponent implements OnInit {
   async initializeApp() {
     if (this.isNativeApp) {
       this.renderer.addClass(document.body, 'native-app');
+
+      await this.capacitorPlatformService.hideSplashScreen();
+      await this.capacitorPlatformService.setStatusBarOverlay(false);
+      this.safeAreaInsets.setSafeAreaInsetsFix();
+
+      const isDarkMode = await this.systemBars.getCurrentIsDarkMode();
+      await this.systemBars.setBars(isDarkMode);
+
+      await this.capacitorPlatformService.showStatusBar();
     } else {
       this.renderer.addClass(document.body, 'web-app');
     }

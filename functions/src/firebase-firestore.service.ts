@@ -162,7 +162,6 @@ export class FirebaseFirestoreService {
           },
           { merge: true },
         );
-        console.log('Created control flags document with default values.');
       }
     } catch (error) {
       console.error('Error creating missing contingent data:', error);
@@ -314,9 +313,6 @@ export class FirebaseFirestoreService {
         },
         { merge: true },
       );
-      console.log(
-        `Created programmer device mapping for userId: ${device.userId}`,
-      );
     }
   }
 
@@ -454,10 +450,6 @@ export class FirebaseFirestoreService {
             lastUpdated: new Date(),
           },
           { merge: true },
-        );
-        console.log(
-          'Updated user mapping document with device info for user:',
-          userId,
         );
       }
     } catch (error) {

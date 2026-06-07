@@ -2,6 +2,34 @@
 
 Welcome to the latest updates for the **z-control IONIC Setup** app.
 
+## Versioning
+
+This project uses a simplified major.minor versioning scheme:
+
+- Major versions indicate significant milestones or breaking changes.
+- Minor versions indicate new features, improvements, and bug fixes.
+- Patch numbers are intentionally omitted; all changes are released as major or minor versions.
+
+## [1.0] - 2026-06-07
+
+### 🚀 Improvements
+
+- Improved wording, styling, and code comments on the feature page for better clarity and usability.
+- Restyled the statistics display mode toggle for improved visual consistency and user experience.
+- Updated the link to the source code in the settings page to point to the correct GitHub repository for this setup app.
+- Added a note about the license information in the settings page to reflect that in future app the example license has to be replaced with your own privacy policy.
+- Replaced Ionic icons with z-control branded icons.
+- Updated splash screen and launcher icons across multiple resolutions.
+- Added native Android support services and comprehensive unit tests.
+- Configured Gradle auto-signing for Android builds using a `keystore.properties` file.
+- Maintained high test quality with 99.25% backend coverage (172 tests) and 99.65% frontend coverage (526 tests).
+
+### 📦 Deployment
+
+- Hosted the application on Firebase Hosting.
+- Successfully published and tested the Android application through the Google Play Internal Testing track.
+- Verified successful operation on both Firebase Hosting and physical Android devices.
+
 ## [0.7] - 2026-06-05
 
 ### ✨ New Features

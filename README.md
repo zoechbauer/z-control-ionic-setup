@@ -1,11 +1,12 @@
 # z-control IONIC Setup
 
-Created as a starter template for building modern, user-friendly Ionic apps with Angular and Capacitor.
+Created as a starter template for building modern, user-friendly Ionic apps with Angular, Capacitor, and Firebase. This setup app provides a clean, tab-based interface with built-in quota management and help features, making it easy to get started with your own Ionic projects. It also serves as the canonical backend source for shared Firebase Functions across z-control apps.
 
 ## Features
 
+- **Quota management**: Track and display API usage with clear quota limits and warnings
 - **Tab-based navigation**: Clean, intuitive UI with separate tabs for main feature and settings
-- **Built-in help**: help page for step-by-step instructions and FAQs
+- **Built-in help**: Help page for step-by-step instructions and FAQs
 - **Structure for Settings**: Dedicated settings tab with accordions for configuration, Feedback, Change-log, Privacy Policy, and support
 
 Download now for free and use it to create your own Ionic apps!
@@ -23,13 +24,21 @@ Practical rule:
 - Deploy shared Firebase Functions from this repository only
 - Other app repositories may contain frontend-only changes and should not deploy shared functions
 
+
 ## Download & Online Access
+**Web Application**
 
-- **Web App:**  
-  [Run the app online (Firebase Hosting)](https://z-control-ionic-setup.web.app/)
+Explore the z-control Ionic Setup application online via Firebase Hosting:
 
-- **Native Mobile App on Android devices:**
-  [Get the app on Google Play Store](https://play.google.com/store/apps/details?id=at.zcontrol.zoe.ionicsetup) — available through closed testing.
+👉 https://z-control-ionic-setup.web.app/
+
+The online demo uses the free Datamuse API, allowing you to test quota management and application features without setting up your own backend environment.
+
+**Android Application**
+
+The Android app is **available only to the z-control team in Google Play Internal Test Group** for testing and validation purposes, as it is used to create new applications based on this setup. It is not intended for public distribution.
+
+👉 https://play.google.com/store/apps/details?id=at.zcontrol.zoe.ionicsetup
 
 ---
 
@@ -41,7 +50,8 @@ Practical rule:
 - **Build Tool**: Angular CLI
 - **Icons**: Ionicons
 - **State Management**: RxJS (BehaviorSubject, Subject)
-- **Testing**: Karma + Jasmine
+- **Backend**: Firebase (Firestore, Cloud Functions, Hosting)
+- **Testing**: Karma + Jasmine (frontend), Vitest (backend)
 - **Deployment**: Firebase Hosting, Capacitor (Android)
 
 ## 📁 Project Structure
@@ -120,7 +130,21 @@ npm run test:watch
 # Run tests with code coverage
 npm run test:coverage
 ```
+#### Backend Tests (Vitest + Istanbul)
 
+```bash
+# Run backend tests
+npm --prefix functions run test
+
+# Run backend tests with Vitest UI (browser dashboard)
+cd functions && npm run test:ui
+
+# Run backend tests with Vitest UI and coverage
+cd functions && npm run test:ui:coverage
+
+# Run backend tests with coverage and auto-exit
+npm --prefix functions run test:coverage
+```
 ### Building for Android
 
 ```bash

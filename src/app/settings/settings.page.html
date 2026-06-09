@@ -6,7 +6,7 @@
   class="settings-content"
   [class.landscape]="!utilsService.isPortrait"
 >
-<h6 class="ion-text-center">{{'APP.NAME' | translate}}</h6>
+<h6 class="ion-text-center">{{ appName }}</h6>
   <ion-accordion-group
     [value]="openAccordion"
     (ionValueChange)="onAccordionGroupChange($event, content)"
@@ -64,15 +64,18 @@
     <app-change-log-accordion
       [lang]="selectedLanguage"
       [versionInfo]="versionInfo"
+      [appName]="appName"
       (ionChange)="openChangelog()"
     ></app-change-log-accordion>
     } @case ('get-mobile-app') {
     <app-get-mobile-app-accordion
       [lang]="selectedLanguage"
+      [appName]="appName"
     ></app-get-mobile-app-accordion>
     } @case ('get-source') {
     <app-get-source-accordion
       [lang]="selectedLanguage"
+      [appName]="appName"
     ></app-get-source-accordion>
     } }
     <!-- Button to show all accordions -->

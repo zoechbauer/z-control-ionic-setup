@@ -1,7 +1,6 @@
 {
   "------ global": "-------",
   "APP": {
-    "NAME": "z-control IONIC Setup",
     "LOADING_DATA": "Daten werden geladen...",
     "UNDER_CONSTRUCTION": "Diese Funktion ist in Arbeit.",
     "MAIN": {

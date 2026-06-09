@@ -10,8 +10,8 @@
   <ion-header>
     <ion-toolbar color="primary">
       <ion-title>
-        <span *ngIf="!isPortrait">Help – z-control IONIC Setup</span>
-        <span *ngIf="isPortrait">Help – IONIC Setup</span>
+        <span *ngIf="!isPortrait">Help – {{ appName }}</span>
+        <span *ngIf="isPortrait">Help – {{ appShortName }}</span>
       </ion-title>
       <ion-buttons slot="start">
         <ion-button
@@ -78,14 +78,30 @@
       </ol>
     </div>
 
-    <h2>This help page still needs to be revised.</h2>
+    <p style="color: var(--ion-color-danger)">
+      This help page is a placeholder and should be customized for your
+      application.
+    </p>
 
     <h3 id="what-can-the-app-do">What can the app do?</h3>
     <strong>What is this app for?</strong>
     <p>
       <strong>Describe the app's core functionality here.</strong>
-      You can choose the base language (English or German) in the settings.
     </p>
+    <p>
+      Here, we deliberately do not provide a description of the demo feature
+      "Search related words".
+    </p>
+    <p>
+      But with this feature, you can better understand the management of the
+      quota. With each word search, the monthly quota is reduced. The quota is
+      automatically reset in the next month.
+    </p>
+    <p>
+      You can find out how to check your monthly allowance further down in the
+      section "How do I use the app?".
+    </p>
+    <p>You can choose the base language (English or German) in the settings.</p>
     <p><strong>Highlights:</strong></p>
     <ul class="no-list-style-inside">
       <li>Describe highlight 1.</li>
@@ -99,7 +115,8 @@
           {{ maxFreeFeatureCharsLengthPerMonth | number: "1.0-0" : "de" }}
           characters for all users
         </strong>
-        (Example: Google Translate). If this quota is exceeded, <i>z-control</i> incurs costs.
+        (Example: Google Translate). If this quota is exceeded,
+        <i>z-control</i> incurs costs.
         <p>
           Therefore, available options are limited to prevent the shared monthly
           quota from being used up too quickly.
@@ -259,8 +276,8 @@
   <ion-header>
     <ion-toolbar color="primary">
       <ion-title>
-        <span *ngIf="!isPortrait">Hilfe – z-control IONIC Setup</span>
-        <span *ngIf="isPortrait">Hilfe – IONIC Setup</span>
+        <span *ngIf="!isPortrait">Hilfe – {{ appName }}</span>
+        <span *ngIf="isPortrait">Hilfe – {{ appShortName }}</span>
       </ion-title>
       <ion-buttons slot="start">
         <ion-button
@@ -329,12 +346,30 @@
       </ol>
     </div>
 
-    <h2>Die Hilfeseite muss noch überarbeitet werden.</h2>
+    <p style="color: var(--ion-color-danger)">
+      Diese Hilfeseite dient als Platzhalter und sollte für Ihre Anwendung
+      angepasst werden.
+    </p>
 
     <h3 id="what-can-the-app-do-DE">Was kann die App?</h3>
     <strong>Wofür ist diese App gedacht?</strong>
     <p>
       <strong>Beschreiben Sie hier die Funktionen der App.</strong>
+    </p>
+    <p>
+      Es wird hier bewusst keine Beschreibung des Demo-Features "Bekannte Wörter
+      suchen" gegeben.
+    </p>
+    <p>
+      Aber mit diesem Feature können Sie die Verwaltung des Kontingents besser
+      verstehen. Bei jeder Wortsuche wird das monatliche Kontingent reduziert.
+      Im nächsten Monat wird das Kontingent automatisch zurückgesetzt.
+    </p>
+    <p>
+      Wie Sie das monatliche Kontingent überprüfen können, erfahren Sie weiter
+      unten im Abschnitt "Wie benutze ich die App?".
+    </p>
+    <p>
       Die Basissprache (Englisch oder Deutsch) können Sie in den Einstellungen
       auswählen.
     </p>
@@ -349,9 +384,10 @@
         <strong>
           Gemeinsames kostenloses Monatskontingent:
           {{ maxFreeFeatureCharsLengthPerMonth | number: "1.0-0" : "de" }}
-          Zeichen für alle Nutzer 
+          Zeichen für alle Nutzer
         </strong>
-        (Beispiel Google Translate). Wird dieses Kontingent überschritten, entstehen für
+        (Beispiel Google Translate). Wird dieses Kontingent überschritten,
+        entstehen für
         <i>z-control</i> Kosten.
         <p>
           Daher ist die Auswahl begrenzt, damit das gemeinsame Monatskontingent

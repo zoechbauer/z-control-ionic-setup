@@ -17,6 +17,7 @@ import { Tab } from '../shared/enums';
 import { UserStatisticComponent } from '../ui/components/user-statistic/user-statistic.component';
 import { FirebaseFirestoreUtilsService } from '../services/firebase-firestore-utils.service';
 import { FeatureExampleComponent } from '../feature-example/feature-example.component';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-main',
@@ -48,6 +49,10 @@ export class MainPage implements OnInit, OnDestroy {
     public readonly utilsService: UtilsService,
     private readonly firestoreUtilsService: FirebaseFirestoreUtilsService,
   ) {}
+
+  get appName(): string {
+    return environment.app.name;
+  }
 
   ngOnInit() {
     this.utilsService.showOrHideIonTabBar();

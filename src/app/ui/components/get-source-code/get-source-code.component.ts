@@ -14,6 +14,7 @@ import { LogoType } from 'src/app/shared/enums';
 })
 export class GetSourceCodeComponent {
   @Input() lang!: string;
+  @Input() appName!: string;
   LogoType = LogoType;
 
   constructor() {}

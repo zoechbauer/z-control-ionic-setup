@@ -23,6 +23,7 @@ import { AppConstants } from 'src/app/shared/app.constants';
 })
 export class GetMobileAppComponent {
   @Input() lang!: string;
+  @Input() appName!: string;
   LogoType = LogoType;
 
   constructor() {}

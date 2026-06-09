@@ -2,7 +2,7 @@
   <app-header [currentTab]="Tab.MainFeature"></app-header>
 </div>
 
-<h6 class="ion-text-center">{{'APP.NAME' | translate}}</h6>
+<h6 class="ion-text-center">{{ appName }}</h6>
 <ion-content #content [class.landscape]="!utilsService.isPortrait">
 
   <!-- TODO - replace with actual feature -->

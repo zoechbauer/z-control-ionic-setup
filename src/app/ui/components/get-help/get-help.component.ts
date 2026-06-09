@@ -16,6 +16,7 @@ import { CommonModule } from '@angular/common';
 import { LocalStorageService } from 'src/app/services/local-storage.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { AppConstants } from 'src/app/shared/app.constants';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-get-help',
@@ -72,6 +73,14 @@ export class HelpModalComponent implements OnInit, OnDestroy {
   get deviceText(): string {
     const key = this.isNative ? 'HELP_DEVICE_TEXT' : 'HELP_DEVICE_TEXT_WEB';
     return this.translate.instant(key);
+  }
+
+  get appName(): string {
+    return environment.app.name;
+  }
+
+  get appShortName(): string {
+    return environment.app.shortName;
   }
 
   private readonly orientationListener = () => {

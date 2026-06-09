@@ -41,6 +41,7 @@ function makeEnv(prod = false) {
     },
     app: {
       name: v("APP_NAME", "My App"),
+      shortName: v("APP_NAME_SHORT", "My App"),
       showTabsBar: v("SHOW_TABS_BAR", "false").toLowerCase() === "true",
       maxFreeFeatureCharsPerMonthForUser: Number(
         v("MAX_FREE_FEATURE_CHARS_PER_MONTH_FOR_USER", "10000"),

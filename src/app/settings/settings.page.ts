@@ -73,6 +73,23 @@ export class SettingsPage implements OnInit, OnDestroy {
     private readonly firestoreUtilsService: FirebaseFirestoreUtilsService,
   ) {}
 
+  get appName(): string {
+    return environment.app.name;
+  }
+
+  get versionInfo() {
+    const { major, minor, date } = {
+      major: environment.version.major,
+      minor: environment.version.minor,
+      date: environment.version.date,
+    };
+    return `${major}.${minor} (${date})`;
+  }
+
+  get isNative(): boolean {
+    return this.utilsService.isNative;
+  }
+
   ngOnInit() {
     this.isLoading = true;
     this.showAllAccordions = true;
@@ -104,10 +121,6 @@ export class SettingsPage implements OnInit, OnDestroy {
     window.addEventListener('resize', () => {
       this.utilsService.showOrHideIonTabBar();
     });
-  }
-
-  get isNative(): boolean {
-    return this.utilsService.isNative;
   }
 
   onAccordionGroupChange(event: CustomEvent, content: IonContent) {
@@ -161,15 +174,6 @@ export class SettingsPage implements OnInit, OnDestroy {
 
   async openChangelog() {
     this.utilsService.openChangelog();
-  }
-
-  get versionInfo() {
-    const { major, minor, date } = {
-      major: environment.version.major,
-      minor: environment.version.minor,
-      date: environment.version.date,
-    };
-    return `${major}.${minor} (${date})`;
   }
 
   ngOnDestroy(): void {

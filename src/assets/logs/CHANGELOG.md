@@ -1,6 +1,6 @@
 # What's New?
 
-Welcome to the latest updates for the **z-control IONIC Setup** app.
+Welcome to the latest updates for the **z-control Ionic Setup** app.
 
 ## Versioning
 
@@ -9,6 +9,15 @@ This project uses a simplified major.minor versioning scheme:
 - Major versions indicate significant milestones or breaking changes.
 - Minor versions indicate new features, improvements, and bug fixes.
 - Patch numbers are intentionally omitted; all changes are released as major or minor versions.
+
+## [1.1] - 2026-06-09
+
+### 🚀 Improvements
+
+- The long and short app names are now sourced exclusively from the environment configuration, ensuring consistent naming throughout the application and simplifying maintenance.
+- Updated the user help page with a notice explaining why the demo feature "Search Related Words" is not documented in detail and how it can be used to explore the quota management system.
+- Added guidance directing users to the "How do I use the app?" section for information about monitoring monthly quota usage.
+- Changed IONIC to Ionic in the changelog and app for consistent branding.
 
 ## [1.0] - 2026-06-07
 
@@ -73,7 +82,7 @@ This project uses a simplified major.minor versioning scheme:
 
 ### 🐛 Fixes
 
-- Renamed "Translator" to "Feature" across the UI to better reflect that this app demonstrates feature implementation in the z-control IONIC Setup project, rather than acting as a standalone translator.
+- Renamed "Translator" to "Feature" across the UI to better reflect that this app demonstrates feature implementation in the z-control Ionic Setup project, rather than acting as a standalone translator.
 
 ### 🔧 Internal
 
@@ -96,7 +105,7 @@ This project uses a simplified major.minor versioning scheme:
 ### ✨ New Features
 
 - Added Firebase Functions to store quota usage data in Firestore.
-- Implemented the Search Related Words feature using the Datamuse API, with results shown on the Main page. This feature demonstrates how to implement functionality in the z-control IONIC Setup project.
+- Implemented the Search Related Words feature using the Datamuse API, with results shown on the Main page. This feature demonstrates how to implement functionality in the z-control Ionic Setup project.
 - Added quota usage tracking for the Search Related Words feature, including monthly quota management.
 - Added relevant documentation for Firebase Functions and unit testing based on the z-control Translator app.
 
@@ -108,7 +117,7 @@ This project uses a simplified major.minor versioning scheme:
 
 ### ✨ New Features
 
-- Initial release of the IONIC setup app with a Main page and a Settings page, built with Angular 20 and Ionic 8.
+- Initial release of the Ionic setup app with a Main page and a Settings page, built with Angular 20 and Ionic 8.
 - Added test infrastructure with Jasmine and Karma.
 - Main page now includes a feature-call simulation button with toast feedback.
 - Settings page now includes:
@@ -119,7 +128,7 @@ This project uses a simplified major.minor versioning scheme:
   - App version and release notes
   - Mobile app installation info
   - Source code link to GitHub
-- Established a maintainable foundation for future z-control IONIC app features.
+- Established a maintainable foundation for future z-control Ionic app features.
 
 ### 🛡 Security
 

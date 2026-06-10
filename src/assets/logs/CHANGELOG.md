@@ -10,6 +10,14 @@ This project uses a simplified major.minor versioning scheme:
 - Minor versions indicate new features, improvements, and bug fixes.
 - Patch numbers are intentionally omitted; all changes are released as major or minor versions.
 
+## [1.2] - YYYY-MM-DD
+
+### ✨ New Features
+
+- Defined the Firestore collection name for the new image-to-text app as `ZC_image_to_text_statistics` in the backend to keep app data isolated and well organized. 
+- Deployed the updated backend to Firebase, ensuring that the new collection is created and ready for use to develop the new image-to-text app.
+- Added an Android Configuration section to `z-control-ionic-setup-usage.md` to document the required native Android changes when creating a new app from the setup project.
+
 ## [1.1] - 2026-06-09
 
 ### 🚀 Improvements

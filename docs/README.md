@@ -1,6 +1,6 @@
 # Documentation Overview: z-control IONIC Setup App
 
-This folder contains categorized guides, troubleshooting steps, and best practices for developing, building, and deploying the z-control IONIC Setup App using Ionic, Angular, and Capacitor.
+The [docs](.) folder contains categorized guides, troubleshooting steps, and best practices for developing, building, and deploying the z-control IONIC Setup App using Ionic, Angular, and Capacitor.
 
 ## A. Programming
 
@@ -65,7 +65,7 @@ Guides for setting up, running, and improving Angular unit tests with Karma and 
 - **local-testing-guide-secureTranslate.md**  
   How to test the SecureTranslate Cloud Function locally using the Firebase Emulator Suite and dotenv for environment variables. Includes curl examples, debugging, and troubleshooting steps.
 
-## G. Google Play Store Publication
+## E. Google Play Store Publication ([docs](upload-to-google-playstore/docs) folder)
 
 - **upload-to-google-playstore/docs/Google-Play-Store-Publication-Guide.md**  
   Complete step-by-step guide for publishing to Google Play Store, covering 24 steps across 6 phases from app creation through post-launch management. Includes build instructions, testing workflows, submission checklists, and troubleshooting.

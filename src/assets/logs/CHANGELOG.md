@@ -10,12 +10,17 @@ This project uses a simplified major.minor versioning scheme:
 - Minor versions indicate new features, improvements, and bug fixes.
 - Patch numbers are intentionally omitted; all changes are released as major or minor versions.
 
-## [1.2] - YYYY-MM-DD
+## [2.0] - 2026-06-11
+
+### ✨ New Architecture
+
+- **Refactor of the z-control Ionic Setup project** to remove all Backend code and Backend documentation and move it to the new  **z-control Backend Functions** app. Otherwise, all cloned apps would have to remove the functions folder, as the functions are shared by all apps and are not app-specific. This refactor allows the z-control Ionic Setup project to focus exclusively on frontend code and shared configurations, while the z-control Backend Functions project manages all backend logic and functions for multiple apps.
+- Removed functions folder from the project because functions are never implemented in frontend projects but only in the backend functions project. This cleanup ensures that the frontend project remains focused on UI and client-side logic, while all backend functionality is centralized in the new z-control Backend Functions project.
+- Updated the README to reflect the new app structure and provide instructions for using the z-control Backend Functions project for backend functionality.
+- Removed backend-related documentation from the docs folder, as the backend code is now mangaged in the separate z-control Backend Functions project. This cleanup ensures that the documentation remains relevant to the frontend app and directs users to the appropriate resources for backend development.
 
 ### ✨ New Features
 
-- Defined the Firestore collection name for the new image-to-text app as `ZC_image_to_text_statistics` in the backend to keep app data isolated and well organized. 
-- Deployed the updated backend to Firebase, ensuring that the new collection is created and ready for use to develop the new image-to-text app.
 - Added an Android Configuration section to `z-control-ionic-setup-usage.md` to document the required native Android changes when creating a new app from the setup project.
 
 ## [1.1] - 2026-06-09

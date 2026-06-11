@@ -36,7 +36,7 @@ The Android app is **available only to the z-control team in Google Play Interna
 - **Build Tool**: Angular CLI
 - **Icons**: Ionicons
 - **State Management**: RxJS (BehaviorSubject, Subject)
-- **Backend**: Firebase (Firestore, Cloud Functions, Hosting) managed by z-control Backend Functions repository
+- **Backend**: Firebase (Firestore, Cloud Functions, Hosting) managed by [z-control Backend Functions](https://github.com/zoechbauer/z-control-backend-functions) repository
 - **Testing**: Karma + Jasmine (frontend), Vitest (backend)
 - **Deployment**: Capacitor (Android) for Frontend
 
@@ -65,7 +65,7 @@ z-control-ionic-setup/
 
 Use this workflow when you build a new feature for another z-control app (for example translator) that needs backend changes.
 
-1. Implement backend changes in z-control Backend Functions repository and deploy them from there.
+1. Implement backend changes in [z-control Backend Functions](https://github.com/zoechbauer/z-control-backend-functions) repository and deploy them from there.
 2. Start Firebase emulators from this setup repository.
 3. Run the target frontend app (for example translator) with `ionic serve`.
 4. Test FE and BE integration against the Firebase emulator.
@@ -114,7 +114,7 @@ npm run test:coverage
 ```
 #### Backend Tests (Vitest + Istanbul)
 
-See z-control Backend Functions repository documentation for backend testing instructions, as the backend code and tests are maintained there.
+See [z-control Backend Functions](https://github.com/zoechbauer/z-control-backend-functions) repository documentation for backend testing instructions, as the backend code and tests are maintained there.
 
 ### Building for Android
 

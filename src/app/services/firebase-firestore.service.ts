@@ -161,11 +161,6 @@ export class FirebaseFirestoreService {
         unsub();
         resolve();
       });
-      // Safety fallback to avoid hanging if callback never fires
-      setTimeout(() => {
-        unsub();
-        resolve();
-      }, 3000);
     });
   }
 

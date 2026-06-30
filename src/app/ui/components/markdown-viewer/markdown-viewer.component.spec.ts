@@ -5,7 +5,8 @@ import {
 } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { MarkdownModule } from 'ngx-markdown';
-import { IonicModule, ModalController } from '@ionic/angular';
+import { IonicModule } from '@ionic/angular';
+import { ModalController } from '@ionic/angular/standalone';
 
 import { MarkdownViewerComponent } from './markdown-viewer.component';
 import { UtilsService } from 'src/app/services/utils.service';

@@ -66,8 +66,8 @@ z-control-ionic-setup/
 Use this workflow when you build a new feature for another z-control app (for example translator) that needs backend changes.
 
 1. Implement backend changes in [z-control Backend Functions](https://github.com/zoechbauer/z-control-backend-functions) repository and deploy them from there.
-2. Start Firebase emulators from this setup repository.
-3. Run the target frontend app (for example translator) with `ionic serve`.
+2. Start Firebase emulators from z-control Backend Functions repository.
+3. Run this target frontend app with `ionic serve`.
 4. Test FE and BE integration against the Firebase emulator.
 5. Deploy shared Firebase Functions from the z-control Backend Functions repository only.
 6. Deploy the target frontend app after integration tests pass.

@@ -1,4 +1,4 @@
-import { environment } from 'src/environments/environment';
+import { environment } from '@env/environment';
 import { DeviceUtils } from './device-utils.service';
 import { UserType } from '../shared/firebase-firestore.interfaces';
 import { AppleDeviceTypeEnum, WebPlatformTypeEnum } from '../shared/enums';
@@ -224,7 +224,7 @@ describe('DeviceUtils', () => {
           userAgent: navigator.userAgent,
           language: navigator.language,
           appVersion: environment.version,
-        })
+        }),
       );
     });
 
@@ -287,7 +287,7 @@ describe('DeviceUtils', () => {
     const createMockUserInfo = (
       userAgent: string,
       platform = '',
-      isNative?: boolean
+      isNative?: boolean,
     ): any => ({
       isNative,
       deviceInfo: {

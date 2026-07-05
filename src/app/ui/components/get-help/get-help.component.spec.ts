@@ -9,10 +9,10 @@ import { TranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
 
 import { HelpModalComponent } from './get-help.component';
-import { LocalStorageService } from 'src/app/services/local-storage.service';
-import { UtilsService } from 'src/app/services/utils.service';
-import { createTranslateServiceMock } from 'src/app/testing/translate-service.mock';
-import { AppConstants } from 'src/app/shared/app.constants';
+import { LocalStorageService } from '@app/services/local-storage.service';
+import { UtilsService } from '@app/services/utils.service';
+import { createTranslateServiceMock } from '@testing/translate-service.mock';
+import { AppConstants } from '@app/shared/app.constants';
 
 describe('HelpModalComponent', () => {
   let component: HelpModalComponent;
@@ -32,7 +32,7 @@ describe('HelpModalComponent', () => {
       [],
       {
         selectedLanguage$: of('de'),
-      }
+      },
     );
     const utilsServiceSpy = jasmine.createSpyObj(
       'UtilsService',
@@ -40,7 +40,7 @@ describe('HelpModalComponent', () => {
       {
         isPortrait: true,
         isNative: true,
-      }
+      },
     );
 
     await TestBed.configureTestingModule({
@@ -57,16 +57,16 @@ describe('HelpModalComponent', () => {
     component = fixture.componentInstance;
 
     mockModalController = TestBed.inject(
-      ModalController
+      ModalController,
     ) as jasmine.SpyObj<ModalController>;
     mockTranslateService = TestBed.inject(
-      TranslateService
+      TranslateService,
     ) as jasmine.SpyObj<TranslateService>;
     mockLocalStorageService = TestBed.inject(
-      LocalStorageService
+      LocalStorageService,
     ) as jasmine.SpyObj<LocalStorageService>;
     mockUtilsService = TestBed.inject(
-      UtilsService
+      UtilsService,
     ) as jasmine.SpyObj<UtilsService>;
 
     mockTranslateService.instant.and.returnValue('Translated Text');
@@ -85,11 +85,11 @@ describe('HelpModalComponent', () => {
 
       expect(window.addEventListener).toHaveBeenCalledWith(
         'resize',
-        jasmine.any(Function)
+        jasmine.any(Function),
       );
       expect(window.addEventListener).toHaveBeenCalledWith(
         'orientationchange',
-        jasmine.any(Function)
+        jasmine.any(Function),
       );
       expect((component as any).orientationListener).toHaveBeenCalled();
     });
@@ -110,7 +110,7 @@ describe('HelpModalComponent', () => {
       tick(600);
 
       expect(mockUtilsService.scrollToElement).toHaveBeenCalledWith(
-        'toc-section'
+        'toc-section',
       );
     }));
   });
@@ -124,11 +124,11 @@ describe('HelpModalComponent', () => {
 
       expect(window.removeEventListener).toHaveBeenCalledWith(
         'resize',
-        jasmine.any(Function)
+        jasmine.any(Function),
       );
       expect(window.removeEventListener).toHaveBeenCalledWith(
         'orientationchange',
-        jasmine.any(Function)
+        jasmine.any(Function),
       );
     });
   });
@@ -142,7 +142,7 @@ describe('HelpModalComponent', () => {
 
       expect(component.scrollToTopObj.id).toBe('toc-DE');
       expect(mockTranslateService.instant).toHaveBeenCalledWith(
-        'SCROLL_TO_TOP_DE'
+        'SCROLL_TO_TOP_DE',
       );
     });
 
@@ -154,7 +154,7 @@ describe('HelpModalComponent', () => {
 
       expect(component.scrollToTopObj.id).toBe('toc');
       expect(mockTranslateService.instant).toHaveBeenCalledWith(
-        'SCROLL_TO_TOP_EN'
+        'SCROLL_TO_TOP_EN',
       );
     });
   });
@@ -197,7 +197,7 @@ describe('HelpModalComponent', () => {
         mockUtilsService,
         mockModalController,
         mockTranslateService,
-        mockLocalStorageService
+        mockLocalStorageService,
       );
 
       expect(newComponent.isPortrait).toBe(true);
@@ -215,7 +215,7 @@ describe('HelpModalComponent', () => {
       expect(component.isNative).toBe(true);
       expect(component.emailSubjectHelpText).toBe('Translated Text');
       expect(mockTranslateService.instant).toHaveBeenCalledWith(
-        'HELP_EMAIL_SUBJECT'
+        'HELP_EMAIL_SUBJECT',
       );
     });
 
@@ -225,7 +225,7 @@ describe('HelpModalComponent', () => {
       expect(component.isNative).toBe(false);
       expect(component.emailSubjectHelpText).toBe('Translated Text');
       expect(mockTranslateService.instant).toHaveBeenCalledWith(
-        'HELP_EMAIL_SUBJECT_WEB'
+        'HELP_EMAIL_SUBJECT_WEB',
       );
     });
 
@@ -235,7 +235,7 @@ describe('HelpModalComponent', () => {
       expect(component.isNative).toBe(true);
       expect(component.deviceText).toBe('Translated Text');
       expect(mockTranslateService.instant).toHaveBeenCalledWith(
-        'HELP_DEVICE_TEXT'
+        'HELP_DEVICE_TEXT',
       );
     });
 
@@ -245,7 +245,7 @@ describe('HelpModalComponent', () => {
       expect(component.isNative).toBe(false);
       expect(component.deviceText).toBe('Translated Text');
       expect(mockTranslateService.instant).toHaveBeenCalledWith(
-        'HELP_DEVICE_TEXT_WEB'
+        'HELP_DEVICE_TEXT_WEB',
       );
     });
 
@@ -255,7 +255,7 @@ describe('HelpModalComponent', () => {
       expect(component.isNative).toBe(true);
       expect(component.languageChangeButtonHelpText).toBe('Translated Text');
       expect(mockTranslateService.instant).toHaveBeenCalledWith(
-        'HELP_LANGUAGE_CHANGE_BUTTON'
+        'HELP_LANGUAGE_CHANGE_BUTTON',
       );
     });
 
@@ -265,13 +265,13 @@ describe('HelpModalComponent', () => {
       expect(component.isNative).toBe(false);
       expect(component.languageChangeButtonHelpText).toBe('Translated Text');
       expect(mockTranslateService.instant).toHaveBeenCalledWith(
-        'HELP_LANGUAGE_CHANGE_WEB_BUTTON'
+        'HELP_LANGUAGE_CHANGE_WEB_BUTTON',
       );
     });
 
     it('should return max free feature chars length per month from AppConstants', () => {
       expect(component.maxFreeFeatureCharsLengthPerMonth).toBe(
-        AppConstants.maxFreeFeatureCharsPerMonth
+        AppConstants.maxFreeFeatureCharsPerMonth,
       );
     });
   });

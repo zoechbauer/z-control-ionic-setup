@@ -1,12 +1,21 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { FirebaseFirestoreUtilsService } from 'src/app/services/firebase-firestore-utils.service';
-import { IonCardHeader, IonCardTitle, IonCardContent, IonCard, IonRow, IonGrid, IonCol, IonCardSubtitle } from '@ionic/angular/standalone';
+import { FirebaseFirestoreUtilsService } from '@app/services/firebase-firestore-utils.service';
+import {
+  IonCardHeader,
+  IonCardTitle,
+  IonCardContent,
+  IonCard,
+  IonRow,
+  IonGrid,
+  IonCol,
+  IonCardSubtitle,
+} from '@ionic/angular/standalone';
 import { NgFor, DecimalPipe } from '@angular/common';
 import { Subscription } from 'rxjs';
-import { UtilsService } from 'src/app/services/utils.service';
-import { DisplayedUserContingentData } from 'src/app/shared/firebase-firestore.interfaces';
-import { FireStoreConstants } from 'src/app/shared/app.constants';
+import { UtilsService } from '@app/services/utils.service';
+import { DisplayedUserContingentData } from '@app/shared/firebase-firestore.interfaces';
+import { FireStoreConstants } from '@app/shared/app.constants';
 
 @Component({
   selector: 'app-user-statistic',
@@ -24,7 +33,7 @@ import { FireStoreConstants } from 'src/app/shared/app.constants';
     TranslatePipe,
     DecimalPipe,
     NgFor,
-],
+  ],
 })
 export class UserStatisticComponent implements OnInit, OnDestroy {
   isContingentExceeded: boolean = false;
@@ -39,7 +48,7 @@ export class UserStatisticComponent implements OnInit, OnDestroy {
   constructor(
     public translate: TranslateService,
     private readonly firestoreUtilsService: FirebaseFirestoreUtilsService,
-    private readonly utilsService: UtilsService
+    private readonly utilsService: UtilsService,
   ) {}
 
   ngOnInit() {
@@ -49,7 +58,7 @@ export class UserStatisticComponent implements OnInit, OnDestroy {
       this.firestoreUtilsService.statisticsRefresh$.subscribe(() => {
         this.updateIsContingentExceeded();
         this.updateTranslationStatistics();
-      })
+      }),
     );
   }
 

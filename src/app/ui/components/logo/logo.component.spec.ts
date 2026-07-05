@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 
 import { LogoComponent } from './logo.component';
-import { LogoType } from 'src/app/shared/enums';
+import { LogoType } from '@app/shared/enums';
 
 describe('LogoComponent', () => {
   let component: LogoComponent;
@@ -36,7 +36,7 @@ describe('LogoComponent', () => {
     it('should set logo text for Company type and Portrait orientation', () => {
       component.type = LogoType.Company;
       spyOnProperty(component as any, 'isPortrait', 'get').and.returnValue(
-        true
+        true,
       );
 
       (component as any).setLogoText();
@@ -48,7 +48,7 @@ describe('LogoComponent', () => {
     it('should set logo text for Company type and Landscape orientation', () => {
       component.type = LogoType.Company;
       spyOnProperty(component as any, 'isPortrait', 'get').and.returnValue(
-        false
+        false,
       );
 
       (component as any).setLogoText();
@@ -74,7 +74,7 @@ describe('LogoComponent', () => {
       fixture.detectChanges();
 
       const setSpy = spyOn<any>(component, 'setLogoText').and.callFake(
-        () => {}
+        () => {},
       );
 
       // dispatch resize event - listener added in constructor should call setLogoText
@@ -85,7 +85,7 @@ describe('LogoComponent', () => {
 
     it('should call setLogoText in ngOnInit', () => {
       const setSpy = spyOn<any>(component, 'setLogoText').and.callFake(
-        () => {}
+        () => {},
       );
 
       component.ngOnInit();

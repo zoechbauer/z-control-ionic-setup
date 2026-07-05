@@ -4,10 +4,10 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { provideIonicAngular } from '@ionic/angular/standalone';
 import { TranslateService } from '@ngx-translate/core';
 
-import { UtilsService } from 'src/app/services/utils.service';
-import { createTranslateServiceMock } from 'src/app/testing/translate-service.mock';
+import { UtilsService } from '@app/services/utils.service';
+import { createTranslateServiceMock } from '@testing/translate-service.mock';
 import { UserDetailComponent } from './user-detail.component';
-import { DisplayMode } from 'src/app/shared/enums';
+import { DisplayMode } from '@app/shared/enums';
 
 class ModalControllerMock {
   dismiss = jasmine.createSpy('dismiss');

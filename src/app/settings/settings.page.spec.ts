@@ -10,7 +10,7 @@ import { LocalStorageService } from '../services/local-storage.service';
 import { UtilsService } from '../services/utils.service';
 import { FirebaseFirestoreService } from '../services/firebase-firestore.service';
 import { createTranslateServiceMock } from '../testing/translate-service.mock';
-import { environment } from 'src/environments/environment';
+import { environment } from '@env/environment';
 import { GetStatisticsAccordionComponent } from '../ui/components/accordions/get-statistics-accordion.component';
 import { GetSourceAccordionComponent } from '../ui/components/accordions/get-source-accordion.component';
 import { GetMobileAppAccordionComponent } from '../ui/components/accordions/get-mobile-app-accordion.component';

@@ -1,4 +1,4 @@
-import { environment } from 'src/environments/environment';
+import { environment } from '@env/environment';
 
 export class AppConstants {
   public static readonly currentUser: string = 'currentUser';
@@ -25,7 +25,7 @@ export class FireStoreConstants {
   };
 
   static readonly getUsersCollectionPath = (
-    selectedMonth: string | undefined = undefined
+    selectedMonth: string | undefined = undefined,
   ) => {
     let month = this.currentYearMonthPath();
     if (selectedMonth) month = selectedMonth;
@@ -33,7 +33,7 @@ export class FireStoreConstants {
   };
 
   static readonly getMetaTotalCharsDocumentPath = (
-    selectedMonth: string | undefined = undefined
+    selectedMonth: string | undefined = undefined,
   ) => {
     let month = this.currentYearMonthPath();
     if (selectedMonth) month = selectedMonth;
@@ -41,7 +41,7 @@ export class FireStoreConstants {
   };
 
   static readonly getMetaContingentDataDocumentPath = (
-    selectedMonth: string | undefined = undefined
+    selectedMonth: string | undefined = undefined,
   ) => {
     let month = this.currentYearMonthPath();
     if (selectedMonth) month = selectedMonth;

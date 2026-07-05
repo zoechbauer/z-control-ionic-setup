@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 
 import { FirebaseFirestoreService } from './firebase-firestore.service';
-import { environment } from 'src/environments/environment';
+import { environment } from '@env/environment';
 import {
   DisplayedUserContingentData,
   DisplayedUserStatistics,

@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 
 import { FirebaseFirestoreService } from './firebase-firestore.service';
-import { environment } from 'src/environments/environment';
+import { environment } from '@env/environment';
 import { UtilsService } from './utils.service';
 import {
   DisplayedUserContingentData,
@@ -31,13 +31,11 @@ describe('FirebaseFirestoreUtilsService', () => {
   let originalCollectionName: any;
 
   beforeAll(() => {
-    originalCollectionName = (FireStoreConstants as any)
-      .COLLECTION_NAME;
+    originalCollectionName = (FireStoreConstants as any).COLLECTION_NAME;
   });
 
   beforeEach(() => {
-    (FireStoreConstants as any).COLLECTION_NAME =
-      originalCollectionName;
+    (FireStoreConstants as any).COLLECTION_NAME = originalCollectionName;
 
     utilsServiceMock = jasmine.createSpyObj('UtilsService', [
       'getPlatform',
@@ -171,7 +169,9 @@ describe('FirebaseFirestoreUtilsService', () => {
     });
 
     it('should return contingent data with user char count', async () => {
-      firestoreServiceMock.readFeatureContingentData.and.resolveTo(contingentData);
+      firestoreServiceMock.readFeatureContingentData.and.resolveTo(
+        contingentData,
+      );
       firestoreServiceMock.getCharCountForUser.and.resolveTo(1000);
 
       const result = await service.getDisplayedUserContingentData();
@@ -190,7 +190,9 @@ describe('FirebaseFirestoreUtilsService', () => {
     });
 
     it('should return contingent data with char count of all users', async () => {
-      firestoreServiceMock.readFeatureContingentData.and.resolveTo(contingentData);
+      firestoreServiceMock.readFeatureContingentData.and.resolveTo(
+        contingentData,
+      );
       firestoreServiceMock.getCharCountForUser.and.resolveTo(1000);
       firestoreServiceMock.getTotalCharCount.and.resolveTo(20000);
 
@@ -241,8 +243,12 @@ describe('FirebaseFirestoreUtilsService', () => {
         consumedFeatureCharCountCurrentMonth: 5000,
         availableFeatureCharCountCurrentMonth: maxTotalFreeChars - 5000,
       };
-      expect(userContingentData).withContext('userContingentData').toEqual(expectedUserResult);
-      expect(totalContingentData).withContext('totalContingentData').toEqual(expectedTotalResult);
+      expect(userContingentData)
+        .withContext('userContingentData')
+        .toEqual(expectedUserResult);
+      expect(totalContingentData)
+        .withContext('totalContingentData')
+        .toEqual(expectedTotalResult);
     });
   });
 
@@ -587,9 +593,15 @@ describe('FirebaseFirestoreUtilsService', () => {
 
         expect(userFeatureUsageResult.length).toBe(3);
 
-        const user1FeatureUsage = userFeatureUsageResult.find((s) => s.userId === 'U-1');
-        const user2FeatureUsage = userFeatureUsageResult.find((s) => s.userId === 'U-2');
-        const progDev1FeatureUsage = userFeatureUsageResult.find((s) => s.userId === 'P-1');
+        const user1FeatureUsage = userFeatureUsageResult.find(
+          (s) => s.userId === 'U-1',
+        );
+        const user2FeatureUsage = userFeatureUsageResult.find(
+          (s) => s.userId === 'U-2',
+        );
+        const progDev1FeatureUsage = userFeatureUsageResult.find(
+          (s) => s.userId === 'P-1',
+        );
         expect(user1FeatureUsage).toEqual(
           jasmine.objectContaining({
             userId: 'U-1',

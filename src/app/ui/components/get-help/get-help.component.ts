@@ -13,10 +13,10 @@ import {
 } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 
-import { LocalStorageService } from 'src/app/services/local-storage.service';
-import { UtilsService } from 'src/app/services/utils.service';
-import { AppConstants } from 'src/app/shared/app.constants';
-import { environment } from 'src/environments/environment';
+import { LocalStorageService } from '@app/services/local-storage.service';
+import { UtilsService } from '@app/services/utils.service';
+import { AppConstants } from '@app/shared/app.constants';
+import { environment } from '@env/environment';
 
 @Component({
   selector: 'app-get-help',
@@ -48,7 +48,7 @@ export class HelpModalComponent implements OnInit, OnDestroy {
     public readonly utilsService: UtilsService,
     private readonly modalController: ModalController,
     private readonly translate: TranslateService,
-    private readonly localStorage: LocalStorageService
+    private readonly localStorage: LocalStorageService,
   ) {}
 
   get maxFreeFeatureCharsLengthPerMonth() {

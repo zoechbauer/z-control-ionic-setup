@@ -9,7 +9,7 @@ import { IonicModule } from '@ionic/angular';
 import { ModalController } from '@ionic/angular/standalone';
 
 import { MarkdownViewerComponent } from './markdown-viewer.component';
-import { UtilsService } from 'src/app/services/utils.service';
+import { UtilsService } from '@app/services/utils.service';
 
 describe('MarkdownViewerComponent', () => {
   let component: MarkdownViewerComponent;
@@ -81,7 +81,7 @@ describe('MarkdownViewerComponent', () => {
 
       expect(console.error).toHaveBeenCalledWith(
         'Error loading changelog:',
-        jasmine.any(Object)
+        jasmine.any(Object),
       );
       expect(component.markdown).toBe('');
     });
@@ -136,7 +136,7 @@ describe('MarkdownViewerComponent', () => {
     });
   });
 
-    it('should call content.scrollToTop with 300 when scrollToTop is called', () => {
+  it('should call content.scrollToTop with 300 when scrollToTop is called', () => {
     const contentSpy = jasmine.createSpyObj('IonContent', ['scrollToTop']);
     (component as any).content = contentSpy;
 

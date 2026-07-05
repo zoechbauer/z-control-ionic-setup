@@ -7,7 +7,7 @@ import { Subject } from 'rxjs';
 
 import { AllMonthsOption, DisplayMode, Tab } from '../shared/enums';
 import { MarkdownViewerComponent } from '../ui/components/markdown-viewer/markdown-viewer.component';
-import { environment } from 'src/environments/environment';
+import { environment } from '@env/environment';
 import { DisplayedUserStatistics } from '../shared/firebase-firestore.interfaces';
 import { UserDetailComponent } from '../ui/components/user-detail/user-detail.component';
 import { HelpModalComponent } from '../ui/components/get-help/get-help.component';
@@ -29,7 +29,7 @@ export class UtilsService {
   constructor(
     private readonly translate: TranslateService,
     private readonly modalController: ModalController,
-    private readonly router: Router
+    private readonly router: Router,
   ) {
     globalThis.addEventListener('orientationchange', () => {
       if (this.currentModal) {
@@ -177,7 +177,7 @@ export class UtilsService {
   async openUserDetail(
     lang: string,
     userStatistic: DisplayedUserStatistics,
-    displayMode: DisplayMode
+    displayMode: DisplayMode,
   ): Promise<void> {
     const modal = await this.modalController.create({
       component: UserDetailComponent,
@@ -205,7 +205,7 @@ export class UtilsService {
           'change-log-modal',
           'user-detail-modal',
           'desktop',
-          'landscape'
+          'landscape',
         );
         switch (modal.component) {
           case HelpModalComponent:
@@ -219,7 +219,7 @@ export class UtilsService {
             break;
           default:
             console.error(
-              'Unknown modal component for setting landscape class'
+              'Unknown modal component for setting landscape class',
             );
         }
         if (this.isDesktop) {
@@ -356,8 +356,6 @@ export class UtilsService {
    * @returns {string} The current month
    */
   getCurrentMonth(): string {
-    return this.formatDateTimeFirestoreSearchString(
-      new Date()
-    );
+    return this.formatDateTimeFirestoreSearchString(new Date());
   }
 }

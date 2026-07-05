@@ -1,4 +1,4 @@
-import { environment } from 'src/environments/environment';
+import { environment } from '@env/environment';
 import { DeviceInfo, UserType } from '../shared/firebase-firestore.interfaces';
 import { AppleDeviceTypeEnum, WebPlatformTypeEnum } from '../shared/enums';
 
@@ -9,7 +9,7 @@ export class DeviceUtils {
 
     if (DeviceUtils.isAndroidPhone(ua)) return true;
     if (DeviceUtils.isAndroidTablet(ua)) return true;
-    
+
     if (DeviceUtils.isIPhone(ua, pf)) return true;
     if (DeviceUtils.isIPad(ua, pf)) return true;
 
@@ -79,7 +79,7 @@ export class DeviceUtils {
    * @returns The Android model name or null if not found
    */
   private static getAndroidModelFromUserAgent(
-    userAgent: string
+    userAgent: string,
   ): string | null {
     const ua = (userAgent || '').toLowerCase();
     const match = /android\s+[\d.]+;\s*([^;]+?)\s+build\//i.exec(ua);
@@ -94,7 +94,7 @@ export class DeviceUtils {
    */
   static detectAppleDevice(
     userAgent = navigator.userAgent,
-    platform = navigator.platform
+    platform = navigator.platform,
   ): AppleDeviceTypeEnum | null {
     const ua = userAgent.toLowerCase();
     const pf = platform.toLowerCase();

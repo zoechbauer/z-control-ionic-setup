@@ -17,7 +17,7 @@ import { Tab } from '../shared/enums';
 import { UserStatisticComponent } from '../ui/components/user-statistic/user-statistic.component';
 import { FirebaseFirestoreUtilsService } from '../services/firebase-firestore-utils.service';
 import { FeatureExampleComponent } from '../feature-example/feature-example.component';
-import { environment } from 'src/environments/environment';
+import { environment } from '@env/environment';
 
 @Component({
   selector: 'app-main',

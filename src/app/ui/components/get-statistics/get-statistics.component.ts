@@ -22,19 +22,19 @@ import { Subscription } from 'rxjs';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 import { LogoComponent } from '../logo/logo.component';
-import { AllMonthsOption, DisplayMode, LogoType } from 'src/app/shared/enums';
-import { FirebaseFirestoreService } from 'src/app/services/firebase-firestore.service';
-import { environment } from 'src/environments/environment';
+import { AllMonthsOption, DisplayMode, LogoType } from '@app/shared/enums';
+import { FirebaseFirestoreService } from '@app/services/firebase-firestore.service';
+import { environment } from '@env/environment';
 import {
   DisplayedUserStatistics,
   StatisticsData,
   UserStatisticsSummary,
   DisplayedUserStatisticsRow,
   ContingentData,
-} from 'src/app/shared/firebase-firestore.interfaces';
-import { UtilsService } from 'src/app/services/utils.service';
-import { LocalStorageService } from 'src/app/services/local-storage.service';
-import { FirebaseFirestoreUtilsService } from 'src/app/services/firebase-firestore-utils.service';
+} from '@app/shared/firebase-firestore.interfaces';
+import { UtilsService } from '@app/services/utils.service';
+import { LocalStorageService } from '@app/services/local-storage.service';
+import { FirebaseFirestoreUtilsService } from '@app/services/firebase-firestore-utils.service';
 import { SpinnerComponent } from '../spinner/spinner.component';
 import { FormsModule } from '@angular/forms';
 
@@ -195,9 +195,10 @@ export class GetStatisticsComponent implements OnInit, OnDestroy {
       this.currentUserUid = await this.localStorageService.loadFirestoreUid();
 
       // Read control flags
-      this.contingentData = await this.firestoreService.readFeatureContingentData(
-        this.filterSelectedMonth,
-      );
+      this.contingentData =
+        await this.firestoreService.readFeatureContingentData(
+          this.filterSelectedMonth,
+        );
       this.isStopped = !!this.contingentData.StopFeatureUsageForAllUsers;
 
       // Total contingent

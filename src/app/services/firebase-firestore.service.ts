@@ -19,7 +19,7 @@ import {
 import { Functions, httpsCallable } from '@angular/fire/functions';
 import { Subject } from 'rxjs';
 
-import { environment } from 'src/environments/environment';
+import { environment } from '@env/environment';
 import { FireStoreConstants } from '../shared/app.constants';
 import { UtilsService } from './utils.service';
 import { LocalStorageService } from './local-storage.service';
@@ -70,9 +70,8 @@ export class FirebaseFirestoreService {
     return this.cachedIsProgrammerDevice;
   }
 
-
   /**
-   * Initializes the Firebase Firestore service by authenticating the user, 
+   * Initializes the Firebase Firestore service by authenticating the user,
    * determining if it's a programmer device, and refreshing relevant data.
    */
   async init() {
@@ -446,13 +445,15 @@ export class FirebaseFirestoreService {
       await runInInjectionContext(this.injector, () =>
         (callable as any)({
           appId: FireStoreConstants.APP_ID,
-          featureType: FeatureType.Feature, 
+          featureType: FeatureType.Feature,
         }),
       );
     } catch (error) {
       console.error('Error creating missing contingent data:', error);
       this.toastService.showToast(
-        this.translate.instant('FEATURE.TOAST.ERROR_CREATING_MISSING_CONTINGENT_DATA'),
+        this.translate.instant(
+          'FEATURE.TOAST.ERROR_CREATING_MISSING_CONTINGENT_DATA',
+        ),
         ToastAnchor.MainPage,
       );
     }
@@ -471,7 +472,9 @@ export class FirebaseFirestoreService {
    * @returns Promise<ContingentData> The contingent data object,
    * or an empty object if not found or on error.
    */
-  async readFeatureContingentData(selectedMonth: string): Promise<ContingentData> {
+  async readFeatureContingentData(
+    selectedMonth: string,
+  ): Promise<ContingentData> {
     try {
       if (selectedMonth === AllMonthsOption.SelectOptionValue) {
         return {}; // contingent data is not displayed for 'all months' option
@@ -512,7 +515,7 @@ export class FirebaseFirestoreService {
   /**
    * Retrieves the current number of feature usage characters for the authenticated user from Firestore.
    * If the document does not exist (e.g., at the start of a new month), the function returns 0.
-   * 
+   *
    * @returns Promise resolving to the user's current character count.
    */
   async getCharCountForUser(): Promise<number> {
@@ -573,7 +576,7 @@ export class FirebaseFirestoreService {
   /**
    * Retrieves feature usage statistics for all users for the selected month or all months from Firestore.
    *  @param selectedMonth The month for which to retrieve user feature usage statistics or all for all user feature usage statistics.
-   * 
+   *
    *  @returns An array of UserFeatureUsageStatistics objects.
    */
   async getAllUserFeatureUsageStatistics(
@@ -609,7 +612,7 @@ export class FirebaseFirestoreService {
 
   /**
    * Retrieves feature usage statistics for all users for the selected month.
-   * 
+   *
    *  @param selectedMonth The month for which to retrieve user feature usage statistics.
    *  @returns An array of UserFeatureUsageStatistics objects.
    */

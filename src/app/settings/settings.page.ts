@@ -4,7 +4,7 @@ import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { IonContent, IonicModule } from '@ionic/angular';
 import { NgIf } from '@angular/common';
 
-import { environment } from 'src/environments/environment';
+import { environment } from '@env/environment';
 import { LogoType, Tab } from '../shared/enums';
 import { FireStoreConstants } from '../shared/app.constants';
 import { LocalStorageService } from '../services/local-storage.service';

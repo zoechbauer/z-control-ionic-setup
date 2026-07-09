@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -45,21 +45,19 @@ import { SpinnerComponent } from '../ui/components/spinner/spinner.component';
   ],
 })
 export class FeatureExampleComponent implements OnInit {
+  translate = inject(TranslateService);
+  localStorage = inject(LocalStorageService);
+  readonly utilsService = inject(UtilsService);
+  private readonly toastService = inject(ToastService);
+  private readonly firestoreUtilsService = inject(FirebaseFirestoreUtilsService);
+  private readonly featureService = inject(FeatureService);
+
   featureInput: string = '';
   relatedWords: string[] = [];
   isLoading = false;
   isContingentExceeded: boolean = false;
   searchBtnDisabled: boolean = false;
   clearBtnDisabled: boolean = false;
-
-  constructor(
-    public translate: TranslateService,
-    public localStorage: LocalStorageService,
-    public readonly utilsService: UtilsService,
-    private readonly toastService: ToastService,
-    private readonly firestoreUtilsService: FirebaseFirestoreUtilsService,
-    private readonly featureService: FeatureService,
-  ) {}
 
   ngOnInit() {
     this.updateIsContingentExceeded().then(() => {
@@ -69,7 +67,7 @@ export class FeatureExampleComponent implements OnInit {
   }
 
   /**
-   * TODO: use this function to check if the user has exceeded their contingent for calling the feature.
+   * Use this function to check if the user has exceeded their contingent for calling the feature.
    */
   private async updateIsContingentExceeded() {
     this.isContingentExceeded =
@@ -84,9 +82,7 @@ export class FeatureExampleComponent implements OnInit {
 
   /**
    * Searches for features based on the user input.
-   *
-   * TODO: Use and rename this function to call your cloud function that 
-   * processes the feature input and returns the results.
+   * Processes the feature input and returns the results.
    */
   async search() {
     this.isLoading = true;

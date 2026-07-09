@@ -1,4 +1,4 @@
-import { Component, OnInit, Renderer2 } from '@angular/core';
+import { Component, inject, OnInit, Renderer2 } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 import { TranslateService } from '@ngx-translate/core';
 import { Capacitor } from '@capacitor/core';
@@ -17,18 +17,16 @@ import { CapacitorPlatformService } from './services/capacitor-platform.service'
   imports: [IonApp, IonRouterOutlet],
 })
 export class AppComponent implements OnInit {
+  private readonly translate = inject(TranslateService);
+  private readonly renderer = inject(Renderer2);
+  private readonly firestoreService = inject(FirebaseFirestoreService);
+  private readonly localStorageService = inject(LocalStorageService);
+  private readonly safeAreaInsets = inject(SafeAreaInsetsService);
+  private readonly systemBars = inject(SystemBarsService);
+  private readonly capacitorPlatformService = inject(CapacitorPlatformService);
+
   isNativeApp = Capacitor.isNativePlatform();
   showTabsBar = environment.app.showTabsBar;
-
-  constructor(
-    private readonly translate: TranslateService,
-    private readonly renderer: Renderer2,
-    private readonly firestoreService: FirebaseFirestoreService,
-    private readonly localStorageService: LocalStorageService,
-    private readonly safeAreaInsets: SafeAreaInsetsService,
-    private readonly systemBars: SystemBarsService,
-    private readonly capacitorPlatformService: CapacitorPlatformService,
-  ) {}
 
   ngOnInit() {
     this.initializeApp();

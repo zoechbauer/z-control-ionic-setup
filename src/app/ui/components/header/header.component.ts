@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import {
   IonHeader,
   IonToolbar,
@@ -32,14 +32,12 @@ import { LogoComponent } from '../logo/logo.component';
   ],
 })
 export class HeaderComponent {
+  translate = inject(TranslateService);
+  readonly utilsService = inject(UtilsService);
+
   @Input() currentTab!: Tab;
   LogoType = LogoType;
   Tab = Tab;
-
-  constructor(
-    public translate: TranslateService,
-    public readonly utilsService: UtilsService,
-  ) {}
 
   get isLargeScreen(): boolean {
     return !this.utilsService.isSmallScreen;

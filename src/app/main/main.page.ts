@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   IonContent,
@@ -38,17 +38,15 @@ import { environment } from '@env/environment';
   ],
 })
 export class MainPage implements OnInit, OnDestroy {
+  translate = inject(TranslateService);
+  localStorage = inject(LocalStorageService);
+  readonly utilsService = inject(UtilsService);
+  private readonly firestoreUtilsService = inject(FirebaseFirestoreUtilsService);
+
   Tab = Tab;
   settingsIcon: string = '<ion-icon name="settings-outline"></ion-icon>';
 
   private readonly subscriptions: Subscription[] = [];
-
-  constructor(
-    public translate: TranslateService,
-    public localStorage: LocalStorageService,
-    public readonly utilsService: UtilsService,
-    private readonly firestoreUtilsService: FirebaseFirestoreUtilsService,
-  ) {}
 
   get appName(): string {
     return environment.app.name;

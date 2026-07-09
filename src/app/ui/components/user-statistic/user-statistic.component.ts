@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { FirebaseFirestoreUtilsService } from '@app/services/firebase-firestore-utils.service';
 import {
@@ -36,6 +36,10 @@ import { FireStoreConstants } from '@app/shared/app.constants';
   ],
 })
 export class UserStatisticComponent implements OnInit, OnDestroy {
+  translate = inject(TranslateService);
+  private readonly firestoreUtilsService = inject(FirebaseFirestoreUtilsService);
+  private readonly utilsService = inject(UtilsService);
+
   isContingentExceeded: boolean = false;
   displayedContingentData: DisplayedUserContingentData[] = [];
   yearMonth: string = FireStoreConstants.currentYearMonthPath();
@@ -44,12 +48,6 @@ export class UserStatisticComponent implements OnInit, OnDestroy {
   get hideColumn(): boolean {
     return this.utilsService.isPortrait && this.utilsService.isNative;
   }
-
-  constructor(
-    public translate: TranslateService,
-    private readonly firestoreUtilsService: FirebaseFirestoreUtilsService,
-    private readonly utilsService: UtilsService,
-  ) {}
 
   ngOnInit() {
     this.updateIsContingentExceeded();

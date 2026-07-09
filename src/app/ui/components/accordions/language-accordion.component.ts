@@ -1,8 +1,5 @@
 import { CommonModule } from '@angular/common';
-import {
-  Component,
-  Input,
-} from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   IonAccordion,
@@ -29,10 +26,8 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
   ],
 })
 export class LanguageAccordionComponent {
-  @Input() lang?: string;
+  translate = inject(TranslateService);
 
-  constructor(
-    public translate: TranslateService,
-  ) {}
+  @Input() lang?: string;
 
 }

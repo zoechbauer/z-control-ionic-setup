@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { IonContent, IonicModule } from '@ionic/angular';
@@ -53,6 +53,11 @@ type AccordionValue = (typeof ACCORDION_VALUES)[number];
   ],
 })
 export class SettingsPage implements OnInit, OnDestroy {
+  translate = inject(TranslateService);
+  readonly localStorage = inject(LocalStorageService);
+  readonly utilsService = inject(UtilsService);
+  private readonly firestoreUtilsService = inject(FirebaseFirestoreUtilsService);
+
   private readonly validAccordionValues = new Set<AccordionValue>(
     ACCORDION_VALUES,
   );
@@ -65,13 +70,6 @@ export class SettingsPage implements OnInit, OnDestroy {
   currentYearMonth: string = FireStoreConstants.currentYearMonthPath();
   isLoading = true;
   private readonly subscriptions: Subscription[] = [];
-
-  constructor(
-    public translate: TranslateService,
-    public readonly localStorage: LocalStorageService,
-    public readonly utilsService: UtilsService,
-    private readonly firestoreUtilsService: FirebaseFirestoreUtilsService,
-  ) {}
 
   get appName(): string {
     return environment.app.name;

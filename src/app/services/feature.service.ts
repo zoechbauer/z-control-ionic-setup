@@ -14,13 +14,13 @@ import { ToastService } from './toast.service';
 
 @Injectable({ providedIn: 'root' })
 export class FeatureService {
+  private readonly functions = inject(Functions);
+  private readonly translate = inject(TranslateService);
+  private readonly toastService = inject(ToastService);
+
   private readonly injector: Injector;
 
-  constructor(
-    private readonly functions: Functions,
-    private readonly translate: TranslateService,
-    private readonly toastService: ToastService,
-  ) {
+  constructor() {
     this.injector = inject(Injector);
   }
 

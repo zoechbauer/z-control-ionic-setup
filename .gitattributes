@@ -1,9 +1,8 @@
-* text eol=lf
-# Treat all typical image types as binary
-*.png binary
-*.jpg binary
+* text=auto
+
+*.png  binary
+*.jpg  binary
 *.jpeg binary
-*.gif binary
+*.gif  binary
 *.webp binary
-*.ico binary
-*.svg text
+*.ico  binary

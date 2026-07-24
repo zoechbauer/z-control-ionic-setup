@@ -83,7 +83,10 @@ describe('MainPage', () => {
     });
 
     describe('ngOnInit', () => {
-      it('should call showOrHideIonTabBar, setupEventListeners, setupSubscriptions, updateIsContingentExceeded, initFormControls, and getTranslationPlaceholder', async () => {
+      const TEST_NAME =
+        'should call showOrHideIonTabBar, setupEventListeners, setupSubscriptions, ' +
+        'updateIsContingentExceeded, initFormControls, and getTranslationPlaceholder';
+      it(TEST_NAME, async () => {
         const showOrHideIonTabBarSpy = utilsServiceSpy.showOrHideIonTabBar;
         const setupEventListenersSpy = spyOn<any>(
           component,

@@ -26,8 +26,10 @@ export class FeatureService {
 
   /**
    * Calls the secureFeature Firebase Cloud Function for feature logic.
-   * see z-control-translator/secureTranslateCloudFunction as a concrete example of how to implement a secure feature cloud function.
-   * @param params The parameters for the feature. In a real implementation, this would be replaced with actual parameters relevant to the feature.
+   * see z-control-translator/secureTranslateCloudFunction as a concrete example of
+   * how to implement a secure feature cloud function.
+   * @param params The parameters for the feature. In a real implementation,
+   *               this would be replaced with actual parameters relevant to the feature.
    * @returns Promise resolving to feature object or throws error.
    */
   async secureFeatureCloudFunction(

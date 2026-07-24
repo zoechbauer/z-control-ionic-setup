@@ -141,7 +141,9 @@ describe('FeatureExampleComponent', () => {
         expect(component.isContingentExceeded).toBeTrue();
       });
 
-      it('should show contingent exceeded toast and not call secureFeatureCloudFunction if contingent is exceeded', async () => {
+      const TEST_NAME =
+        'should show contingent exceeded toast and not call secureFeatureCloudFunction if contingent is exceeded';
+      it(TEST_NAME, async () => {
         firestoreUtilsServiceSpy.isContingentExceeded.and.returnValue(
           Promise.resolve(true),
         );
@@ -157,7 +159,10 @@ describe('FeatureExampleComponent', () => {
         ).not.toHaveBeenCalled();
       });
 
-      it('should show contingent exceeded toast and clear isLoading if secureFeatureCloudFunction throws an error which contains contingent', async () => {
+      const TEST_NAME_2 =
+        'should show contingent exceeded toast and clear isLoading ' +
+        'if secureFeatureCloudFunction throws an error which contains contingent';
+      it(TEST_NAME_2, async () => {
         component.isLoading = true;
         featureServiceSpy.secureFeatureCloudFunction.and.throwError(
           new Error('Feature quota/contingent exceeded'),
@@ -175,7 +180,10 @@ describe('FeatureExampleComponent', () => {
         expect(component.isLoading).toBeFalse();
       });
 
-      it('should log error, show error toast and clear isLoading if secureFeatureCloudFunction throws an error', async () => {
+      const TEST_NAME_3 =
+        'should log error, show error toast and clear isLoading ' +
+        'if secureFeatureCloudFunction throws an error';
+      it(TEST_NAME_3, async () => {
         component.isLoading = true;
         const consoleErrorSpy = spyOn(console, 'error');
         featureServiceSpy.secureFeatureCloudFunction.and.throwError(
@@ -204,7 +212,10 @@ describe('FeatureExampleComponent', () => {
         expect(featureServiceSpy.secureFeatureCloudFunction).toHaveBeenCalled();
       });
 
-      it('should refresh statistics and show completion toast if secureFeatureCloudFunction returns result', async () => {
+      const TEST_NAME_4 =
+        'should refresh statistics and show completion toast ' +
+        'if secureFeatureCloudFunction returns result';
+      it(TEST_NAME_4, async () => {
         featureServiceSpy.secureFeatureCloudFunction.and.returnValue(
           Promise.resolve({
             feature: { text: 'Linz', related: 'upper austria' },

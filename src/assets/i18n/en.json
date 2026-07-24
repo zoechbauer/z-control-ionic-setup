@@ -63,7 +63,12 @@
       "QUOTA_REDUCED": "The monthly quota has been reduced.",
       "CONTINGENT_EXCEEDED": "Feature quota exceeded. Please try again next month.",
       "ERROR_CALLING_FEATURE": "Error calling the main feature. Please try again later or use another word.",
-      "ERROR_CREATING_MISSING_CONTINGENT_DATA": "Error creating missing contingent data."
+      "ERROR_CREATING_MISSING_CONTINGENT_DATA": "Error creating missing contingent data.",
+      "ERROR_ADDING_USER": "Error adding user. Please try again.",
+      "ERROR_LOADING_USERS": "Error loading users. Please try again.",
+      "ERROR_UPDATING_PROGRAMMER_DEVICES": "Error updating programmer devices. Please try again.",
+      "ERROR_GETTING_PROGRAMMER_DEVICES": "Error getting programmer devices. Please try again.",
+      "ERROR_GETTING_PROGRAMMER_DEVICE_STATUS": "Error getting programmer device status. Please try again."
     }
   },
 

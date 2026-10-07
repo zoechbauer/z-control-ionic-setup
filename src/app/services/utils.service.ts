@@ -358,4 +358,32 @@ export class UtilsService {
   getCurrentMonth(): string {
     return this.formatDateTimeFirestoreSearchString(new Date());
   }
+
+  /**
+   * Adds leading blanks to a string or number to ensure it reaches a specified total length.
+   * @param value - The string or number to format.
+   * @param totalLength - The desired total length of the resulting string.
+   */
+  addLeadingBlanks(value: string | number, totalLength: number): string {
+    const valueStr = String(value);
+    const leadingBlanksCount = totalLength - valueStr.length;
+    if (leadingBlanksCount > 0) {
+      return ' '.repeat(leadingBlanksCount) + valueStr;
+    }
+    return valueStr;
+  }
+
+  /**
+   * Adds trailing blanks to a string or number to ensure it reaches a specified total length.
+   * @param value - The string or number to format.
+   * @param totalLength - The desired total length of the resulting string.
+   */
+  addTrailingBlanks(value: string | number, totalLength: number): string {
+    const valueStr = String(value);
+    const trailingBlanksCount = totalLength - valueStr.length;
+    if (trailingBlanksCount > 0) {
+      return valueStr + ' '.repeat(trailingBlanksCount);
+    }
+    return valueStr;
+  }
 }

@@ -13,6 +13,7 @@ import { LocalStorageService } from '@app/services/local-storage.service';
 import { UtilsService } from '@app/services/utils.service';
 import { createTranslateServiceMock } from '@testing/translate-service.mock';
 import { AppConstants } from '@app/shared/app.constants';
+import { environment } from 'src/environments/environment';
 
 describe('HelpModalComponent', () => {
   let component: HelpModalComponent;
@@ -269,6 +270,14 @@ describe('HelpModalComponent', () => {
       expect(component.maxFreeFeatureCharsLengthPerMonth).toBe(
         AppConstants.maxFreeFeatureCharsPerMonth,
       );
+    });
+
+    it('should return app name', () => {
+      expect(component.appName).toBe(environment.app.name);
+    });
+
+    it('should return app short name', () => {
+      expect(component.appShortName).toBe(environment.app.shortName);
     });
   });
 });

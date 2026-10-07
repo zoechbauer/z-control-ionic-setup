@@ -28,8 +28,13 @@ import {
 
 import { routes } from './app-routes';
 import { ServicesModule } from './services.module';
+import { FirebaseCredentials } from './services/firebase-credentials';
 import { environment } from '@env/environment';
 
+/**
+ * Application configuration for the Ionic Angular app, including routing, 
+ * HTTP client, translation, and Firebase setup.
+ */
 export const appConfig: ApplicationConfig = {
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
@@ -48,7 +53,7 @@ export const appConfig: ApplicationConfig = {
       suffix: '.json',
     }),
 
-    provideFirebaseApp(() => initializeApp(environment.firebase)),
+    provideFirebaseApp(() => initializeApp(FirebaseCredentials.getFirebaseCredentials())),
     provideAuth(() => getAuth()),
     // DRY: Helper to get emulator host or undefined if not using emulator
     (() => {

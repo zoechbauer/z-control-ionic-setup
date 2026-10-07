@@ -257,8 +257,11 @@ describe('ToastService', () => {
         positionAnchor: 'toast-anchor-main',
       });
 
+      const errMsg =
+        'Toast presentation failed. Ionic ToastController may still be affected by a production/runtime issue. ' +
+        'UI fallback is intentionally disabled to preserve consistent Ionic UI.';
       expect(consoleErrorSpy).toHaveBeenCalledWith(
-        'Toast presentation failed. Ionic ToastController may still be affected by a production/runtime issue. UI fallback is intentionally disabled to preserve consistent Ionic UI.',
+        errMsg,
         jasmine.objectContaining({
           error: failingError,
           message: 'Test Message',
@@ -279,8 +282,11 @@ describe('ToastService', () => {
         position: 'top',
       });
 
+      const errMsg =
+        'Toast presentation failed. Ionic ToastController may still be affected by a production/runtime issue. ' +
+        'UI fallback is intentionally disabled to preserve consistent Ionic UI.';
       expect(consoleErrorSpy).toHaveBeenCalledWith(
-        'Toast presentation failed. Ionic ToastController may still be affected by a production/runtime issue. UI fallback is intentionally disabled to preserve consistent Ionic UI.',
+        errMsg,
         jasmine.objectContaining({
           error: timeoutError,
           message: 'Timeout Message',

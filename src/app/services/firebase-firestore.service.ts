@@ -189,7 +189,7 @@ export class FirebaseFirestoreService {
         );
       }
     }
-    this.saveUserIdToLocalStorage(this.user.uid);
+    await this.saveUserIdToLocalStorage(this.user.uid);
   }
 
   /**
@@ -253,9 +253,7 @@ export class FirebaseFirestoreService {
     } catch (error) {
       console.error('Error loading users from user mapping:', error);
       this.toastService.showToast(
-        this.translate.instant(
-          'FEATURE.TOAST.ERROR_LOADING_USERS',
-        ),
+        this.translate.instant('FEATURE.TOAST.ERROR_LOADING_USERS'),
         ToastAnchor.SettingsPage,
       );
       return [];
@@ -302,9 +300,7 @@ export class FirebaseFirestoreService {
     } catch (error) {
       console.error('Error adding user:', error);
       this.toastService.showToast(
-        this.translate.instant(
-          'FEATURE.TOAST.ERROR_ADDING_USER',
-        ),
+        this.translate.instant('FEATURE.TOAST.ERROR_ADDING_USER'),
         ToastAnchor.MainPage,
       );
     }
@@ -589,12 +585,19 @@ export class FirebaseFirestoreService {
         const allMonths =
           this.utilsService.getAllFirestoreSearchStringsForMonth();
 
-        for (const month of allMonths) {
-          if (month !== AllMonthsOption.localStorageValue) {
-            const statsForMonth =
-              await this.getAllUserFeatureUsageStatisticsForMonth(month);
-            result = result.concat(statsForMonth);
-          }
+        const monthsToFetch = allMonths.filter(
+          (m) => m !== AllMonthsOption.localStorageValue,
+        );
+        if (monthsToFetch.length > 0) {
+          const statsArrays = await Promise.all(
+            monthsToFetch.map((month) =>
+              this.getAllUserFeatureUsageStatisticsForMonth(month),
+            ),
+          );
+          result = statsArrays.reduce(
+            (acc, arr) => acc.concat(arr),
+            [] as UserFeatureUsageStatistics[],
+          );
         }
       } else {
         result =

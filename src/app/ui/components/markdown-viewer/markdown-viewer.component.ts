@@ -1,5 +1,12 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, Input, OnInit, ViewChild, SecurityContext, inject } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnInit,
+  ViewChild,
+  SecurityContext,
+  inject,
+} from '@angular/core';
 import { MarkdownComponent, MarkdownService, SANITIZE } from 'ngx-markdown';
 import {
   IonContent,
@@ -59,12 +66,12 @@ export class MarkdownViewerComponent implements OnInit {
     this.loadMarkdownChangelog();
   }
 
-  closeModal() {
-    this.modalController.dismiss();
+  async closeModal(): Promise<void> {
+    await this.modalController.dismiss();
   }
 
-  scrollToTop() {
-    this.content.scrollToTop(300);
+  async scrollToTop(): Promise<void> {
+    await this.content.scrollToTop(300);
   }
 
   private loadMarkdownChangelog() {

@@ -29,7 +29,7 @@ export class AppComponent implements OnInit {
   showTabsBar = environment.app.showTabsBar;
 
   ngOnInit() {
-    this.initializeApp();
+    void this.initializeApp();
   }
 
   async initializeApp() {
@@ -40,7 +40,7 @@ export class AppComponent implements OnInit {
       await this.capacitorPlatformService.setStatusBarOverlay(false);
       this.safeAreaInsets.setSafeAreaInsetsFix();
 
-      const isDarkMode = await this.systemBars.getCurrentIsDarkMode();
+      const isDarkMode = this.systemBars.getCurrentIsDarkMode();
       await this.systemBars.setBars(isDarkMode);
 
       await this.capacitorPlatformService.showStatusBar();

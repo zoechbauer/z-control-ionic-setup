@@ -60,7 +60,7 @@ export class FeatureExampleComponent implements OnInit {
   clearBtnDisabled: boolean = false;
 
   ngOnInit() {
-    this.updateIsContingentExceeded().then(() => {
+    void this.updateIsContingentExceeded().then(() => {
       this.initFormControls();
       this.isLoading = false;
     });

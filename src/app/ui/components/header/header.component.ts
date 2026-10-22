@@ -55,16 +55,16 @@ export class HeaderComponent {
     return !this.utilsService.isShowIonTabBar;
   }
 
-  goToSettings() {
-    this.utilsService.navigateToTab(Tab.Settings);
+  async goToSettings(): Promise<void> {
+    await this.utilsService.navigateToTab(Tab.Settings);
   }
 
-  goToMainFeature() {
-    this.utilsService.navigateToTab(Tab.MainFeature);
+  async goToMainFeature(): Promise<void> {
+    await this.utilsService.navigateToTab(Tab.MainFeature);
   }
 
-  goToSettingsAndOpenFeedback() {
-    this.utilsService.navigateToTabWithParams(Tab.Settings, {
+  async goToSettingsAndOpenFeedback(): Promise<void> {
+    await this.utilsService.navigateToTabWithParams(Tab.Settings, {
       open: 'z-control',
     });
     setTimeout(() => {

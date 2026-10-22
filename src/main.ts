@@ -67,4 +67,4 @@ addIcons({
 // Register German locale data for number/date pipes
 registerLocaleData(localeDe);
 
-bootstrapApplication(AppComponent, appConfig);
+void bootstrapApplication(AppComponent, appConfig);

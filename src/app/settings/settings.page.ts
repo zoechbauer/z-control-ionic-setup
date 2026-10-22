@@ -100,7 +100,7 @@ export class SettingsPage implements OnInit, OnDestroy {
 
   private setupSubscriptions() {
     this.subscriptions.push(
-      this.localStorage.selectedLanguage$.subscribe(async (lang) => {
+      this.localStorage.selectedLanguage$.subscribe(lang => {
         this.translate.use(lang);
         this.translate.setDefaultLang(lang);
         this.selectedLanguage = lang;
@@ -161,10 +161,10 @@ export class SettingsPage implements OnInit, OnDestroy {
     return undefined;
   }
 
-  onLanguageChange(event: any) {
+  async onLanguageChange(event: any) {
     const lang = event.detail?.value;
     if (lang) {
-      this.localStorage.saveSelectedLanguage(lang);
+      await this.localStorage.saveSelectedLanguage(lang);
       this.translate.use(lang);
       this.translate.setDefaultLang(lang);
     }
@@ -175,8 +175,8 @@ export class SettingsPage implements OnInit, OnDestroy {
     this.showAllAccordions = true;
   }
 
-  async openChangelog() {
-    this.utilsService.openChangelog();
+  async openChangelog(): Promise<void> {
+    await this.utilsService.openChangelog();
   }
 
   ngOnDestroy(): void {

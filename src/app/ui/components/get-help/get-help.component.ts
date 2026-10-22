@@ -114,8 +114,8 @@ export class HelpModalComponent implements OnInit, OnDestroy {
     }
   }
 
-  dismissModal() {
-    this.modalController.dismiss();
+  async dismissModal(): Promise<void> {
+    await this.modalController.dismiss();
   }
 
   scrollToTop() {

@@ -10,6 +10,13 @@ This project uses a simplified major.minor versioning scheme:
 - Minor versions indicate new features, improvements, and bug fixes.
 - Patch numbers are intentionally omitted; all changes are released as major or minor versions.
 
+## [2.8] – 2026-10-22
+
+### 🔧 Internal
+
+- Improved the code base to fix lint errors and SonarQube issues.
+- Updated tests, suite contains **556 specs with 99.6% statement coverage**.
+
 ## [2.7] – 2026-10-07
 
 ### ✨ New Features

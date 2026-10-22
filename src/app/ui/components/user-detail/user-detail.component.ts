@@ -49,8 +49,8 @@ export class UserDetailComponent {
   @Input() displayMode!: DisplayMode;
   DisplayMode = DisplayMode;
 
-  close(): void {
-    this.modalCtrl.dismiss();
+  async close(): Promise<void> {
+    await this.modalCtrl.dismiss();
   }
 
   getAppVersion(): string {

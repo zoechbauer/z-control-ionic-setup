@@ -16,6 +16,7 @@
         placeholder="{{ 'FEATURE.CARD.PLACEHOLDER.INPUT' | translate }}"
         [(ngModel)]="featureInput"
         (ionInput)="enableButtons()"
+        [disabled]="featureInputDisabled"
       ></ion-input>
     </ion-item>
     <ion-list lines="none" *ngIf="relatedWords.length">

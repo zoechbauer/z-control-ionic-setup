@@ -106,6 +106,11 @@
     <ul class="no-list-style-inside">
       <li>Describe highlight 1.</li>
       <li>Describe highlight 2, and so on.</li>
+      <li>
+        <strong>Offline indicator</strong><br />
+        If you are offline, an additional note appears in the header with the
+        current connection status.
+      </li>
     </ul>
     <p><strong>Limitations:</strong></p>
     <ul class="no-list-style-inside">
@@ -143,6 +148,19 @@
           </li>
           <li>step 2, etc.</li>
         </ol>
+      </li>
+      <li>
+        <strong>What happens when I am offline?</strong>
+        <p>
+          If my connection is interrupted, certain actions cannot be carried
+          out. A notice in the header keeps me informed about the app’s current
+          offline status at all times.
+        </p>
+        <p>
+          In this case, I cannot process Datamuse API requests until the
+          connection is restored. The relevant button remains disabled in the
+          meantime.
+        </p>
       </li>
       <li>
         <strong>How can I check my monthly feature quota?</strong>
@@ -252,9 +270,20 @@
       <ul class="no-list-style">
         <li>
           <p>
-            <b>Description of problem 1:</b>
+            <strong>Why is the Search button disabled?</strong>
           </p>
-          <p>Description of the cause and solution for this problem.</p>
+          <p>
+            This button is disabled when there is no internet connection. This is
+            also shown in the header with the message "No network connection."
+          </p>
+          <p>
+            As soon as the internet connection is restored, the Search button is
+            re-enabled and the message in the header disappears.
+          </p>
+          <p>
+            If you have not entered any text yet, the Search button is also
+            disabled.
+          </p>
         </li>
         <li *ngIf="isNative">
           <p>
@@ -377,6 +406,11 @@
     <ul class="no-list-style-inside">
       <li>Beschreiben Sie Highlight 1.</li>
       <li>Beschreiben Sie Highlight 2 usw.</li>
+      <li>
+        <strong>Offline Hinweis</strong><br />
+        Wenn Sie offline sind, erscheint zusätzlich ein Hinweis im Header mit
+        dem aktuellen Verbindungsstatus.
+      </li>
     </ul>
     <p><strong>Einschränkungen:</strong></p>
     <ul class="no-list-style-inside">
@@ -416,6 +450,19 @@
           </li>
           <li>Schritt 2, usw.</li>
         </ol>
+      </li>
+      <li>
+        <strong>Was passiert, wenn ich offline bin?</strong>
+        <p>
+          Wenn meine Verbindung unterbrochen ist, können bestimmte Aktionen
+          nicht ausgeführt werden. Ein Hinweis im Header informiert mich
+          jederzeit über den aktuellen Offline-Status der App.
+        </p>
+        <p>
+          In diesem Fall kann ich die Datamuse API nicht verwenden, bis die
+          Verbindung wiederhergestellt ist. Die entsprechende Schaltfläche
+          bleibt dann deaktiviert.
+        </p>
       </li>
       <li>
         <strong
@@ -540,9 +587,22 @@
       <ul class="no-list-style">
         <li>
           <p>
-            <strong>Beschreibung von Problem 1:</strong>
+            <strong> Warum ist die Schaltflächen Suchen deaktiviert? </strong>
           </p>
-          <p>Beschreibung der Ursache und Lösung des Problems.</p>
+          <p>
+            Diese Schaltfläche ist deaktiviert, wenn keine Internetverbindung
+            besteht. Dies wird auch im Header mit dem Hinweis "Keine
+            Internetverbindung" angezeigt.
+          </p>
+          <p>
+            Sobald die Internetverbindung wiederhergestellt ist, wird die
+            Schaltfläche Suchen wieder aktiviert und der Hinweis im
+            Header verschwindet.
+          </p>
+          <p>
+            Sollten Sie noch keinen Text eingegeben haben, wird die Schaltfläche
+            Suchen ebenfalls deaktiviert.
+          </p>
         </li>
         <li *ngIf="isNative">
           <p>

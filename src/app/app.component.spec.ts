@@ -11,6 +11,7 @@ import { FirebaseFirestoreService } from './services/firebase-firestore.service'
 import { LocalStorageService } from './services/local-storage.service';
 import { createTranslateServiceMock } from './testing/translate-service.mock';
 import { CapacitorPlatformService } from './services/capacitor-platform.service';
+import { ConnectivityService } from './services/connectivity.service';
 
 describe('AppComponent', () => {
   let component: AppComponent;
@@ -66,6 +67,12 @@ describe('AppComponent', () => {
               .and.resolveTo(undefined),
           },
         },
+        {
+          provide: ConnectivityService,
+          useValue: jasmine.createSpyObj('ConnectivityService', [
+            'startMonitoring',
+          ]),
+        },
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
     }).compileComponents();
@@ -94,18 +101,22 @@ describe('AppComponent', () => {
         component.isNativeApp = true;
 
         const safeAreaInsetsService = TestBed.inject(
-          SafeAreaInsetsService
+          SafeAreaInsetsService,
         ) as jasmine.SpyObj<SafeAreaInsetsService>;
         const systemBarsService = TestBed.inject(
-          SystemBarsService
+          SystemBarsService,
         ) as jasmine.SpyObj<SystemBarsService>;
         const firestoreService = TestBed.inject(
-          FirebaseFirestoreService
+          FirebaseFirestoreService,
         ) as jasmine.SpyObj<FirebaseFirestoreService>;
         const localStorageService = TestBed.inject(LocalStorageService) as any;
+        const connectivityService = TestBed.inject(
+          ConnectivityService,
+        ) as jasmine.SpyObj<ConnectivityService>;
 
         await component.initializeApp();
 
+        expect(connectivityService.startMonitoring).toHaveBeenCalled();
         expect(safeAreaInsetsService.setSafeAreaInsetsFix).toHaveBeenCalled();
         expect(systemBarsService.getCurrentIsDarkMode).toHaveBeenCalled();
         expect(systemBarsService.setBars).toHaveBeenCalled();
@@ -158,7 +169,7 @@ describe('AppComponent', () => {
 
         const bodyDiv = fixture.nativeElement.querySelector('div');
         expect(
-          bodyDiv?.classList.contains('native-app-height-show-tabs-bar')
+          bodyDiv?.classList.contains('native-app-height-show-tabs-bar'),
         ).toBeTrue();
       });
 

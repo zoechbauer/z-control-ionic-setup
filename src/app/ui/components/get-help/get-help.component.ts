@@ -50,42 +50,69 @@ export class HelpModalComponent implements OnInit, OnDestroy {
   isPortrait = this.utilsService.isPortrait;
   private langSub?: Subscription;
 
+  /**
+   * Gets the maximum number of free feature characters allowed per month.
+   */
   get maxFreeFeatureCharsLengthPerMonth() {
     return AppConstants.maxFreeFeatureCharsPerMonth;
   }
 
+  /**
+   * Determines if the app is running in a native environment.
+   */
   get isNative(): boolean {
     return this.utilsService.isNative;
   }
 
+  /**
+   * Gets the email subject text for the help email, depending on the platform.
+   */
   get emailSubjectHelpText(): string {
     const key = this.isNative ? 'HELP_EMAIL_SUBJECT' : 'HELP_EMAIL_SUBJECT_WEB';
     return this.translate.instant(key);
   }
 
+  /**
+   * Gets the help text for the language change button, depending on the platform.
+   */
   get languageChangeButtonHelpText(): string {
     const key = this.isNative
       ? 'HELP_LANGUAGE_CHANGE_BUTTON'
       : 'HELP_LANGUAGE_CHANGE_WEB_BUTTON';
     return this.translate.instant(key);
   }
+  /**
+   * Gets the device-specific help text, depending on the platform.
+   */
   get deviceText(): string {
     const key = this.isNative ? 'HELP_DEVICE_TEXT' : 'HELP_DEVICE_TEXT_WEB';
     return this.translate.instant(key);
   }
 
+  /**
+   * Gets the app name from the environment configuration.
+   */
   get appName(): string {
     return environment.app.name;
   }
 
+  /**
+   * Gets the short name of the app from the environment configuration.
+   */
   get appShortName(): string {
     return environment.app.shortName;
   }
 
+  /**
+   * Gets the current orientation of the device (portrait or landscape).
+   */
   private readonly orientationListener = () => {
     this.isPortrait = this.utilsService.isPortrait;
   };
 
+  /**
+   * Initializes the component and sets up necessary event listeners.
+   */
   ngOnInit() {
     // Scroll to specific section if provided
     if (this.scrollToSection) {
@@ -104,6 +131,9 @@ export class HelpModalComponent implements OnInit, OnDestroy {
     this.orientationListener();
   }
 
+  /**
+   * Sets the scroll-to-top object based on the selected language.
+   */
   private setScrollToTopObj() {
     if (this.selectedLanguage === 'de') {
       this.scrollToTopObj.id = 'toc-DE';
@@ -114,14 +144,23 @@ export class HelpModalComponent implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Dismisses the help modal.
+   */
   async dismissModal(): Promise<void> {
     await this.modalController.dismiss();
   }
 
+  /**
+   * Scrolls the view to the top of the content.
+   */
   scrollToTop() {
     this.utilsService.scrollToElement(this.scrollToTopObj.id);
   }
 
+  /**
+   * Cleans up resources and event listeners when the component is destroyed.
+   */
   ngOnDestroy() {
     this.langSub?.unsubscribe();
     window.removeEventListener('resize', this.orientationListener);

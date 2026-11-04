@@ -64,6 +64,11 @@ export class LocalStorageService {
    */
   statisticsSelectedMonth$ = this.statisticsSelectedMonthSubject.asObservable();
 
+  /**
+   * Loads the firestore UID from storage, or sets it to null if not found.
+   * Updates the firestoreUidSubject accordingly.
+   * @returns The firestore UID or null if not found
+   */
   private async initStorage() {
     await this.storage.create();
   }

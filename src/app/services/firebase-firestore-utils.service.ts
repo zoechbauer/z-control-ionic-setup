@@ -523,6 +523,11 @@ export class FirebaseFirestoreUtilsService {
     return false;
   }
 
+  /**
+   * Checks if the contingent for the current user has been exceeded.
+   * @param flags The contingent data from Firestore
+   * @returns True if the user's contingent is exceeded, otherwise false
+   */
   private async isContingentForUserExceeded(
     flags: ContingentData,
   ): Promise<boolean> {
@@ -533,6 +538,11 @@ export class FirebaseFirestoreUtilsService {
     return charCount >= limit;
   }
 
+  /**
+   * Checks if the total contingent for all users has been exceeded.
+   * @param flags The contingent data from Firestore
+   * @returns True if the total contingent is exceeded, otherwise false
+   */
   private async isTotalContingentExceeded(
     flags: ContingentData,
   ): Promise<boolean> {

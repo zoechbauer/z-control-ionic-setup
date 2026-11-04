@@ -10,6 +10,22 @@ This project uses a simplified major.minor versioning scheme:
 - Minor versions indicate new features, improvements, and bug fixes.
 - Patch numbers are intentionally omitted; all changes are released as major or minor versions.
 
+## [2.9] – 2026-11-04
+
+### 🚀 Improvements
+
+- Added offline detection to disable time-critical actions and display a clear status indicator in the header when the app is offline, improving reliability and preventing failed operations.
+- Added Back button feature to header, allowing users to navigate to the previous page easily.
+- Expanded the help page with guidance on offline behavior.
+
+### 🔧 Internal
+
+- Renamed FeatureExampleComponent to FeatureComponent and updated all references accordingly, so apps built with z&#8209;control Ionic Setup do not need to rename the component manually.
+- Added function documentation where it was missing to improve clarity and maintainability.
+- Added documentation for the offline connectivity handling flow, including the global connectivity listener, HTTP fallback handling, persistent header state, native platform connectivity behavior, and debounce strategy used to keep the app status reliable while offline.
+- Updated documentation mobile problem fixed guide to include steps for resolving Android device connectivity issues with the local development server.
+- Updated unit tests; test suite contains **572 specs with 99.6% statement coverage**.
+
 ## [2.8] – 2026-10-22
 
 ### 🔧 Internal
@@ -97,7 +113,7 @@ This project uses a simplified major.minor versioning scheme:
 
 ### ✨ New Architecture
 
-- **Refactor of the z-control Ionic Setup project** to remove all Backend code and Backend documentation and move it to the new  **z-control Backend Functions** app. Otherwise, all cloned apps would have to remove the functions folder, as the functions are shared by all apps and are not app-specific. This refactor allows the z-control Ionic Setup project to focus exclusively on frontend code and shared configurations, while the z-control Backend Functions project manages all backend logic and functions for multiple apps.
+- **Refactor of the z-control Ionic Setup project** to remove all Backend code and Backend documentation and move it to the new **z-control Backend Functions** app. Otherwise, all cloned apps would have to remove the functions folder, as the functions are shared by all apps and are not app-specific. This refactor allows the z-control Ionic Setup project to focus exclusively on frontend code and shared configurations, while the z-control Backend Functions project manages all backend logic and functions for multiple apps.
 - Removed functions folder from the project because functions are never implemented in frontend projects but only in the backend functions project. This cleanup ensures that the frontend project remains focused on UI and client-side logic, while all backend functionality is centralized in the new z-control Backend Functions project.
 - Updated the README to reflect the new app structure and provide instructions for using the z-control Backend Functions project for backend functionality.
 - Removed backend-related documentation from the docs folder, as the backend code is now mangaged in the separate z-control Backend Functions project. This cleanup ensures that the documentation remains relevant to the frontend app and directs users to the appropriate resources for backend development.

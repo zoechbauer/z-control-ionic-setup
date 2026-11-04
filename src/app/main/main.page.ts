@@ -16,7 +16,7 @@ import { LocalStorageService } from '../services/local-storage.service';
 import { Tab } from '../shared/enums';
 import { UserStatisticComponent } from '../ui/components/user-statistic/user-statistic.component';
 import { FirebaseFirestoreUtilsService } from '../services/firebase-firestore-utils.service';
-import { FeatureExampleComponent } from '../feature-example/feature-example.component';
+import { FeatureComponent } from '../feature/feature.component';
 import { environment } from '@env/environment';
 
 @Component({
@@ -34,14 +34,16 @@ import { environment } from '@env/environment';
     TranslatePipe,
     HeaderComponent,
     UserStatisticComponent,
-    FeatureExampleComponent,
+    FeatureComponent,
   ],
 })
 export class MainPage implements OnInit, OnDestroy {
   translate = inject(TranslateService);
   localStorage = inject(LocalStorageService);
   readonly utilsService = inject(UtilsService);
-  private readonly firestoreUtilsService = inject(FirebaseFirestoreUtilsService);
+  private readonly firestoreUtilsService = inject(
+    FirebaseFirestoreUtilsService,
+  );
 
   Tab = Tab;
   settingsIcon: string = '<ion-icon name="settings-outline"></ion-icon>';
@@ -52,6 +54,10 @@ export class MainPage implements OnInit, OnDestroy {
     return environment.app.name;
   }
 
+  /**
+   * Initializes the main page by showing or hiding the Ion tab bar,
+   * setting up event listeners, and subscribing to necessary observables.
+   */
   ngOnInit() {
     this.utilsService.showOrHideIonTabBar();
     this.setupEventListeners();
@@ -73,6 +79,10 @@ export class MainPage implements OnInit, OnDestroy {
     );
   }
 
+  /**
+   * Handles the change event for the Ion accordion group.
+   * Requests a statistics refresh if an accordion is expanded.
+   */
   onAccordionGroupChange(event: CustomEvent, content: IonContent) {
     const accordionValue = event?.detail?.value;
     if (accordionValue) {
@@ -80,6 +90,9 @@ export class MainPage implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Cleans up subscriptions and other resources when the component is destroyed.
+   */
   ngOnDestroy() {
     this.subscriptions.forEach((subscription) => subscription.unsubscribe());
   }

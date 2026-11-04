@@ -66,6 +66,11 @@ export class DeviceUtils {
       : normalizedModel;
   }
 
+  /**
+   * Determines the device brand for a given user.
+   * @param userInfo The user information
+   * @returns The device brand as a string
+   */
   private static getModelFromUserAgent(userAgent: string): string | null {
     return (
       DeviceUtils.getAndroidModelFromUserAgent(userAgent) ||

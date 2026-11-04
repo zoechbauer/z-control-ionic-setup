@@ -9,7 +9,7 @@ import {
   IonicRouteStrategy,
   provideIonicAngular,
 } from '@ionic/angular/standalone';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideTranslateService } from '@ngx-translate/core';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 
@@ -30,9 +30,10 @@ import { routes } from './app-routes';
 import { ServicesModule } from './services.module';
 import { FirebaseCredentials } from './services/firebase-credentials';
 import { environment } from '@env/environment';
+import { networkErrorInterceptor } from './interceptors/network-error.interceptor';
 
 /**
- * Application configuration for the Ionic Angular app, including routing, 
+ * Application configuration for the Ionic Angular app, including routing,
  * HTTP client, translation, and Firebase setup.
  */
 export const appConfig: ApplicationConfig = {
@@ -42,7 +43,7 @@ export const appConfig: ApplicationConfig = {
       // all ionic services are now available for injection
       mode: 'md',
     }),
-    provideHttpClient(),
+    provideHttpClient(withInterceptors([networkErrorInterceptor])),
     provideRouter(routes, withPreloading(PreloadAllModules)),
 
     importProvidersFrom(ServicesModule),
@@ -53,7 +54,9 @@ export const appConfig: ApplicationConfig = {
       suffix: '.json',
     }),
 
-    provideFirebaseApp(() => initializeApp(FirebaseCredentials.getFirebaseCredentials())),
+    provideFirebaseApp(() =>
+      initializeApp(FirebaseCredentials.getFirebaseCredentials()),
+    ),
     provideAuth(() => getAuth()),
     // DRY: Helper to get emulator host or undefined if not using emulator
     (() => {

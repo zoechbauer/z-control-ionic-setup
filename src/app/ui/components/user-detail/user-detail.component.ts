@@ -53,6 +53,10 @@ export class UserDetailComponent {
     await this.modalCtrl.dismiss();
   }
 
+  /**
+   * Retrieves the app version from the user statistics.
+   * @returns The formatted app version string.
+   */
   getAppVersion(): string {
     if (!this.userStatistic?.deviceInfo?.appVersion?.date) {
       return '';
@@ -61,6 +65,11 @@ export class UserDetailComponent {
     return `${v.major}.${v.minor} (${v.date})`;
   }
 
+  /**
+   * Formats the given date and time according to the current display mode.
+   * @param dateTime The date and time to format.
+   * @returns The formatted date and time string.
+   */
   getFormatDateTime(dateTime: Date | null): string {
     if (this.displayMode === DisplayMode.Programmer) {
       return this.utilsService.formatDateTimeISO(dateTime);
@@ -69,6 +78,10 @@ export class UserDetailComponent {
     return this.utilsService.formatDateISO(dateTime);
   }
 
+  /**
+   * Retrieves the displayed platform information from the user statistics.
+   * @returns The formatted platform string.
+   */
   getDisplayedPlatform(): string {
     const platform = this.userStatistic.displayedPlatform;
     return platform === 'native' ? `${platform} - Android App` : platform;

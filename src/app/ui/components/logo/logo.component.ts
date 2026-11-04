@@ -28,16 +28,26 @@ export class LogoComponent implements OnInit, OnChanges {
     });
   }
 
+  /**
+   * Initializes the component and sets the initial logo text.
+   */
   ngOnInit(): void {
     this.setLogoText();
   }
 
+  /**
+   * Responds to changes in input properties and updates the logo text if the type changes.
+   * @param changes The changes to the input properties.
+   */
   ngOnChanges(changes: SimpleChanges) {
     if (changes['type']) {
       this.setLogoText();
     }
   }
 
+  /**
+   * Sets the logo text based on the current type and screen orientation.
+   */
   private setLogoText(): void {
     this.leftLogoText = '';
     this.rightLogoText = '';
@@ -51,6 +61,10 @@ export class LogoComponent implements OnInit, OnChanges {
     }
   }
 
+  /**
+   * Determines if the screen is in portrait orientation.
+   * @returns True if the screen is in portrait orientation, false otherwise.
+   */
   private get isPortrait(): boolean {
     return window.matchMedia('(orientation: portrait)').matches;
   }

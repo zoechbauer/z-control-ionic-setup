@@ -306,6 +306,9 @@ export class FirebaseFirestoreService {
     }
   }
 
+  /**
+   * Retrieves the device information for the current device.
+   */
   private get deviceInfo(): DeviceInfo {
     return DeviceUtils.getDeviceInfo();
   }
@@ -455,6 +458,11 @@ export class FirebaseFirestoreService {
     }
   }
 
+  /**
+   * Retrieves an HTTPS callable function for the given function name.
+   * @param functionName The name of the Firebase Cloud Function
+   * @returns The callable function
+   */
   private getHttpsCallable(functionName: string) {
     return httpsCallable(this.functions, functionName);
   }
@@ -498,10 +506,20 @@ export class FirebaseFirestoreService {
     }
   }
 
+  /**
+   * Retrieves a Firestore document reference for the given path.
+   * @param path The path to the Firestore document
+   * @returns DocumentReference<DocumentData> The document reference
+   */
   private getFirestoreDoc(path: string): DocumentReference<DocumentData> {
     return doc(this.firestore, path);
   }
 
+  /**
+   * Retrieves a Firestore document snapshot for the given document reference.
+   * @param docRef The reference to the Firestore document
+   * @returns Promise<DocumentSnapshot<DocumentData>> The document snapshot
+   */
   private getFirestoreDocSnapshot(
     docRef: DocumentReference<DocumentData>,
   ): Promise<DocumentSnapshot<DocumentData>> {
@@ -695,12 +713,22 @@ export class FirebaseFirestoreService {
     this.cachedFeatureUsage.set(month, data);
   }
 
+  /**
+   * Retrieves a Firestore collection reference for the given path.
+   * @param path The path to the Firestore collection
+   * @returns CollectionReference<DocumentData> The collection reference
+   */
   private getCollection(path: string) {
     return runInInjectionContext(this.injector, () =>
       collection(this.firestore, path),
     );
   }
 
+  /**
+   * Retrieves all documents from the given Firestore collection reference.
+   * @param collectionRef The reference to the Firestore collection
+   * @returns Promise<QuerySnapshot<DocumentData>> The query snapshot containing all documents
+   */
   private getDocs(
     collectionRef: ReturnType<FirebaseFirestoreService['getCollection']>,
   ): Promise<QuerySnapshot<DocumentData>> {

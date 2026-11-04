@@ -16,6 +16,7 @@
       "MAIN_SHORT": "Hauptfunktion",
       "SETTINGS": "Einstellungen "
     },
+    "NETWORK_OFFLINE": "Keine Internetverbindung!",
     "TOOLTIP": {
       "OPEN_FEEDBACK": "Feedback-Seite öffnen",
       "OPEN_HELP": "Hilfeseite öffnen",

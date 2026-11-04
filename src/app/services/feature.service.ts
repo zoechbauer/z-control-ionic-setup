@@ -1,3 +1,5 @@
+// TODO - replace with actual feature
+
 import {
   inject,
   Injectable,
@@ -56,6 +58,11 @@ export class FeatureService {
     }
   }
 
+  /**
+   * Retrieves an HTTPS callable function for the given function name.
+   * @param functionName The name of the Firebase Cloud Function
+   * @returns The callable function
+   */
   private getHttpsCallable(functionName: string) {
     return httpsCallable(this.functions, functionName);
   }

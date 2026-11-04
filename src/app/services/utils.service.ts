@@ -28,6 +28,14 @@ export class UtilsService {
    * Observable for logo click events.
    */
   logoClicked$ = this.logoClickedSub.asObservable();
+  /**
+   * Emits when the back button is clicked (used for navigation triggers).
+   */
+  backButtonClickedSub = new Subject<boolean>();
+  /**
+   * Observable for back button click events.
+   */
+  backButtonClicked$ = this.backButtonClickedSub.asObservable();
   private currentModal: HTMLIonModalElement | null = null;
 
   constructor() {

@@ -73,10 +73,16 @@ export class SettingsPage implements OnInit, OnDestroy {
   isLoading = true;
   private readonly subscriptions: Subscription[] = [];
 
+  /**
+   * Returns the name of the application from the environment configuration.
+   */
   get appName(): string {
     return environment.app.name;
   }
 
+  /**
+   * Returns the version information of the application in the format "major.minor (date)".
+   */
   get versionInfo() {
     const { major, minor, date } = {
       major: environment.version.major,
@@ -86,10 +92,17 @@ export class SettingsPage implements OnInit, OnDestroy {
     return `${major}.${minor} (${date})`;
   }
 
+  /**
+   * Returns whether the application is running in a native environment.
+   */
   get isNative(): boolean {
     return this.utilsService.isNative;
   }
 
+  /**
+   * Lifecycle hook that is called after the component has been initialized.
+   * Sets up necessary subscriptions and event listeners for the settings page.
+   */
   ngOnInit() {
     this.isLoading = true;
     this.showAllAccordions = true;
@@ -123,6 +136,11 @@ export class SettingsPage implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Handles the change event for an accordion group.
+   * @param event The custom event containing the new accordion value
+   * @param content The IonContent instance associated with the accordion
+   */
   onAccordionGroupChange(event: CustomEvent, content: IonContent) {
     const value = this.normalizeAccordionValue(event?.detail?.value);
 
@@ -143,6 +161,11 @@ export class SettingsPage implements OnInit, OnDestroy {
     this.showAllAccordions = this.openAccordion == null;
   }
 
+  /**
+   * Normalizes the raw value emitted by an accordion group.
+   * @param rawValue The raw value from the accordion event
+   * @returns The normalized accordion value, null if closed, or undefined if invalid
+   */
   private normalizeAccordionValue(
     rawValue: unknown,
   ): AccordionValue | null | undefined {
@@ -161,6 +184,10 @@ export class SettingsPage implements OnInit, OnDestroy {
     return undefined;
   }
 
+  /**
+   * Handles the change event for the language selection.
+   * @param event The event containing the selected language
+   */
   async onLanguageChange(event: any) {
     const lang = event.detail?.value;
     if (lang) {
@@ -170,15 +197,25 @@ export class SettingsPage implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Opens all accordions by setting the openAccordion to null and showAllAccordions to true.
+   */
   showAll() {
     this.openAccordion = null;
     this.showAllAccordions = true;
   }
 
+  /**
+   * Opens the changelog modal or page.
+   */
   async openChangelog(): Promise<void> {
     await this.utilsService.openChangelog();
   }
 
+  /**
+   * Lifecycle hook that is called when the component is destroyed.
+   * Cleans up subscriptions to prevent memory leaks.
+   */
   ngOnDestroy(): void {
     this.subscriptions.forEach((sub) => sub.unsubscribe());
   }

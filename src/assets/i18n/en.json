@@ -16,6 +16,7 @@
       "MAIN_SHORT": "Main Feature",
       "SETTINGS": "Settings"
     },
+    "NETWORK_OFFLINE": "No network connection!",
     "TOOLTIP": {
       "OPEN_FEEDBACK": "Open feedback page",
       "OPEN_HELP": "Open help page",

@@ -31,6 +31,9 @@ export class ChangeLogAccordionComponent {
   @Input() appName!: string;
   @Output() ionChange = new EventEmitter<void>();
 
+  /**
+   * Opens the changelog modal or page by emitting the ionChange event.
+   */
   openChangelog() {
     this.ionChange.emit();
   }

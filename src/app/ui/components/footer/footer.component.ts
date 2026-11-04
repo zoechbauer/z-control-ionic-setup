@@ -14,6 +14,9 @@ export class FooterComponent {
 
   showDetails = false;
 
+  /**
+   * Toggles the visibility of additional details in the footer.
+   */
   get mailtoLink() {
     return 'mailto:zcontrol.app.qr@gmail.com?subject=z-control%20Multi%20Translator%20App%20Feedback';
   }

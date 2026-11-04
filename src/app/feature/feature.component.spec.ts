@@ -13,8 +13,9 @@ import { ToastAnchor } from '../shared/enums';
 import { createTranslateServiceMock } from '../testing/translate-service.mock';
 import { UserStatisticComponent } from '../ui/components/user-statistic/user-statistic.component';
 import { SpinnerComponent } from '../ui/components/spinner/spinner.component';
-import { FeatureExampleComponent } from './feature-example.component';
+import { FeatureComponent } from './feature.component';
 import { FeatureService } from '../services/feature.service';
+import { ConnectivityService } from '../services/connectivity.service';
 
 @Component({
   selector: 'app-user-statistic',
@@ -30,13 +31,14 @@ class MockUserStatisticComponent {}
 })
 class MockSpinnerComponent {}
 
-describe('FeatureExampleComponent', () => {
-  let component: FeatureExampleComponent;
-  let fixture: ComponentFixture<FeatureExampleComponent>;
+describe('FeatureComponent', () => {
+  let component: FeatureComponent;
+  let fixture: ComponentFixture<FeatureComponent>;
   let utilsServiceSpy: jasmine.SpyObj<UtilsService>;
   let firestoreUtilsServiceSpy: jasmine.SpyObj<FirebaseFirestoreUtilsService>;
   let toastServiceSpy: jasmine.SpyObj<ToastService>;
   let featureServiceSpy: jasmine.SpyObj<FeatureService>;
+  let connectivityServiceSpy: jasmine.SpyObj<ConnectivityService>;
 
   beforeEach(async () => {
     utilsServiceSpy = jasmine.createSpyObj('UtilsService', [
@@ -50,13 +52,16 @@ describe('FeatureExampleComponent', () => {
     featureServiceSpy = jasmine.createSpyObj('FeatureService', [
       'secureFeatureCloudFunction',
     ]);
+    connectivityServiceSpy = jasmine.createSpyObj('ConnectivityService', [
+      'isOffline',
+    ]);
 
     await TestBed.configureTestingModule({
       imports: [
         IonicModule.forRoot(),
         MockUserStatisticComponent,
         MockSpinnerComponent,
-        FeatureExampleComponent,
+        FeatureComponent,
       ],
       providers: [
         {
@@ -81,9 +86,10 @@ describe('FeatureExampleComponent', () => {
           useValue: firestoreUtilsServiceSpy,
         },
         { provide: FeatureService, useValue: featureServiceSpy },
+        { provide: ConnectivityService, useValue: connectivityServiceSpy },
       ],
     })
-      .overrideComponent(FeatureExampleComponent, {
+      .overrideComponent(FeatureComponent, {
         remove: {
           imports: [UserStatisticComponent, SpinnerComponent],
         },
@@ -93,7 +99,7 @@ describe('FeatureExampleComponent', () => {
       })
       .compileComponents();
 
-    fixture = TestBed.createComponent(FeatureExampleComponent);
+    fixture = TestBed.createComponent(FeatureComponent);
     component = fixture.componentInstance;
   });
 
@@ -108,7 +114,7 @@ describe('FeatureExampleComponent', () => {
         component.clear();
         expect(initFormControlsSpy).toHaveBeenCalled();
       });
-      
+
       it('should init form controls if initFormControls() is called', () => {
         component.featureInput = 'Some text';
         component.relatedWords = ['word1', 'word2'];
@@ -123,6 +129,73 @@ describe('FeatureExampleComponent', () => {
       });
     });
 
+    describe('enable/disable buttons', () => {
+      beforeEach(() => {
+        component.searchBtnDisabled = true;
+        component.clearBtnDisabled = false;
+        Object.defineProperty(connectivityServiceSpy, 'isOffline', {
+          get: () => false,
+        });
+      });
+
+      it('should enable/disable search button depending on featureInput', () => {
+        const testCases = [
+          { CaseNo: 1, input: 'Some text', expectedButtonDisabled: false },
+          { CaseNo: 2, input: '', expectedButtonDisabled: true },
+        ];
+        for (const test of testCases) {
+          component.featureInput = test.input;
+          component.enableButtons();
+
+          expect(component.searchBtnDisabled)
+            .withContext(`CaseNo: ${test.CaseNo}`)
+            .toBe(test.expectedButtonDisabled);
+        }
+      });
+
+      it('should enable/disable search button depending on connectivity', () => {
+        const testCases = [
+          {
+            CaseNo: 1,
+            input: 'Some text',
+            offline: false,
+            expectedButtonDisabled: false,
+          },
+          {
+            CaseNo: 2,
+            input: 'Some text',
+            offline: true,
+            expectedButtonDisabled: true,
+          },
+        ];
+        for (const test of testCases) {
+          component.featureInput = test.input;
+          Object.defineProperty(connectivityServiceSpy, 'isOffline', {
+            get: () => test.offline,
+          });
+          component.enableButtons();
+
+          expect(component.searchBtnDisabled)
+            .withContext(`CaseNo: ${test.CaseNo}`)
+            .toBe(test.expectedButtonDisabled);
+        }
+      });
+
+      it('should enable/disable clear button depending on featureInput', () => {
+        const testCases = [
+          { CaseNo: 1, input: 'Some text', expectedButtonDisabled: false },
+          { CaseNo: 2, input: '', expectedButtonDisabled: true },
+        ];
+        for (const test of testCases) {
+          component.featureInput = test.input;
+          component.enableButtons();
+          expect(component.clearBtnDisabled)
+            .withContext(`CaseNo: ${test.CaseNo}`)
+            .toBe(test.expectedButtonDisabled);
+        }
+      });
+    });
+
     describe('search', () => {
       let originalSimulate: boolean;
 
@@ -131,6 +204,9 @@ describe('FeatureExampleComponent', () => {
         firestoreUtilsServiceSpy.isContingentExceeded.and.returnValue(
           Promise.resolve(false),
         );
+        Object.defineProperty(connectivityServiceSpy, 'isOffline', {
+          get: () => false,
+        });
       });
 
       it('should set isContingentExceeded to true if contingent is exceeded', async () => {
@@ -212,6 +288,17 @@ describe('FeatureExampleComponent', () => {
         expect(featureServiceSpy.secureFeatureCloudFunction).toHaveBeenCalled();
       });
 
+      it('should not call secureFeatureCloudFunction if device is offline', async () => {
+        Object.defineProperty(connectivityServiceSpy, 'isOffline', {
+          get: () => true,
+        });
+        await component.search();
+
+        expect(
+          featureServiceSpy.secureFeatureCloudFunction,
+        ).not.toHaveBeenCalled();
+      });
+
       const TEST_NAME_4 =
         'should refresh statistics and show completion toast ' +
         'if secureFeatureCloudFunction returns result';
@@ -242,6 +329,21 @@ describe('FeatureExampleComponent', () => {
         );
         await component.search();
         expect(component.isLoading).toBeFalse();
+      });
+
+      it('should disable form controls after search is completed', async () => {
+        component.isLoading = true;
+        featureServiceSpy.secureFeatureCloudFunction.and.returnValue(
+          Promise.resolve({
+            feature: { text: 'Linz', related: 'upper austria' },
+          }),
+        );
+        await component.search();
+
+        expect(component.isLoading).toBeFalse();
+        expect(component.featureInputDisabled).toBeTrue();
+        expect(component.searchBtnDisabled).toBeTrue();
+        expect(component.clearBtnDisabled).toBeFalse();
       });
     });
   });

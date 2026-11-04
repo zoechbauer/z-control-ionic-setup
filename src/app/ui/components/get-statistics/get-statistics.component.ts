@@ -110,10 +110,16 @@ export class GetStatisticsComponent implements OnInit, OnDestroy {
   private _statisticsData: StatisticsData | null = null;
   private isPortrait = true;
 
+  /**
+   * Gets the statistics data.
+   */
   get statisticsData(): StatisticsData | null {
     return this._statisticsData;
   }
 
+  /**
+   * Sets the statistics data and updates the displayed user statistics rows.
+   */
   set statisticsData(value: StatisticsData | null) {
     this._statisticsData = value;
     this.allUserStatsRows = (value?.displayedUserStatistics ?? []).map(
@@ -128,26 +134,45 @@ export class GetStatisticsComponent implements OnInit, OnDestroy {
     this.applyUserStatsFilter();
   }
 
+  /**
+   * Determines whether to hide the column based on the device orientation.
+   */
   get hideColumn(): boolean {
     return this.isPortrait;
   }
 
+  /**
+   * Determines whether to hide the column if the device is in portrait mode or the display mode is set to user.
+   */
   get hideColumnIfUserOrPortrait(): boolean {
     return this.isPortrait || this.displayMode === DisplayMode.User;
   }
 
+  /**
+   * Checks if the application is running in a native environment.
+   */
   get isNative(): boolean {
     return this.utilsService.isNative;
   }
 
+  /**
+   * Checks if the application is using the Firebase emulator.
+   */
   get isFirebaseEmulator(): boolean {
     return environment.app.useFirebaseEmulator;
   }
 
+  /**
+   * Checks if all months are selected in the filter.
+   */
   get isAllMonthsSelected(): boolean {
     return this.filterSelectedMonth === AllMonthsOption.SelectOptionValue;
   }
 
+  /**
+   * Lifecycle hook that is called after the component has been initialized.
+   * Initializes the component by setting up subscriptions, event listeners, and initial data.
+   */
   ngOnInit(): void {
     this.setupSubscriptions();
     this.setupEventListeners();
@@ -182,6 +207,9 @@ export class GetStatisticsComponent implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Initializes the component by loading necessary data and setting up the initial state.
+   */
   async init() {
     this.isLoading = true;
     this.searchTerm = '';
@@ -242,11 +270,21 @@ export class GetStatisticsComponent implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Handles changes to the search term input.
+   * @param value The new search term value.
+   */
   onSearchTermChange(value: string | null | undefined): void {
     this.searchTerm = value ?? '';
     this.applyUserStatsFilter();
   }
 
+  /**
+   * Tracks user statistics rows by their unique user ID.
+   * @param index The index of the row in the list.
+   * @param userStat The user statistics row.
+   * @returns The unique user ID for the row.
+   */
   trackByUserId(index: number, userStat: DisplayedUserStatisticsRow): string {
     return userStat.userId;
   }
@@ -297,6 +335,11 @@ export class GetStatisticsComponent implements OnInit, OnDestroy {
     );
   }
 
+  /**
+   * Gets the section header text for the given translation key, including the selected month.
+   * @param translationKey The translation key for the section header.
+   * @returns The formatted section header text.
+   */
   getSectionHeader(translationKey: string): string {
     let selectedMonth: string;
 
@@ -311,6 +354,9 @@ export class GetStatisticsComponent implements OnInit, OnDestroy {
     return `${this.translate.instant(translationKey)}: ${selectedMonth}`;
   }
 
+  /**
+   * Sets the initial filter values for the statistics view, including display mode and selected month.
+   */
   private async setFilterValues(): Promise<void> {
     this.displayMode =
       await this.localStorageService.getStatisticsDisplayMode();
@@ -326,6 +372,9 @@ export class GetStatisticsComponent implements OnInit, OnDestroy {
     this.selectedMonthForStatisticsSections = this.filterSelectedMonth;
   }
 
+  /**
+   * Handles the filter action, storing the selected month and display mode in local storage and reloading the data.
+   */
   async onFilterData(): Promise<void> {
     this.selectedMonthForStatisticsSections = this.filterSelectedMonth;
     this.displayMode = this.selectedDisplayMode;
@@ -346,10 +395,20 @@ export class GetStatisticsComponent implements OnInit, OnDestroy {
     await this.init();
   }
 
+  /**
+   * Checks if the given user ID corresponds to the current user.
+   * @param userId The user ID to check.
+   * @returns True if the user ID matches the current user's ID, false otherwise.
+   */
   isCurrentUser(userId: string): boolean {
     return userId === this.currentUserUid;
   }
 
+  /**
+   * Shows detailed information for a specific user's statistics.
+   * @param lang The language to display the details in.
+   * @param userStatistic The user statistics to display.
+   */
   async showDetailInfos(
     lang: string,
     userStatistic: DisplayedUserStatistics,
@@ -357,6 +416,11 @@ export class GetStatisticsComponent implements OnInit, OnDestroy {
     await this.utilsService.openUserDetail(lang, userStatistic, this.displayMode);
   }
 
+  /**
+   * Formats the given date and time according to the current display mode.
+   * @param dateTime The date and time to format.
+   * @returns The formatted date and time string.
+   */
   getFormatDateTime(dateTime: Date | null): string {
     if (this.displayMode === DisplayMode.Programmer) {
       return this.utilsService.formatDateTimeISO(dateTime);
@@ -365,6 +429,9 @@ export class GetStatisticsComponent implements OnInit, OnDestroy {
     return this.utilsService.formatDateISO(dateTime);
   }
 
+  /**
+   * Cleans up subscriptions when the component is destroyed.
+   */
   ngOnDestroy(): void {
     this.subscriptions.forEach((sub) => sub.unsubscribe());
   }

@@ -5,18 +5,28 @@ import { HeaderComponent } from './header.component';
 import { TranslateService } from '@ngx-translate/core';
 import { UtilsService } from '@app/services/utils.service';
 import { Tab } from '@app/shared/enums';
-import { Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { createTranslateServiceMock } from '@testing/translate-service.mock';
+import { ConnectivityService } from '@app/services/connectivity.service';
 
 describe('HeaderComponent', () => {
   let component: HeaderComponent;
   let fixture: ComponentFixture<HeaderComponent>;
+  let utilsService: UtilsService;
+  let connectionServiceSpy: jasmine.SpyObj<ConnectivityService>;
 
   const modalControllerSpy = jasmine.createSpyObj('ModalController', [
     'create',
   ]);
+
   const logoClickedSub = new Subject<boolean>();
+  const backButtonClickedSub = new Subject<void>();
+  const offlineChangedSub = new BehaviorSubject<boolean>(false);
   const _isSmallScreen = false;
+  connectionServiceSpy = jasmine.createSpyObj('ConnectivityService', [], {
+    offlineChanged$: offlineChangedSub.asObservable(),
+  });
+
   const utilsServiceMock = {
     get isSmallScreen() {
       return _isSmallScreen;
@@ -29,6 +39,9 @@ describe('HeaderComponent', () => {
     navigateToTabWithParams: jasmine.createSpy('navigateToTabWithParams'),
     logoClickedSub,
     logoClicked$: logoClickedSub.asObservable(),
+    offlineChanged$: offlineChangedSub.asObservable(),
+    backButtonClickedSub,
+    backButtonClicked$: backButtonClickedSub.asObservable(),
   };
 
   beforeEach(waitForAsync(() => {
@@ -39,63 +52,83 @@ describe('HeaderComponent', () => {
         { provide: TranslateService, useValue: createTranslateServiceMock() },
         { provide: ModalController, useValue: modalControllerSpy },
         { provide: UtilsService, useValue: utilsServiceMock },
+        { provide: ConnectivityService, useValue: connectionServiceSpy },
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(HeaderComponent);
     component = fixture.componentInstance;
+    utilsService = TestBed.inject(UtilsService);
     fixture.detectChanges();
   }));
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  describe('class logic', () => {
+    it('should create', () => {
+      expect(component).toBeTruthy();
+    });
+
+    it('should call utilsService.openHelpModal', async () => {
+      await component.openHelpModal();
+      expect(utilsService.openHelpModal).toHaveBeenCalled();
+    });
+
+    it('should call utilsService.navigateToTab with Tab.MainFeature and Tab.Settings', () => {
+      component.goToMainFeature();
+      expect(utilsService.navigateToTab).toHaveBeenCalledWith(Tab.MainFeature);
+
+      component.goToSettings();
+      expect(utilsService.navigateToTab).toHaveBeenCalledWith(Tab.Settings);
+    });
+
+    it('should return correct values for onMainFeatureTab and onSettingsTab', () => {
+      component.currentTab = Tab.MainFeature;
+
+      expect(component.onMainFeatureTab).toBeTrue();
+      expect(component.onSettingsTab).toBeFalse();
+    });
+
+    it('should navigate to Tab.Settings with params and emit logoClickedSub after 500ms', (done) => {
+      spyOn(utilsService.logoClickedSub, 'next');
+      component.goToSettingsAndOpenFeedback();
+
+      expect(utilsService.navigateToTabWithParams).toHaveBeenCalledWith(
+        Tab.Settings,
+        { open: 'z-control' },
+      );
+      setTimeout(() => {
+        expect(utilsService.logoClickedSub.next).toHaveBeenCalledWith(true);
+        done();
+      }, 510);
+    });
+
+    it('should return true for isLargeScreen if utilsService.isSmallScreen is false', () => {
+      Object.defineProperty(utilsService, 'isSmallScreen', {
+        get: () => false,
+      });
+      expect(component.isLargeScreen).toBeTrue();
+    });
+
+    it('should return false for isLargeScreen if utilsService.isSmallScreen is true', () => {
+      Object.defineProperty(utilsService, 'isSmallScreen', { get: () => true });
+      expect(component.isLargeScreen).toBeFalse();
+    });
+
+    it('should emit backButtonClicked$ when the back button is clicked', () => {
+      const spy = spyOn(utilsService.backButtonClickedSub, 'next');
+      component.goBack(new Event('click'));
+
+      expect(spy).toHaveBeenCalledWith(true);
+    });
   });
 
-  it('should call utilsService.openHelpModal', async () => {
-    const utilsService = TestBed.inject(UtilsService);
-    await component.openHelpModal();
-    expect(utilsService.openHelpModal).toHaveBeenCalled();
-  });
+  describe('template rendering', () => {
+    it('should show offline status in the header when offlineChanged$ emits true', () => {
+      component.currentTab = Tab.MainFeature;
+      offlineChangedSub.next(true);
+      fixture.detectChanges();
 
-  it('should call utilsService.navigateToTab with Tab.MainFeature and Tab.Settings', () => {
-    const utilsService = TestBed.inject(UtilsService);
-    component.goToMainFeature();
-    expect(utilsService.navigateToTab).toHaveBeenCalledWith(Tab.MainFeature);
-
-    component.goToSettings();
-    expect(utilsService.navigateToTab).toHaveBeenCalledWith(Tab.Settings);
-  });
-
-  it('should return correct values for onMainFeatureTab and onSettingsTab', () => {
-    component.currentTab = Tab.MainFeature;
-
-    expect(component.onMainFeatureTab).toBeTrue();
-    expect(component.onSettingsTab).toBeFalse();
-  });
-
-  it('should navigate to Tab.Settings with params and emit logoClickedSub after 500ms', (done) => {
-    const utilsService = TestBed.inject(UtilsService);
-    spyOn(utilsService.logoClickedSub, 'next');
-    component.goToSettingsAndOpenFeedback();
-    expect(utilsService.navigateToTabWithParams).toHaveBeenCalledWith(
-      Tab.Settings,
-      { open: 'z-control' },
-    );
-    setTimeout(() => {
-      expect(utilsService.logoClickedSub.next).toHaveBeenCalledWith(true);
-      done();
-    }, 510);
-  });
-
-  it('should return true for isLargeScreen if utilsService.isSmallScreen is false', () => {
-    const utilsService = TestBed.inject(UtilsService);
-    Object.defineProperty(utilsService, 'isSmallScreen', { get: () => false });
-    expect(component.isLargeScreen).toBeTrue();
-  });
-
-  it('should return false for isLargeScreen if utilsService.isSmallScreen is true', () => {
-    const utilsService = TestBed.inject(UtilsService);
-    Object.defineProperty(utilsService, 'isSmallScreen', { get: () => true });
-    expect(component.isLargeScreen).toBeFalse();
+      const compiled = fixture.nativeElement as HTMLElement;
+      expect(compiled.textContent).toContain('HEADER.NETWORK_OFFLINE');
+    });
   });
 });

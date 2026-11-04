@@ -19,6 +19,9 @@ The [docs](.) folder contains categorized guides, troubleshooting steps, and bes
 - **checklist-update-objects.md**  
   Checklist for safely updating nested objects in Angular/TypeScript, including immutability, merging strategies, and unit testing.
 
+- **offline-connectivity-handling.md**  
+  Guide for handling offline connectivity in the app, including displaying offline-status notifications and graceful error handling when the network is unavailable.
+
 ### Unit Testing
 
 Guides for setting up, running, and improving Angular unit tests with Karma and Jasmine, including practical fixes and learning resources.

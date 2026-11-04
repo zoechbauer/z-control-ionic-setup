@@ -7,12 +7,14 @@ The z-control IONIC Setup app is a starter template and utility for building Ion
 - **Quota management**: Track and display API usage with clear quota limits and warnings
 - **Tab-based navigation**: Clean, intuitive UI with separate tabs for main feature and settings
 - **Built-in help**: Help page for step-by-step instructions and FAQs
+- **Offline indicator**: Shows when the app is offline and unable to access the Feature service
 - **Structure for Settings**: Dedicated settings tab with accordions for configuration, Feedback, Change-log, Privacy Policy, and support
 
 Download now for free and use it to create your own Ionic apps!
 
 ## Download & Online Access
-**Web Application**
+
+### Web Application
 
 Explore the z-control Ionic Setup application online via Firebase Hosting:
 
@@ -20,7 +22,7 @@ Explore the z-control Ionic Setup application online via Firebase Hosting:
 
 The online demo uses the free Datamuse API, allowing you to test quota management and application features without setting up your own backend environment.
 
-**Android Application**
+### Android Application
 
 The Android app is **available only to the z-control team in Google Play Internal Test Group** for testing and validation purposes, as it is used to create new applications based on this setup. It is not intended for public distribution.
 
@@ -42,7 +44,7 @@ The Android app is **available only to the z-control team in Google Play Interna
 
 ## 📁 Project Structure
 
-```
+```text
 z-control-ionic-setup/
 ├── src/                         # Angular/Ionic frontend source
 │   ├── app/                     # Pages, components, services, shared code
@@ -112,6 +114,7 @@ npm run test:watch
 # Run tests with code coverage
 npm run test:coverage
 ```
+
 #### Backend Tests (Vitest + Istanbul)
 
 See [z-control Backend Functions](https://github.com/zoechbauer/z-control-backend-functions) repository documentation for backend testing instructions, as the backend code and tests are maintained there.
